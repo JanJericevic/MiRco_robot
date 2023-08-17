@@ -1,0 +1,4 @@
+<launch>
+  <arg name="venv" value="/home/jajelinx/environments/mir_env/bin/python3" />
+  <node pkg="joy_teleop" type="test.py" name="test_node" output="screen"/>
+</launch>

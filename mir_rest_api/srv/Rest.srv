@@ -1,0 +1,7 @@
+string method
+string header
+string endpoint
+string json
+---
+int64 status_code
+string response

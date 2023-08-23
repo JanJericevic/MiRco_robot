@@ -141,13 +141,16 @@ If all you want is to connect to the MiR100 roscore for monitoring all you need 
 
 Depending on your use case you will use the Docker image during development or you will only use it for deployment. For development see the [volume mounting]() section. For deployment see the [copying files]() section.
 
-You need an active internet connection
+**TODO**
+- dockerfile names
+- dockerignore
 
 #### Volume mounting
 
 ```
 docker build -t mir-ros --build-arg MYUID=$(id -u) --build-arg MYGID=$(id -g) --build-arg MYUSER=$(id -nu) --build-arg MYGROUP=$(id -ng) .
 ```
+
 #### Copying files
 
 ## Frequent use cases:

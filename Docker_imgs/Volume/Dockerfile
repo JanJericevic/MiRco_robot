@@ -46,7 +46,7 @@ ENV PATH="/home/${MYUSER}/.local/bin:$PATH"
 USER $MYUSER
 
 # create ROS workspace and set owner
-COPY --chown=$MYUSER . /home/${MYUSER}/ws/src
+COPY --chown=$MYUSER ./src /home/${MYUSER}/ws/src
 
 # create python environmetns directory
 RUN cd /home/${MYUSER} \
@@ -61,7 +61,8 @@ USER root
 # use rosdep to install all dependencies
 RUN rosdep update \
     && apt update \
-    && DEBIAN_FRONTEND=noninteractive rosdep install --from-paths mir_robot/src -i -y --rosdistro noetic \
+    && cd /home/${MYUSER}/ws \
+    && DEBIAN_FRONTEND=noninteractive rosdep install --from-paths src -i -y --rosdistro noetic \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # change back to user
@@ -69,8 +70,6 @@ USER $MYUSER
 
 # build all packages in the workspace 
 RUN source "/opt/ros/noetic/setup.bash" \
-    && cd /home/${MYUSER}/ws/src\
-    && catkin_init_workspace \
     && cd /home/${MYUSER}/ws \
     && catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
 

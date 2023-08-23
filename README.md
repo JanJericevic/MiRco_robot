@@ -145,6 +145,9 @@ You need an active internet connection
 
 #### Volume mounting
 
+```
+docker build -t mir-ros --build-arg MYUID=$(id -u) --build-arg MYGID=$(id -g) --build-arg MYUSER=$(id -nu) --build-arg MYGROUP=$(id -ng) .
+```
 #### Copying files
 
 ## Frequent use cases:

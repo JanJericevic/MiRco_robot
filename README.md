@@ -61,52 +61,6 @@ $ cd ~/MiR100/ws/ \
 
 ```
 
-### Install `mir_robot` package
-We are using the source install. For other options see the package [github page](https://github.com/DFKI-NI/mir_robot#mir_robot).
-
-```
-# clone mir_robot into the catkin workspace
-$ cd ~/MiR100/ws/src/
-$ git clone -b noetic https://github.com/DFKI-NI/mir_robot.git
-
-# update and install packages
-$ sudo apt update \
-&& sudo apt upgrade -y \
-&& sudo apt install -y --no-install-recommends python3-catkin-lint python3-catkin-tools
-
-
-# use rosdep to install all dependencies
-$ rosdep update
-$ rosdep install --from-paths ./ -i -y --rosdistro noetic 
-
-# build all packages in the workspace
-$ source /opt/ros/noetic/setup.bash
-$ catkin_init_workspace
-$ cd ~/MiR100/ws
-$ catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
-```
-
-### Install `mir_joy_teleop` package
-TODO: package link
-
-```
-# package requires ROS joy package
-$ sudo apt install ros-noetic-joy
-
-# add mir_joy_teleop package to workspace and build workspace
-$ cd ~/MiR100/ws
-$ catkin_make
-```
-
-### Install `mir_rest_api` package
-TODO: package link
-
-```
-# add mir_rest_api package to workspace and build workspace
-$ cd ~/MiR100/ws
-$ catkin_make
-```
-
 ## Working with Docker:
 The `mir_robot` package and in turn `mir_driver` use the external computer roscore to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer roscore for controlling the robot or connect to the internal MiR100 computer roscore for monitoring. Docker containers allow you flexibility in your setup: 
 - use your computer to control the robot and a Docker image to connect to the robot roscore for monitoring and vice versa

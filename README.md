@@ -18,22 +18,47 @@
 
 ## Installation
 
-### Create ROS workspace and source it
+### Create a ROS workspace and source it
 
 ```
 $ mkdir -p ~/MiR100/ws/src
-$ cd ~/MiR100/ws/
-$ catkin_make
-$ source devel/setup.bash
+$ cd ~/MiR100/ws/ \
+&& catkin_make \
+&& source devel/setup.bash
 
 # add workspace to .bashrc
 $ echo "source ~/MiR100/ws/devel/setup.bash" >> ~/.bashrc
 ```
+
 You can check if workspace is sourced correctly with:
 
 ```
 $ echo $ROS_PACKAGE_PATH
 /home/<youruser>/MiR100/ws/src:/opt/ros/noetic/share
+```
+
+### Install the packages
+We are using the source install of the `mir_robot` package. For other options see the package [github page](https://github.com/DFKI-NI/mir_robot#mir_robot).
+
+```
+# clone mir_robot into the catkin workspace
+$ cd ~/MiR100/ws/src/ \
+&& git clone -b noetic https://github.com/DFKI-NI/mir_robot.git
+
+# clone this repository into the catkin workspace
+$ cd ~/MiR100/ws/src/ \
+&& git clone -b main https://github.com/JanJericevic/MiR100_robolab.git
+
+# update and install packages
+$ sudo apt update \
+&& sudo apt upgrade -y \
+&& sudo apt install -y --no-install-recommends python3-catkin-lint python3-catkin-tools
+
+# use rosdep to install all dependencies
+$ cd ~/MiR100/ws/ \
+&& rosdep update \
+&& rosdep install --from-paths src -i -y --rosdistro noetic 
+
 ```
 
 ### Install `mir_robot` package
@@ -83,7 +108,10 @@ $ catkin_make
 ```
 
 ## Working with Docker:
-The `mir_robot` package and in turn `mir_driver` use the external computer roscore to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer roscore for controlling the robot or connect to the internal MiR100 computer roscore for monitoring. Using docker containers you can do both.  
+The `mir_robot` package and in turn `mir_driver` use the external computer roscore to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer roscore for controlling the robot or connect to the internal MiR100 computer roscore for monitoring. Docker containers allow you flexibility in your setup: 
+- use your computer to control the robot and a Docker image to connect to the robot roscore for monitoring and vice versa
+- use Docker containers for both controlling and monitoring the robot
+- no need for OS wide ROS install & possibility of switching between ROS versions  
 
 ### Install Docker engine
 Full install instructions are available at Dockers [official website](https://docs.docker.com/engine/install/ubuntu/).
@@ -137,19 +165,38 @@ $ docker run hello-world
 
 ### Building the image
 
-If all you want is to connect to the MiR100 roscore for monitoring all you need is a ROS Docker image. We will build a custom ROS Docker image complete with the same ROS packages so you have a choice in running the project locally or using Docker containers.
+If all you want is to connect to the MiR100 roscore for monitoring all you need is a ROS Docker image. We will build a custom ROS Docker image complete with the same ROS packages so you have a choice of running the project locally or using Docker containers.
 
-Depending on your use case you will use the Docker image during development or you will only use it for deployment. For development see the [volume mounting]() section. For deployment see the [copying files]() section.
+```
+# go to the src directory of the workspace
+$ cd ~/MiR100/ws/src
+
+# copy the Dockerfile
+
+# then build the Docker image
+$ docker build -t <image-name> --build-arg MYUID=$(id -u) --build-arg MYGID=$(id -g) --build-arg MYUSER=$(id -nu) --build-arg MYGROUP=$(id -ng) .
+```
+
+**NOTE:** if you're on a machine with no OS wide ROS install and don't have a `catkin ws`, build the Docker image at the root of the directory where you copied the ROS packages to. The build commands remain the same.
+
+To avoid permissions issues with shared files between the host computer and the image container, we create a user with `sudo` permissions inside the image. User profile can be changed when building the image (the `build-arg` mentioned above) and inside the Dockerfile.  
+The current profile settings are: 
+   
+> *username*: same as the host username that built the image  
+> *password*: same as the username
+
+
+Depending on your use case you will use the Docker image during development (you plan to regularly modify your codebase) or you will only use it for deployment. For development see the [volume mounting]() section. For deployment see the [copying files]() section.
 
 **TODO**
 - dockerfile names
 - dockerignore
+- entrypoints
+- convenience scripts
+- useful tags
 
 #### Volume mounting
 
-```
-docker build -t mir-ros --build-arg MYUID=$(id -u) --build-arg MYGID=$(id -g) --build-arg MYUSER=$(id -nu) --build-arg MYGROUP=$(id -ng) .
-```
 
 #### Copying files
 

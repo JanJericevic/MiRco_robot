@@ -28,7 +28,7 @@ SHELL [ "/bin/bash" , "-c" ]
 # update and install packages
 RUN apt update \
     && apt upgrade -y \
-    && apt install -y --no-install-recommends build-essential python3-rosdep python3-catkin-lint python3-catkin-tools ros-noetic-joy \
+    && apt install -y --no-install-recommends build-essential python3-rosdep python3-catkin-lint python3-catkin-tools \
     && python3 -m pip install requests \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
@@ -46,7 +46,7 @@ ENV PATH="/home/${MYUSER}/.local/bin:$PATH"
 USER $MYUSER
 
 # create ROS workspace and set owner
-COPY --chown=$MYUSER ./src /home/${MYUSER}/ws/src
+COPY --chown=$MYUSER . /home/${MYUSER}/ws/src
 
 # create python environmetns directory
 RUN cd /home/${MYUSER} \

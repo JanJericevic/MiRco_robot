@@ -4,22 +4,22 @@
 - [Dependancies](#dependencies)
 - [Packages overview](#overview)
 - [Installation](#installation)
+- [Working with Docker](#working-with-docker)
 - [Frequent use cases](#frequent-use-cases)
+- [Convenience scripts](/convenience_scripts/README.md)
 
 ### Dependencies
-
 - **`ROS noetic:`** full desktop version is preferred. Can install other variant dependant on your use case. Make sure to install and initialize [rosdep](http://wiki.ros.org/noetic/Installation/Ubuntu#:~:text=source%20~%2F.zshrc-,dependencies%20for%20building%20packages,-Up%20to%20now).
 - **`(optional) Docker:`** when using the external roscore for controlling and MiR100 internal roscore for monitoring the robot. See [docker instructions](#working-with-docker) for details. 
 
 ### Overview
-- **`mir_robot:`** [DFKI](https://www.dfki.de/web) package containing the ROS driver and config files for MiR100 robot.
+- **`mir_robot:`** [DFKI](https://www.dfki.de/web) [package](https://github.com/DFKI-NI/mir_robot#mir_robot) containing the ROS driver and config files for MiR100 robot.
 - **`mir_joy_teleop:`** joystick teleoperation package.
 - **`mir_rest_api:`** MiR100 REST API. Allows direct requests or requests using a ROS service.
 
 ## Installation
 
 ### Create a ROS workspace and source it
-
 ```
 $ mkdir -p ~/MiR100/ws/src
 $ cd ~/MiR100/ws/ \
@@ -118,7 +118,6 @@ $ docker run hello-world
 ```
 
 ### Building the image
-
 If all you want is to connect to the MiR100 roscore for monitoring all you need is a ROS Docker image. We will build a custom ROS Docker image complete with the same ROS packages so you have a choice of running the project locally or using Docker containers.
 
 ```
@@ -129,6 +128,11 @@ $ cd ~/MiR100/ws/src
 
 # then build the Docker image
 $ docker build -t <image-name> --build-arg MYUID=$(id -u) --build-arg MYGID=$(id -g) --build-arg MYUSER=$(id -nu) --build-arg MYGROUP=$(id -ng) .
+
+# list you built Docker images
+$ docker images
+
+# verify that your <image-name> is among the listed images
 ```
 
 **NOTE:** if you're on a machine with no OS wide ROS install and don't have a `catkin ws`, build the Docker image at the root of the directory where you copied the ROS packages to. The build commands remain the same.
@@ -148,6 +152,34 @@ Depending on your use case you will use the Docker image during development (you
 - entrypoints
 - convenience scripts
 - useful tags
+
+### Running the image
+Starting work directory inside the container is set to `/home/<your-user>/ws`.  
+You can open an interactive bash shell with:
+```
+docker run -it <image-name> bash
+```
+The above command is ok for simple tasks however more advanced tasks require additional commands.
+
+#### Networking
+There are many options for the network settings of a container that you can read about [here](https://docs.docker.com/engine/reference/run/#network-settings). Depending on your application you may want to use another option, in our case we choose to use the host's network inside the container.
+
+```
+docker run -it --net=host <image-name> bash
+```
+
+#### GUI applications
+ROS workflow is full of visual tools, which means that we need graphics capabilities from inside the container. [ROS wiki](http://wiki.ros.org/docker/Tutorials/GUI) mentions a few possible methods. Here we take the **simple but unsecure** method using X server. We expose our xhost so that the container can render to the correct display by reading and writing though the X11 unix socket
+
+```
+docker run -it --net=host \
+    --env="DISPLAY" \
+    --env="QT_X11_NO_MITSHM=1" \
+    --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
+    --device /dev/dri \
+    <image-name> \
+    bash
+```
 
 #### Volume mounting
 

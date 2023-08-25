@@ -136,7 +136,7 @@ $ docker images
 # verify that your <image-name> is among the listed images
 ```
 
-**NOTE:** if you're on a machine with no OS wide ROS install and don't have a `catkin ws`, build the Docker image at the root of the directory where you copied the ROS packages to. The build commands remain the same.
+***NOTE:** if you're on a machine with no OS wide ROS install and don't have a `catkin ws`, build the Docker image at the root of the directory where you copied the ROS packages to. The build commands remain the same.*
 
 To avoid permissions issues with shared files between the host computer and the image container, we create a user with `sudo` permissions inside the image (this is especially relevant during [development](#volume-mounting)). User profile can be changed when building the image (the `build-arg` mentioned above) and inside the Dockerfile.  
 The current profile settings are: 
@@ -216,6 +216,32 @@ $ docker run -it --net=host --gpus all \
     bash
 ```
 #### Volume mounting
+***NOTE:** mounted files are available only at runtime. Any files needed for building the image should be copied before then.*
+
+For development we want persistent files that are shared between the host machine and the containers, files that can be changed both from the host side and from inside the container, in a setup which does not require us to rebuild the image every time we modify our code. We achieve this using [volumes](https://docs.docker.com/storage/volumes/). To achieve the necessary permissions we create a `sudo` user inside the image (see "[Building the image](#building-the-image)" section).
+
+
+##### Example development setup for a host with the OS wide ROS install:
+```
+$ docker run -it \
+    --volume="/home/<host-user>/ws":"/home/<container-user>/ws":rw \
+    <image-name> \
+    bash
+```
+
+We mount our host side workspace `/home/<host-user>/ws` to the container side workspace `/home/<container-user>/ws` in read-write mode. This means that the two workspaces are connected. Any change that we make in either of the two will affect both.
+
+##### Example development setup for a host without the OS wide ROS install:
+```
+$ docker run -it \
+    --volume="/home/<host-user>/ws/src":"/home/<container-user>/ws/src":rw \
+    <image-name> \
+    bash
+```
+Here we mount the `src` folder of our host side workspace `/home/<host-user>/ws/src` to the `src` folder of our container side workspace `/home/<container-user>/ws/src` in read-write mode. This means that the two folders are connected. Any change that we make in either of the two will affect both.  
+However, **since only the `src` folders of the workspaces are connected, the workspace still needs to be built inside the container with `catkin_make`**. It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base. 
+
+TODO: entrypoints, can you mount whole workspace?
 
 
 ## Frequent use cases:

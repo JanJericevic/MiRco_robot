@@ -243,5 +243,6 @@ However, **since only the `src` folders of the workspaces are connected, the wor
 
 TODO: entrypoints, can you mount whole workspace?
 
+#### Input devices
 
 ## Frequent use cases:

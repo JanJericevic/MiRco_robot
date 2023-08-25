@@ -118,7 +118,8 @@ $ docker run hello-world
 ```
 
 ### Building the image
-If all you want is to connect to the MiR100 roscore for monitoring all you need is a ROS Docker image. We will build a custom ROS Docker image complete with the same ROS packages so you have a choice of running the project locally or using Docker containers.
+If all you want is to connect to the MiR100 roscore for monitoring all you need is a ROS Docker image.  
+We will build a custom ROS Docker image complete with the same ROS packages so you have a choice of running the project locally or using Docker containers.
 
 ```
 # clone this repository and any other ROS packages you need to your workspace
@@ -137,7 +138,7 @@ $ docker images
 
 **NOTE:** if you're on a machine with no OS wide ROS install and don't have a `catkin ws`, build the Docker image at the root of the directory where you copied the ROS packages to. The build commands remain the same.
 
-To avoid permissions issues with shared files between the host computer and the image container, we create a user with `sudo` permissions inside the image. User profile can be changed when building the image (the `build-arg` mentioned above) and inside the Dockerfile.  
+To avoid permissions issues with shared files between the host computer and the image container, we create a user with `sudo` permissions inside the image (this is especially relevant during [development](#volume-mounting)). User profile can be changed when building the image (the `build-arg` mentioned above) and inside the Dockerfile.  
 The current profile settings are: 
    
 > ***username***: same as the host username that built the image  
@@ -159,7 +160,7 @@ You can open an interactive bash shell with:
 ```
 docker run -it <image-name> bash
 ```
-This is ok for simple tasks however more advanced tasks require additional commands. Below are explanations for specific commands. However, since the commands can get complicated, we recommend the use of convenience scripts for repetitive commands. Create your own or use one of [ours](/convenience_scripts/).
+This is ok for simple tasks however more advanced tasks require additional commands. Below are explanations for specific commands. However, since the commands can get complicated, we recommend the use of convenience scripts for repetitive cases. Create your own or use one of [ours](/convenience_scripts/).
 
 #### Networking
 There are many options for the network settings of a container that you can read about [here](https://docs.docker.com/engine/reference/run/#network-settings). Depending on your application you may want to use another option, in our case we choose to use the host's network inside the container. Among other things, this allows containers to talk to each other (e.g. one container is running the roscore, the other subscribes to a topic).
@@ -184,7 +185,7 @@ docker run -it --net=host \
 Before you start the container, you have to change access permissions to the X server. The easiest is to grant access to everyone, or you can [specify](https://manpages.ubuntu.com/manpages/lunar/en/man1/xhost.1.html) a specific user.
 
 ```
-# disable access control
+# disables access control
 $ xhost +
 
 # grants access to specific user
@@ -196,7 +197,7 @@ $ xhost +SI:local:<user-name>
 Changes to the X server access only persist until the next logout/login, but it is best practice to enable back the access control once you're finished working with the container.
 
 ```
-# enable access control
+# enables access control
 $ xhost -
 ```
 
@@ -204,7 +205,7 @@ $ xhost -
 Users of NVIDIA GPUs can download the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker), which allows them to build GPU accelerated containers or in some cases solves display issues if the above mentioned setup is not working. The "Graphics inside Docker Containers" paragraph of this [ ROS&Docker guide](https://roboticseabass.com/2021/04/21/docker-and-ros/) describes working with such images. 
 
 ```
-# example of docker run command for NVIDIA GPU enabled container
+# example of a docker run command for NVIDIA GPU enabled container
 $ docker run -it --net=host --gpus all \
     --env="NVIDIA_DRIVER_CAPABILITIES=all" \
     --env="DISPLAY" \

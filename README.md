@@ -59,6 +59,9 @@ $ source ~/MiR100/ws/devel/setup.bash \
 ```bash
 # test mir_driver
 $ roslaunch mir_driver mir.launch
+
+# test REST API
+# direct requests
 ```
 
 ## Working with Docker:

@@ -697,8 +697,11 @@ def main():
         api = MirRestApi("UserName", "Password")  
         # api = MirRestApi("UserName", "Password", ip) # when setting robot IP
         
-        print(api.header)
+        # example of direct REST request
         print(api.status_state_get())
+
+        # example of REST request over ROS service
+        # print(api.status_state_get(1))
 
     except rospy.ServiceException as e:
         print("Service call failed: %s" %e)

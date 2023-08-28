@@ -11,7 +11,7 @@
 ### Dependencies
 - **`ROS noetic:`** full desktop version is preferred. Can install other variant dependant on your use case.
 - **`rosdep:`** command-line tool for installing system dependencies. Follow these install [instructions](http://wiki.ros.org/rosdep).
-- **`(optional) Docker:`** when using the external roscore for controlling and MiR100 internal roscore for monitoring the robot. See [Working with Docker](#working-with-docker) for details. 
+- **`(optional) Docker:`** when using the external `roscore` for controlling and MiR100 internal `roscore` for monitoring the robot. See [Working with Docker](#working-with-docker) for details. 
 
 ### Overview
 - **`mir_robot:`** [DFKI](https://www.dfki.de/web) [package](https://github.com/DFKI-NI/mir_robot#mir_robot) containing the ROS driver and config files for MiR100 robot.
@@ -52,21 +52,32 @@ $ source /opt/ros/noetic/setup.bash \
 # source the workspace and add it to the .bashrc
 $ source ~/MiR100/ws/devel/setup.bash \
 && echo "source ~/MiR100/ws/devel/setup.bash" >> ~/.bashrc
-
 ```
 
-### Test the installation
-```bash
-# test mir_driver
-$ roslaunch mir_driver mir.launch
+## Frequent use cases
+***NOTE:*** everytime before using the robot synchronize system time as best you can. In the MiR interface go to: "System" -> "Settings" -> "Date & Time". For an advanced setup see [this solution](https://github.com/DFKI-NI/mir_robot#advanced).
 
-# test REST API
-# direct requests
-```
+### Connect to the robot
+- connect to the MiR_R*** hotspot
+- open mir.com / default IP = 192.168.12.20
+- log in to the web interface
+- using the interface you can control the robot, map your environment, configure settings...
+-  TODO
+
+### Connect to the robot with ROS
+There are two ways of using ROS to connect to the MiR100 robot:
+- connect to its internal `roscore`
+- connect using `mir_driver`. This method runs `roscore` on the host computer, connecting to the MiR `roscore` over `ROS Bridge`.
+
+#### Internal `roscore`
+TODO
+
+#### Using `mir_driver`
+TODO
 
 ## Working with Docker:
-The `mir_robot` package and in turn `mir_driver` use the external computer roscore to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer roscore for controlling the robot or connect to the internal MiR100 computer roscore for monitoring. Docker containers allow you flexibility in your setup: 
-- use your computer to control the robot and a Docker image to connect to the robot roscore for monitoring and vice versa
+The `mir_robot` package and in turn `mir_driver` use the external computer `roscore` to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer `roscore` for controlling the robot or connect to the internal MiR100 computer `roscore` for monitoring. Docker containers allow you flexibility in your setup: 
+- use your computer to control the robot and a Docker image to connect to the robot `roscore` for monitoring and vice versa
 - use Docker containers for both controlling and monitoring the robot
 - no need for OS wide ROS install & possibility of switching between ROS versions  
 
@@ -121,7 +132,7 @@ $ docker run hello-world
 ```
 
 ### Building the image
-If all you want is to connect to the MiR100 roscore for monitoring all you need is a ROS Docker image.  
+If all you want is to connect to the MiR100 `roscore` for monitoring all you need is a ROS Docker image.  
 We will build a custom ROS Docker image complete with the same ROS packages so you have a choice of running the project locally or using Docker containers.
 
 ```bash
@@ -166,7 +177,7 @@ docker run -it <image-name> bash
 This is ok for simple tasks however more advanced tasks require additional commands. Below are explanations for specific commands. However, since the commands can get complicated, we recommend the use of convenience scripts for repetitive cases. Create your own or use one of [ours](/convenience_scripts/).
 
 #### Networking
-There are many options for the network settings of a container that you can read about [here](https://docs.docker.com/engine/reference/run/#network-settings). Depending on your application you may want to use another option, in our case we choose to use the host's network inside the container. Among other things, this allows containers to talk to each other (e.g. one container is running the roscore, the other subscribes to a topic).
+There are many options for the network settings of a container that you can read about [here](https://docs.docker.com/engine/reference/run/#network-settings). Depending on your application you may want to use another option, in our case we choose to use the host's network inside the container. Among other things, this allows containers to talk to each other (e.g. one container is running the `roscore`, the other subscribes to a topic).
 
 ```bash
 docker run -it --net=host <image-name> bash
@@ -247,5 +258,3 @@ However, **since only the `src` folders of the workspaces are connected, the wor
 TODO: entrypoints, can you mount whole workspace?
 
 #### Input devices
-
-## Frequent use cases:

@@ -9,8 +9,9 @@
 - [Convenience scripts](/convenience_scripts/README.md)
 
 ### Dependencies
-- **`ROS noetic:`** full desktop version is preferred. Can install other variant dependant on your use case. Make sure to install and initialize [rosdep](http://wiki.ros.org/noetic/Installation/Ubuntu#:~:text=source%20~%2F.zshrc-,dependencies%20for%20building%20packages,-Up%20to%20now).
-- **`(optional) Docker:`** when using the external roscore for controlling and MiR100 internal roscore for monitoring the robot. See [docker instructions](#working-with-docker) for details. 
+- **`ROS noetic:`** full desktop version is preferred. Can install other variant dependant on your use case.
+- **`rosdep:`** command-line tool for installing system dependencies. Follow these install [instructions](http://wiki.ros.org/rosdep).
+- **`(optional) Docker:`** when using the external roscore for controlling and MiR100 internal roscore for monitoring the robot. See [Working with Docker](#working-with-docker) for details. 
 
 ### Overview
 - **`mir_robot:`** [DFKI](https://www.dfki.de/web) [package](https://github.com/DFKI-NI/mir_robot#mir_robot) containing the ROS driver and config files for MiR100 robot.
@@ -18,36 +19,18 @@
 - **`mir_rest_api:`** MiR100 REST API. Allows direct requests or requests using a ROS service.
 
 ## Installation
-
-### Create a ROS workspace and source it
-```
-$ mkdir -p ~/MiR100/ws/src
-$ cd ~/MiR100/ws/ \
-&& catkin_make \
-&& source devel/setup.bash
-
-# add workspace to .bashrc
-$ echo "source ~/MiR100/ws/devel/setup.bash" >> ~/.bashrc
-```
-
-You can check if workspace is sourced correctly with:
-
-```
-$ echo $ROS_PACKAGE_PATH
-/home/<youruser>/MiR100/ws/src:/opt/ros/noetic/share
-```
-
-### Install the packages
 We are using the source install of the `mir_robot` package. For other options see the package [github page](https://github.com/DFKI-NI/mir_robot#mir_robot).
 
-```
+```bash
+# create a catkin workspace
+$ mkdir -p ~/MiR100/ws/src
+$ cd ~/MiR100/ws/src
+
 # clone mir_robot into the catkin workspace
-$ cd ~/MiR100/ws/src/ \
-&& git clone -b noetic https://github.com/DFKI-NI/mir_robot.git
+$ git clone -b noetic https://github.com/DFKI-NI/mir_robot.git
 
 # clone this repository into the catkin workspace
-$ cd ~/MiR100/ws/src/ \
-&& git clone -b main https://github.com/JanJericevic/MiR100_robolab.git
+$ git clone -b main https://github.com/JanJericevic/MiR100_robolab.git
 
 # update and install packages
 $ sudo apt update \
@@ -59,6 +42,23 @@ $ cd ~/MiR100/ws/ \
 && rosdep update \
 && rosdep install --from-paths src -i -y --rosdistro noetic 
 
+# build all the packages in the catkin workspace
+$ source /opt/ros/noetic/setup.bash
+$ cd ~/MiR100/ws/src
+$ catkin_init_workspace
+$ cd ~/MiR100/ws/src
+$ catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
+
+# source the workspace and add it to the .bashrc
+$ source ~/MiR100/ws/devel/setup.bash
+$ echo "source ~/MiR100/ws/devel/setup.bash" >> ~/.bashrc
+
+```
+
+### Test the installation
+```bash
+# test mir_driver
+$ roslaunch mir_driver mir.launch
 ```
 
 ## Working with Docker:

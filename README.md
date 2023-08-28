@@ -43,15 +43,15 @@ $ cd ~/MiR100/ws/ \
 && rosdep install --from-paths src -i -y --rosdistro noetic 
 
 # build all the packages in the catkin workspace
-$ source /opt/ros/noetic/setup.bash
-$ cd ~/MiR100/ws/src
-$ catkin_init_workspace
-$ cd ~/MiR100/ws/src
-$ catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
+$ source /opt/ros/noetic/setup.bash \
+&& cd ~/MiR100/ws/src \
+&& catkin_init_workspace \
+&& cd ~/MiR100/ws/src \
+&& catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
 
 # source the workspace and add it to the .bashrc
-$ source ~/MiR100/ws/devel/setup.bash
-$ echo "source ~/MiR100/ws/devel/setup.bash" >> ~/.bashrc
+$ source ~/MiR100/ws/devel/setup.bash \
+&& echo "source ~/MiR100/ws/devel/setup.bash" >> ~/.bashrc
 
 ```
 

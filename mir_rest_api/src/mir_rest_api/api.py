@@ -698,7 +698,7 @@ def main():
         # api = MirRestApi("UserName", "Password", ip) # when setting robot IP
         
         print(api.header)
-        print(api.status_get())
+        print(api.status_mode_get())
 
     except rospy.ServiceException as e:
         print("Service call failed: %s" %e)

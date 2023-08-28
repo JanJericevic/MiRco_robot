@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#mount volume to docker image to specified paths
+#mount volume to docker container to specified paths
 #run docker with image specified with variable 1
 docker run -it --net=host --gpus all \
     --env="NVIDIA_DRIVER_CAPABILITIES=all" \

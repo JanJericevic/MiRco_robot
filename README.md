@@ -46,7 +46,7 @@ $ cd ~/MiR100/ws/ \
 $ source /opt/ros/noetic/setup.bash \
 && cd ~/MiR100/ws/src \
 && catkin_init_workspace \
-&& cd ~/MiR100/ws/src \
+&& cd ~/MiR100/ws/ \
 && catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
 
 # source the workspace and add it to the .bashrc

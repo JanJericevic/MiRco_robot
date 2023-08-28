@@ -71,12 +71,12 @@ The `mir_robot` package and in turn `mir_driver` use the external computer rosco
 Full install instructions are available at Dockers [official website](https://docs.docker.com/engine/install/ubuntu/).
 Make sure old versions od Docker engine are [uninstalled](https://docs.docker.com/engine/install/ubuntu/#uninstall-docker-engine).
 
-```
-# Update the apt package index and install packages to allow apt to use a repository over HTTPS:
+```bash
+# update the apt package index and install packages to allow apt to use a repository over HTTPS:
 $ sudo apt-get update
 $ sudo apt-get install ca-certificates curl gnupg
 
-# Add Docker’s official GPG key
+# add Docker’s official GPG key
 $ sudo install -m 0755 -d /etc/apt/keyrings
 $ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 $ sudo chmod a+r /etc/apt/keyrings/docker.gpg
@@ -101,19 +101,19 @@ $ sudo docker run hello-world
 All optional installation steps are available at Dockers [official website](https://docs.docker.com/engine/install/linux-postinstall/).  
 Useful post installation step is to manage Docker as a non sudo user. This allow the omission of `sudo` in front of docker commands. When allowing this make sure to be aware of how this [impacts security of your system](https://docs.docker.com/engine/security/#docker-daemon-attack-surface).
 
-```
-# Create the docker group
-# On some Linux distributions, the system automatically creates this group when installing Docker Engine using a package manager
+```bash
+# create the docker group
+# on some Linux distributions, the system automatically creates this group when installing Docker Engine using a package manager
 $ sudo groupadd docker
 
-# Add your user to the docker group
+# add your user to the docker group
 $ sudo usermod -aG docker $USER
 
-# Log out and log back in so that your group membership is re-evaluated
+# log out and log back in so that your group membership is re-evaluated
 # or un the following command to activate the changes to groups
 $ newgrp docker
 
-# Verify that you can run docker commands without sudo
+# verify that you can run docker commands without sudo
 $ docker run hello-world
 ```
 
@@ -121,7 +121,7 @@ $ docker run hello-world
 If all you want is to connect to the MiR100 roscore for monitoring all you need is a ROS Docker image.  
 We will build a custom ROS Docker image complete with the same ROS packages so you have a choice of running the project locally or using Docker containers.
 
-```
+```bash
 # clone this repository and any other ROS packages you need to your workspace
 
 # go to the src directory of the workspace
@@ -157,7 +157,7 @@ Depending on your use case you will use the Docker image during development (you
 
 ### Running the image
 You can open an interactive bash shell with:
-```
+```bash
 docker run -it <image-name> bash
 ```
 This is ok for simple tasks however more advanced tasks require additional commands. Below are explanations for specific commands. However, since the commands can get complicated, we recommend the use of convenience scripts for repetitive cases. Create your own or use one of [ours](/convenience_scripts/).
@@ -165,14 +165,14 @@ This is ok for simple tasks however more advanced tasks require additional comma
 #### Networking
 There are many options for the network settings of a container that you can read about [here](https://docs.docker.com/engine/reference/run/#network-settings). Depending on your application you may want to use another option, in our case we choose to use the host's network inside the container. Among other things, this allows containers to talk to each other (e.g. one container is running the roscore, the other subscribes to a topic).
 
-```
+```bash
 docker run -it --net=host <image-name> bash
 ```
 
 #### GUI applications
 ROS workflow is full of visual tools, which means that we need graphics capabilities from inside the container. [ROS wiki](http://wiki.ros.org/docker/Tutorials/GUI) mentions a few possible methods. Here we take the **simple but unsecure** method using X server. We expose our xhost so that the container can render to the correct display by reading and writing though the X11 unix socket.
 
-```
+```bash
 docker run -it --net=host \
     --env="DISPLAY" \
     --env="QT_X11_NO_MITSHM=1" \
@@ -184,7 +184,7 @@ docker run -it --net=host \
 
 Before you start the container, you have to change access permissions to the X server. The easiest is to grant access to everyone, or you can [specify](https://manpages.ubuntu.com/manpages/lunar/en/man1/xhost.1.html) a specific user.
 
-```
+```bash
 # disables access control
 $ xhost +
 
@@ -196,7 +196,7 @@ $ xhost +SI:local:<user-name>
 
 Changes to the X server access only persist until the next logout/login, but it is best practice to enable back the access control once you're finished working with the container.
 
-```
+```bash
 # enables access control
 $ xhost -
 ```
@@ -204,7 +204,7 @@ $ xhost -
 #### NVIDIA
 Users of NVIDIA GPUs can download the [NVIDIA Container Toolkit](https://github.com/NVIDIA/nvidia-docker), which allows them to build GPU accelerated containers or in some cases solves display issues if the above mentioned setup is not working. The "Graphics inside Docker Containers" paragraph of this [ ROS&Docker guide](https://roboticseabass.com/2021/04/21/docker-and-ros/) describes working with such images. 
 
-```
+```bash
 # example of a docker run command for NVIDIA GPU enabled container
 $ docker run -it --net=host --gpus all \
     --env="NVIDIA_DRIVER_CAPABILITIES=all" \
@@ -222,7 +222,7 @@ For development we want persistent files that are shared between the host machin
 
 
 ##### Example development setup for a host with the OS wide ROS install:
-```
+```bash
 $ docker run -it \
     --volume="/home/<host-user>/ws":"/home/<container-user>/ws":rw \
     <image-name> \
@@ -232,7 +232,7 @@ $ docker run -it \
 We mount our host side workspace `/home/<host-user>/ws` to the container side workspace `/home/<container-user>/ws` in read-write mode. This means that the two workspaces are connected. Any change that we make in either of the two will affect both.
 
 ##### Example development setup for a host without the OS wide ROS install:
-```
+```bash
 $ docker run -it \
     --volume="/home/<host-user>/ws/src":"/home/<container-user>/ws/src":rw \
     <image-name> \

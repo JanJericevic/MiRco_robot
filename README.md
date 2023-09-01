@@ -54,26 +54,107 @@ $ source ~/MiR100/ws/devel/setup.bash \
 && echo "source ~/MiR100/ws/devel/setup.bash" >> ~/.bashrc
 ```
 
-## Frequent use cases
+## Connect to the robot
 ***NOTE:*** everytime before using the robot synchronize system time as best you can. In the MiR interface go to: "System" -> "Settings" -> "Date & Time". For an advanced setup see [this solution](https://github.com/DFKI-NI/mir_robot#advanced).
 
-### Connect to the robot
+### Connect to the web interface
 - connect to the MiR_R*** hotspot
 - open mir.com / default IP = 192.168.12.20
 - log in to the web interface
-- using the interface you can control the robot, map your environment, configure settings...
--  TODO
+- control the robot
 
 ### Connect to the robot with ROS
 There are two ways of using ROS to connect to the MiR100 robot:
 - connect to its internal `roscore`
-- connect using `mir_driver`. This method runs `roscore` on the host computer, connecting to the MiR `roscore` over `ROS Bridge`.
+- connect using `mir_driver`. This method runs `roscore` on the host computer, connecting to the MiR100 `roscore` over `ROS Bridge`.
 
 #### Internal `roscore`
-TODO
+Set the address of the master to the address of `roscore` of the MiR100 robot and test the connection.
+
+```bash
+# this needs to be done in every terminal
+export ROS_MASTER_URI=http://192.168.12.20:11311
+export ROS_HOSTNAME=<your IP: 192.168.12.**>
+
+# test the connection
+# test subscriber
+$ rostopic list
+$ rostopic echo /cmd_vel
+
+# test publisher
+$ rostopic pub -r 50 /cmd_vel geometry_msgs/TwistStamped "header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: ''
+twist:
+  linear:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  angular:
+    x: 0.0
+    y: 0.0
+    z: 0.2"
+```
 
 #### Using `mir_driver`
-TODO
+If connected to the MiR_R** hotspot:
+
+```bash
+# launch mir_driver
+$ roslaunch mir_driver mir.launch
+
+# test the connection
+# test subscriber
+$ rostopic echo /amcl_pose
+
+# test publisher
+$ rostopic pub -r 50 /cmd_vel geometry_msgs/TwistStamped "header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: ''
+twist:
+  linear:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  angular:
+    x: 0.0
+    y: 0.0
+    z: 0.2"
+```
+If connected to the same outside network as the robot:
+
+```bash
+# launch mir_driver and set the robot IP
+$ roslaunch mir_driver mir.launch mir_hostname=<robot-IP>
+
+# test the connections the same as the hotspot connection
+```
+
+### Connect the robot to a WIFI network
+You can connect the robot to an outside network:
+
+- turn on the robot and connect to its network
+- go to System -> Settings -> WiFi
+- select "Add connection"
+- select the network and fill in required information
+- when you're finished select "Add connection"
+- robot IP is displayed under the network connection name. You can use this IP to access the web interface or with [`mir_driver`](TODO)
+
+## Controlling the robot
+
+### Web interface
+
+### ROS
+
+#### MiR100 internal `roscore`
+
+#### Using `mir_driver`
 
 ## Working with Docker:
 The `mir_robot` package and in turn `mir_driver` use the external computer `roscore` to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer `roscore` for controlling the robot or connect to the internal MiR100 computer `roscore` for monitoring. Docker containers allow you flexibility in your setup: 

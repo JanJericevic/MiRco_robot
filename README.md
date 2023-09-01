@@ -136,23 +136,23 @@ If all you want is to connect to the MiR100 `roscore` for monitoring all you nee
 We will build a custom ROS Docker image complete with the same ROS packages so you have a choice of running the project locally or using Docker containers.
 
 ```bash
-# clone this repository and any other ROS packages you need to your workspace
-
-# go to the src directory of the workspace
-$ cd ~/MiR100/ws/src
+# download the desired packages to the src of your workspace
+# move the Dockerfile in MiR100_robolab folder to the src folder
+$ cd ~/MiR100/ws/src/MiR100_robolab
+$ mv ~/MiR100/ws/src/MiR100_robolab/Dockerfile ~/MiR100/ws/src
 
 # build the Docker image
+$ cd ~/MiR100/ws/src
 $ docker build -t <image-name> --build-arg MYUID=$(id -u) --build-arg MYGID=$(id -g) --build-arg MYUSER=$(id -nu) --build-arg MYGROUP=$(id -ng) .
 
 # list your built Docker images
-$ docker images
-
 # verify that your <image-name> is among the listed images
+$ docker images
 ```
 
-***NOTE:** if you're on a machine with no OS wide ROS install and don't have a `catkin ws`, build the Docker image at the root of the directory where you copied the ROS packages to. The build commands remain the same.*
+***NOTE:** if you're on a machine with no OS wide ROS install and don't have a `catkin ws` the steps remain the same. Move the `Dockerfile` to the root directory of your packages, then build the Docker image in that root directory. The build commands remain the same.*
 
-To avoid permissions issues with shared files between the host computer and the image container, we create a user with `sudo` permissions inside the image (this is especially relevant during [development](#volume-mounting)). User profile can be changed when building the image (the `build-arg` mentioned above) and inside the Dockerfile.  
+To avoid permissions issues with shared files between the host computer and the image container, we create a user with `sudo` permissions inside the image (this is especially relevant during [development](#volume-mounting)). User profile can be changed when building the image (the `build-arg` listed above) and inside the `Dockerfile`.  
 The current profile settings are: 
    
 > ***username***: same as the host username that built the image  
@@ -184,7 +184,7 @@ docker run -it --net=host <image-name> bash
 ```
 
 #### GUI applications
-ROS workflow is full of visual tools, which means that we need graphics capabilities from inside the container. [ROS wiki](http://wiki.ros.org/docker/Tutorials/GUI) mentions a few possible methods. Here we take the **simple but unsecure** method using X server. We expose our xhost so that the container can render to the correct display by reading and writing though the X11 unix socket.
+ROS workflow is full of visual tools, which means that we need graphics capabilities from inside the container. [ROS wiki](http://wiki.ros.org/docker/Tutorials/GUI) mentions a few possible methods. Here we take the **simple but unsecure** method using X server. We expose our `xhost` so that the container can render to the correct display by reading and writing though the X11 unix socket.
 
 ```bash
 docker run -it --net=host \
@@ -243,7 +243,8 @@ $ docker run -it \
     bash
 ```
 
-We mount our host side workspace `/home/<host-user>/ws` to the container side workspace `/home/<container-user>/ws` in read-write mode. This means that the two workspaces are connected. Any change that we make in either of the two will affect both.
+We mount our host side workspace `/home/<host-user>/ws` to the container side workspace `/home/<container-user>/ws` in read-write mode. This means that the two workspaces are connected. Any change that we make in either of the two will affect both.  
+It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base.
 
 ##### Example development setup for a host without the OS wide ROS install:
 ```bash
@@ -258,3 +259,45 @@ However, **since only the `src` folders of the workspaces are connected, the wor
 TODO: entrypoints, can you mount whole workspace?
 
 #### Input devices
+To use input devices like joysticks inside the Docker container we have to mount it when starting the container.
+
+```bash
+docker run -it \
+    --device /dev/input \
+    <image-name> \
+    bash
+```
+
+The above example mounts the whole input directory but you can also specify specific devices. Here we mount joystick 0.
+
+```bash
+docker run -it \
+    --device /dev/input/js0 \
+    <image-name> \
+    bash
+```
+
+**OPTIONAL:** Some input devices require you to change their permissions so that they become accessible to your application. To avoid repetative changing of permissions every time you plug them in, you can create a `udev` rule.
+
+```bash
+# with the desired input device unplugged
+# list the input devices on your host
+$ ls /dev/input
+by-id    event0  event10  event3  event5  event7  event9  mouse0  mouse2
+by-path  event1  event11  event2   event4  event6  event8  mice    mouse1
+
+# plug in the desired input device
+# again list the input devices to see your device name
+$ ls /dev/input
+by-id    event1   event20  event5  event8  mice    mouse2
+by-path  event10  event19  event3   event6  event9  mouse0
+event0   event11  event2   event4   event7  js0     mouse1
+```
+
+Using the above method, we find that our device name is `js0`. Now we create a `udev` rule. Add a file `/etc/udev/rules.d/99-userdev-input.rules` with:
+
+```bash
+KERNEL=="js0", SUBSYSTEM=="input", ACTION=="add", RUN+="/usr/bin/setfacl -m o:rw $env{DEVNAME}"
+```
+
+This udev rule uses `ACL` to set the `others` read-write permissions of the input device `js0`. You can modify the rule using `ACL` commands.

@@ -1,12 +1,18 @@
 <launch>
- <!-- joy node -->
- <!-- select correct input device -->
+  <!-- input device -->
+  <arg name="device" default="js1" />
+  <!-- select which roscore controls the robot: internal(MiR100) / external(mir_driver). Affects message type for /cmd_vel  -->
+  <arg name="roscore" default="external" />
+
+  <!-- joy node -->
+  <!-- select correct input device -->
   <node respawn="true" pkg="joy" type="joy_node" name="joy_node" >
-    <param name="dev" type="string" value="/dev/input/js0" />
+    <param name="dev" type="string" value="/dev/input/$(arg device" />
     <param name="deadzone" value="0.1" />
     <!-- <param name="autorepeat_rate" value="20" /> -->
   </node>
 
- <!-- teleop node -->
-  <node pkg="joy_teleop" type="joy_teleop2.py" name="joy_teleop_node" output="screen" />
+  <!-- teleop node -->
+  <node pkg="joy_teleop" type="joy_teleop_internal.py" name="joy_teleop_node" output="screen" if="$(eval roscore == 'internal')" />
+  <node pkg="joy_teleop" type="joy_teleop_external.py" name="joy_teleop_node" output="screen" if="$(eval roscore == 'external')" />
 </launch>

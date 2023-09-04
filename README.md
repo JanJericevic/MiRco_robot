@@ -104,7 +104,7 @@ twist:
 ```
 
 #### Using `mir_driver`
-If connected to the MiR_R** hotspot:
+- If connected to the MiR_R** hotspot:
 
 ```bash
 # launch mir_driver
@@ -126,7 +126,7 @@ angular:
 ```
 ***NOTE:** when using `mir_driver` to connect to the robot we send `geometry_msgs/Twist` type messages instead of `geometry_msgs/TwistStamped` to the `/cmd_vel` topic. That is because the `mir_driver` package expects messages type `geometry_msgs/Twist` on the `/cmd_vel` topic and converts them to `geometry_msgs/TwistStamped` messages before sending the commands to the robot.*
 
-If connected to the same [outside network](#connect-the-robot-to-a-wifi-network) as the robot:
+- If connected to the same [outside network](#connect-the-robot-to-a-wifi-network) as the robot:
 
 ```bash
 # launch mir_driver and set the robot IP
@@ -146,24 +146,32 @@ You can connect the robot to an outside network:
 - robot IP is displayed under the network connection name. You can use this IP to access the web interface or with [`mir_driver`](TODO)
 
 ## Controlling the robot
+***NOTE:*** everytime before using the robot synchronize system time as best you can. In the MiR interface go to: "System" -> "Settings" -> "Date & Time". For an advanced setup see [this solution](https://github.com/DFKI-NI/mir_robot#advanced).
 
-### Web interface
+### Using a joystick
+To control the robot with a joystick use the `mir_joy_teleop` package.  
+As with connecting to the robot, there is a slight difference between sending the joystick commands directly to the robots internal `roscore` or with the `mir_driver`.
 
-### ROS
+#### Internal `roscore`
 
-#### MiR100 internal `roscore`
+```bash
+# launch a joy_node and a teleop node
+# default input device is js1
+$ roslaunch mir_joy_teleop joy_teleop.launch
+
+# specify input device - e.g. js2
+$ roslaunch mir_joy_teleop joy_teleop.launch device:=js2
+```
 
 #### Using `mir_driver`
 
-#### Using a joystick
-
 ```bash
-# launch joy_node and a teleop node
-# default device is js1
-$ roslaunch mir_joy_teleop joy_teleop.launch
+# launch a joy_node and a teleop node
+# default input device is js1
+$ roslaunch mir_joy_teleop joy_teleop.launch roscore:=external
 
-# specify input device
-$ roslaunch mir_joy_teleop joy_teleop.launch device:=js2
+# specify input device - e.g. js2
+$ roslaunch mir_joy_teleop joy_teleop.launch device:=js2 roscore:=external
 ```
 
 ## Working with Docker:

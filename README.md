@@ -1,11 +1,15 @@
 # MiR100 environment setup and workflow
 
+### Tested on:
+- MiR100 robot
+- software version 2.13.3.2
+
 ### Table of contents
 - [Dependancies](#dependencies)
 - [Packages overview](#overview)
 - [Installation](#installation)
 - [Working with Docker](#working-with-docker)
-- [Frequent use cases](#frequent-use-cases)
+- [Connect to the robot](#connect-to-the-robot)
 - [Convenience scripts](/convenience_scripts/README.md)
 
 ### Dependencies
@@ -111,29 +115,24 @@ $ roslaunch mir_driver mir.launch
 $ rostopic echo /amcl_pose
 
 # test publisher
-$ rostopic pub -r 50 /cmd_vel geometry_msgs/TwistStamped "header:
-  seq: 0
-  stamp:
-    secs: 0
-    nsecs: 0
-  frame_id: ''
-twist:
-  linear:
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  angular:
-    x: 0.0
-    y: 0.0
-    z: 0.2"
+$ rostopic pub -r 50 /cmd_vel geometry_msgs/Twist "linear:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 0.2"
 ```
-If connected to the same outside network as the robot:
+***NOTE:** when using `mir_driver` to connect to the robot we send `geometry_msgs/Twist` type messages instead of `geometry_msgs/TwistStamped` to the `/cmd_vel` topic. That is because the `mir_driver` package expects messages type `geometry_msgs/Twist` on the `/cmd_vel` topic and converts them to `geometry_msgs/TwistStamped` messages before sending the commands to the robot.*
+
+If connected to the same [outside network](#connect-the-robot-to-a-wifi-network) as the robot:
 
 ```bash
 # launch mir_driver and set the robot IP
-$ roslaunch mir_driver mir.launch mir_hostname=<robot-IP>
+$ roslaunch mir_driver mir.launch mir_hostname:=<robot-IP>
 
-# test the connections the same as the hotspot connection
+# test the connection the same way as the hotspot connection
 ```
 
 ### Connect the robot to a WIFI network
@@ -155,6 +154,17 @@ You can connect the robot to an outside network:
 #### MiR100 internal `roscore`
 
 #### Using `mir_driver`
+
+#### Using a joystick
+
+```bash
+# launch joy_node and a teleop node
+# default device is js1
+$ roslaunch mir_joy_teleop joy_teleop.launch
+
+# specify input device
+$ roslaunch mir_joy_teleop joy_teleop.launch device:=js2
+```
 
 ## Working with Docker:
 The `mir_robot` package and in turn `mir_driver` use the external computer `roscore` to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer `roscore` for controlling the robot or connect to the internal MiR100 computer `roscore` for monitoring. Docker containers allow you flexibility in your setup: 
@@ -358,7 +368,7 @@ docker run -it \
     bash
 ```
 
-**OPTIONAL:** Some input devices require you to change their permissions so that they become accessible to your application. To avoid repetative changing of permissions every time you plug them in, you can create a `udev` rule.
+**OPTIONAL:** Some input devices require you to change their permissions so that they become accessible to your application (e.g. ["Configuring the Joystick"](http://wiki.ros.org/joy/Tutorials/ConfiguringALinuxJoystick) section of this ROS tutorial). To avoid repetative changing of permissions every time you plug them in, you can create a `udev` rule.
 
 ```bash
 # with the desired input device unplugged
@@ -381,4 +391,4 @@ Using the above method, we find that our device name is `js0`. Now we create a `
 KERNEL=="js0", SUBSYSTEM=="input", ACTION=="add", RUN+="/usr/bin/setfacl -m o:rw $env{DEVNAME}"
 ```
 
-This udev rule uses `ACL` to set the `others` read-write permissions of the input device `js0`. You can modify the rule using `ACL` commands.
+This udev rule uses `ACL` to set the read-write permissions of the input device `js0` for the `others` group. You can modify the rule using `ACL` commands.

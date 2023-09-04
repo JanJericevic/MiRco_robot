@@ -684,11 +684,10 @@ def main():
     print("""
     Set your MiR interface User Name and Password.
     If using other network than MiR100 internal network set robot IP.
-    Authorization header is generated as: BASE64( <username>:SHA-256( <password> ) )
     """)
 
     # set the MiR100 ip
-    ip = "193.2.178.59"
+    ip = "193.2.177.115"
 
     # if using ROS service for REST requests
     # rospy.wait_for_service('mir_rest_api_service')

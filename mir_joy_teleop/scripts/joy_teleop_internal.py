@@ -59,7 +59,10 @@ class JoyTeleop:
         :type data: Joy
         """
         self.vel.twist.linear.x = self.range_lin_vel*data.axes[1]
-        self.vel.twist.angular.z = self.range_ang_vel*data.axes[2]
+        # self.vel.twist.angular.z = self.range_ang_vel*data.axes[2]
+        
+        # ps3 controlles angular velocity
+        self.vel.twist.angular.z = self.range_ang_vel*data.axes[3]
        
        # adjust velocity ranges
        # only when robot is stationary

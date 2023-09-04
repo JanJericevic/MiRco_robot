@@ -59,7 +59,10 @@ class JoyTeleop:
         :type data: Joy
         """
         self.vel.linear.x = self.range_lin_vel*data.axes[1]
-        self.vel.angular.z = self.range_ang_vel*data.axes[2]
+        # self.vel.angular.z = self.range_ang_vel*data.axes[2]
+
+        # ps3 controlles angular velocity
+        self.vel.twist.angular.z = self.range_ang_vel*data.axes[3]
        
        # adjust velocity ranges
        # only when robot is stationary
@@ -109,7 +112,6 @@ def main():
     print("""
     Set your MiR interface User Name and Password.
     If using other network than MiR100 internal network set robot IP.
-    Authorization header is generated as: BASE64( <username>:SHA-256( <password> ) )
     """)
 
     # set the MiR100 ip

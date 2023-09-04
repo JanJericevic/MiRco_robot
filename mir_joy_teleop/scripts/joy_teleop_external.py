@@ -62,7 +62,7 @@ class JoyTeleop:
         # self.vel.angular.z = self.range_ang_vel*data.axes[2]
 
         # ps3 controlles angular velocity
-        self.vel.twist.angular.z = self.range_ang_vel*data.axes[3]
+        self.vel.angular.z = self.range_ang_vel*data.axes[3]
        
        # adjust velocity ranges
        # only when robot is stationary

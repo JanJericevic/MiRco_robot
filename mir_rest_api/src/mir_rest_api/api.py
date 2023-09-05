@@ -3,16 +3,15 @@
 """MIR100 REST API
 
 This API does not contain every endpoint in the MiR100 REST API!
-It contains only endpoints useful to the author.
+It contains only endpoints useful to the author at the time of development.
 
 Instructions:
-Don't forget to set robot REST authorization header.
-Don't forget to set the robot IP if using other network than MiR100 internal network.
-Authorization header is generated as: BASE64( <username>:SHA-256( <password> ) )
+Don't forget to set login credentials for the robot REST authorization header.
+Don't forget to set the robot IP if using other network than MiR100 internal hotspot.
 
 Two ways of sending REST requests:
     handle_request(): send direct REST request to the robot API
-    handle_request_ros(): send REST request over ROS service. Needs ROS service server node running
+    handle_request_ros(): send REST request over ROS service. Requires ROS service server node running
 """
 
 import requests
@@ -45,13 +44,15 @@ class MirRestApi:
         # when sending requests over ROS services we need a service handle
         self.service_handle = rospy.ServiceProxy('mir_rest_api_service', Rest)
     
-    def generate_auth_head(self, usrname: str, password: str):
+    def generate_auth_head(self, usrname: str, password: str) -> str:
         """generate authorization header
 
         :param usrname: MiR interface username
         :type usrname: str
         :param password: MiR interface password
         :type password: str
+        :return: authorization string
+        :rtype: str
         """
 
         hashed_pass = hashlib.sha256(password.encode('utf-8')).hexdigest()
@@ -89,8 +90,10 @@ class MirRestApi:
         
         elif self.method == "POST":
             try:
-                response = requests.post(self.endpoint,json=self.json, headers=self.header)
+                response = requests.post(self.endpoint, json=self.json, headers=self.header)
                 response = [response.status_code, response.json()]
+                if response[0] != 200:
+                    pprint(response[1])
                 return response
             except Exception as e:
                 # rospy.logerr(e)
@@ -98,8 +101,10 @@ class MirRestApi:
 
         elif self.method == "PUT":
             try:
-                response = requests.put(self.endpoint,json=self.json, headers=self.header)
+                response = requests.put(self.endpoint, json=self.json, headers=self.header)
                 response = [response.status_code, response.json()]
+                if response[0] != 200:
+                    pprint(response[1])
                 return response
             except Exception as e:
                 # rospy.logerr(e)
@@ -201,7 +206,10 @@ class MirRestApi:
             return [response[0], {"state_id": response[1]["state_id"],"state_text": response[1]["state_text"]}]
 
     def status_state_id_put(self, state_id: int, ros: bool = 0) -> [int, dict]:
-        """Modify the current state of the robot. Choices are: {3, 4, 11}, State: {Ready, Pause, Manual control}
+        """Modify the current state of the robot. 
+        
+        Possible robot state_id: {3, 4, 5, 11}, State: {Ready, Pause, Executing,Manual control}.
+        Using this method the user can only put state_id: {3, 4}, State: {Ready, Pause}.
 
         :param state_id: desired robot state
         :type state_id: int
@@ -210,6 +218,10 @@ class MirRestApi:
         :return: list containing REST response status code and body
         :rtype: [int, dict]
         """
+
+        if state_id !=3 and state_id != 4:
+            print("INVALID INPUT. Select state_id=3 for 'Ready' or state_id=4 for 'Pause'")
+            return
 
         self.method = "PUT"
         self.endpoint = self.url + "/status"
@@ -223,7 +235,7 @@ class MirRestApi:
 
     
     def status_state_id_toggle_put(self, ros: bool = 0) -> [int, dict]:
-        """Toggle the current state of the robot between 'Ready'/'Executing' and 'Pause'. Choices are: {3, 4}, State: {Ready, Pause}
+        """Toggle the current state of the robot between 'Ready'/'Executing' and 'Pause'.
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional

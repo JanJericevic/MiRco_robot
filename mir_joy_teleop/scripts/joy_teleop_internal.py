@@ -44,7 +44,7 @@ class JoyTeleop:
         self.range_ang_vel = 0.2
         self.min_lin_vel = 0.1
         self.min_ang_vel = 0.1
-        self.max_lin_vel = 2.0
+        self.max_lin_vel = 3.0
         self.max_ang_vel = 1.0
 
         self.api = api
@@ -66,23 +66,43 @@ class JoyTeleop:
        
        # adjust velocity ranges
        # only when robot is stationary
+       # logitech f710 controller
+        # if self.vel.twist.linear.x == 0 and self.vel.twist.angular.z == 0:
+        #     # TODO: simultaneous stick and button data bug
+        #     if (data.buttons[4] == 1) and (self.range_lin_vel < self.max_lin_vel):
+        #         self.range_lin_vel = round(self.range_lin_vel + 0.1,  1)
+        #         rospy.loginfo("MAX LIN VELOCITY = %s m/s", self.range_lin_vel)
+
+        #     elif (data.buttons[6] == 1) and (self.range_lin_vel > self.min_lin_vel):
+        #         self.range_lin_vel = round(self.range_lin_vel - 0.1, 1)
+        #         rospy.loginfo("MAX LIN VELOCITY = %s m/s", self.range_lin_vel)
+
+        #     elif (data.buttons[5] == 1) and (self.range_ang_vel < self.max_ang_vel):
+        #         self.range_ang_vel = round(self.range_ang_vel + 0.1, 1)
+        #         rospy.loginfo("MAX ANG VELOCITY = %s rad/s", self.range_ang_vel)
+
+        #     elif (data.buttons[7] == 1) and (self.range_ang_vel > self.min_ang_vel):
+        #         self.range_ang_vel = round(self.range_ang_vel - 0.1, 1)
+        #         rospy.loginfo("MAX ANG VELOCITY = %s rad/s", self.range_ang_vel)
+
+        # playstation3 controller
         if self.vel.twist.linear.x == 0 and self.vel.twist.angular.z == 0:
             # TODO: simultaneous stick and button data bug
-            if (data.buttons[4] == 1) and (self.range_lin_vel < self.max_lin_vel):
-                self.range_lin_vel = self.range_lin_vel + 0.1
-                rospy.loginfo("MAX LIN VELOCITY = %s", self.range_lin_vel)
+            if (data.buttons[13] == 1) and (self.range_lin_vel < self.max_lin_vel):
+                self.range_lin_vel = round(self.range_lin_vel + 0.1,  1)
+                rospy.loginfo("MAX LIN VELOCITY = %s m/s", self.range_lin_vel)
 
-            elif (data.buttons[6] == 1) and (self.range_lin_vel > self.min_lin_vel):
-                self.range_lin_vel = self.range_lin_vel - 0.1
-                rospy.loginfo("MAX LIN VELOCITY = %s", self.range_lin_vel)
+            elif (data.buttons[14] == 1) and (self.range_lin_vel > self.min_lin_vel):
+                self.range_lin_vel = round(self.range_lin_vel - 0.1, 1)
+                rospy.loginfo("MAX LIN VELOCITY = %s m/s", self.range_lin_vel)
 
-            elif (data.buttons[5] == 1) and (self.range_ang_vel < self.max_ang_vel):
-                self.range_ang_vel = self.range_ang_vel + 0.1
-                rospy.loginfo("MAX ANG VELOCITY = %s", self.range_ang_vel)
+            elif (data.buttons[16] == 1) and (self.range_ang_vel < self.max_ang_vel):
+                self.range_ang_vel = round(self.range_ang_vel + 0.1, 1)
+                rospy.loginfo("MAX ANG VELOCITY = %s rad/s", self.range_ang_vel)
 
-            elif (data.buttons[7] == 1) and (self.range_ang_vel > self.min_ang_vel):
-                self.range_ang_vel = self.range_ang_vel - 0.1
-                rospy.loginfo("MAX ANG VELOCITY = %s", self.range_ang_vel)
+            elif (data.buttons[15] == 1) and (self.range_ang_vel > self.min_ang_vel):
+                self.range_ang_vel = round(self.range_ang_vel - 0.1, 1)
+                rospy.loginfo("MAX ANG VELOCITY = %s rad/s", self.range_ang_vel)
 
         # using joystick & MiR100 robot REST API
         if data.buttons[0] == 1:

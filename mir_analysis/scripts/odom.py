@@ -20,8 +20,10 @@ import rospy
 from nav_msgs.msg import Odometry
 
 def analyze(msg):
-    if msg.twist.twist.linear.x == 0.0:
+    print(msg.twist.twist.linear.x)
+    if msg.twist.twist.linear.x > 2:
         print("TARGET VELOCITY REACHED! VELOCITY = %s" %(msg.twist.twist.linear.x))
+        rospy.signal_shutdown("target velocity reached")
 
 def main():
     rospy.init_node('odom_listener', anonymous=True)

@@ -22,6 +22,7 @@ import json
 from pprint import pprint
 import base64
 import hashlib
+from typing import List
 
 class MirRestApi:
     """MiR REST API class
@@ -63,11 +64,11 @@ class MirRestApi:
         auth_header = "Basic " + base64_string
         return auth_header
     
-    def handle_request(self) -> [int, dict]:
+    def handle_request(self) -> List[int, dict]:
         """Handle REST request
 
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         if self.method == "GET":
@@ -131,13 +132,13 @@ class MirRestApi:
 
     # MiR REST API endpoints:
     # ---------- robot state ----------
-    def status_get(self, ros: bool = 0) -> [int, dict]:
+    def status_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the robot status
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -148,15 +149,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def status_put(self, json: dict, ros: bool = 0) -> [int, dict]:
+    def status_put(self, json: dict, ros: bool = 0) -> List[int, dict]:
         """Modify the robot status
 
         :param json: request body
         :type json: dict
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "PUT"
@@ -167,13 +168,13 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def status_mode_get(self, ros: bool = 0) -> [int, dict]:
+    def status_mode_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the current mode of the robot
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -186,13 +187,13 @@ class MirRestApi:
             response =  self.handle_request()
             return [response[0], {"mode_id": response[1]["mode_id"],"mode_text": response[1]["mode_text"], "mode_key_state":response[1]["mode_key_state"]}]
 
-    def status_state_get(self, ros: bool = 0) -> [int, dict]:
+    def status_state_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the current state of the robot
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -205,7 +206,7 @@ class MirRestApi:
             response =  self.handle_request()
             return [response[0], {"state_id": response[1]["state_id"],"state_text": response[1]["state_text"]}]
 
-    def status_state_id_put(self, state_id: int, ros: bool = 0) -> [int, dict]:
+    def status_state_id_put(self, state_id: int, ros: bool = 0) -> List[int, dict]:
         """Modify the current state of the robot. 
         
         Possible robot state_id: {3, 4, 5, 11}, State: {Ready, Pause, Executing,Manual control}.
@@ -215,8 +216,8 @@ class MirRestApi:
         :type state_id: int
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         if state_id !=3 and state_id != 4:
@@ -234,13 +235,13 @@ class MirRestApi:
             return [response[0], {"state_id": response[1]["state_id"],"state_text": response[1]["state_text"]}]
 
     
-    def status_state_id_toggle_put(self, ros: bool = 0) -> [int, dict]:
+    def status_state_id_toggle_put(self, ros: bool = 0) -> List[int, dict]:
         """Toggle the current state of the robot between 'Ready'/'Executing' and 'Pause'.
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         status = self.status_state_get(ros)[1]
@@ -276,13 +277,13 @@ class MirRestApi:
             return [response[0], {"state_id": response[1]["state_id"],"state_text": response[1]["state_text"]}]
 
     # ---------- missions ----------
-    def mission_groups_get(self, ros: bool = 0) -> [int, dict]:
+    def mission_groups_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of mission groups
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -293,15 +294,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def mission_groups_group_id_missions_get(self,group_id: str, ros: bool = 0) -> [int, dict]:
+    def mission_groups_group_id_missions_get(self,group_id: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of missions that belong to the group with the specified group ID
 
         :param group_id: mission group ID
         :type group_id: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -312,13 +313,13 @@ class MirRestApi:
         else:
             return self.handle_request()
 
-    def mission_queue_get(self, ros: bool = 0) -> [int, dict]:
+    def mission_queue_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of missions in the queue. Finished, failed, pending and executing missions will be displayed here
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -329,15 +330,15 @@ class MirRestApi:
         else:
             return self.handle_request()
 
-    def mission_queue_post(self, mission_id: str, ros: bool = 0) -> [int, dict]:
+    def mission_queue_post(self, mission_id: str, ros: bool = 0) -> List[int, dict]:
         """Add a new mission to the mission queue. The mission will always go to the end of the queue
 
         :param mission_id: mission ID
         :type mission_id: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "POST"
@@ -348,13 +349,13 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def mission_queue_delete(self, ros: bool = 0) -> [int, dict]:
+    def mission_queue_delete(self, ros: bool = 0) -> List[int, dict]:
         """Abort all the pending and executing missions from the mission queue
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "DELETE"
@@ -365,15 +366,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def mission_queue_id_get(self, id: int, ros: bool = 0) -> [int, dict]:
+    def mission_queue_id_get(self, id: int, ros: bool = 0) -> List[int, dict]:
         """Retrieve the details about the mission with the specified ID in the mission queue
 
         :param id: mission ID in the mission queue
         :type id: int
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -384,15 +385,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def mission_queue_id_delete(self, id: int, ros: bool = 0) -> [int, dict]:
+    def mission_queue_id_delete(self, id: int, ros: bool = 0) -> List[int, dict]:
         """Abort the mission with the specified ID in the mission queue
 
         :param id: mission ID in the mission queue
         :type id: int
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "DELETE"
@@ -403,15 +404,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def mission_queue_mission_queue_id_actions_get(self, mission_queue_id: int, ros: bool = 0) -> [int, dict]:
+    def mission_queue_mission_queue_id_actions_get(self, mission_queue_id: int, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of actions from the mission with the specified ID in the mission queue
 
         :param mission_queue_id: mission ID in the mission queue
         :type mission_queue_id: int
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -422,7 +423,7 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def mission_queue_mission_queue_id_actions_id_get(self, mission_queue_id: int, id: int, ros: bool = 0) -> [int, dict]:
+    def mission_queue_mission_queue_id_actions_id_get(self, mission_queue_id: int, id: int, ros: bool = 0) -> List[int, dict]:
         """Retrieve the details about the action with the specified ID from the mission with the specified ID in the mission queue
 
         :param mission_queue_id: mission ID in the mission queue
@@ -431,8 +432,8 @@ class MirRestApi:
         :type id: int
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -443,13 +444,13 @@ class MirRestApi:
         else:
             return self.handle_request()
 
-    def missions_get(self, ros: bool = 0) -> [int, dict]:
+    def missions_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of missions
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -460,15 +461,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def missions_guid_get(self, guid: str, ros: bool = 0) -> [int, dict]:
+    def missions_guid_get(self, guid: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the details about the mission with the specified GUID
 
         :param guid: mission GUID
         :type guid: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -479,15 +480,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def missions_guid_delete(self, guid: str, ros: bool = 0) -> [int, dict]:
+    def missions_guid_delete(self, guid: str, ros: bool = 0) -> List[int, dict]:
         """Erase the mission with the specified GUID
 
         :param guid: mission GUID
         :type guid: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "DELETE"
@@ -498,15 +499,15 @@ class MirRestApi:
         else:
             return self.handle_request()
 
-    def missions_guid_definition_get(self, guid: str, ros: bool = 0) -> [int, dict]:
+    def missions_guid_definition_get(self, guid: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the mission with the specified GUID as an action definition that can be inserted in another mission
 
         :param guid: mission GUID
         :type guid: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -517,15 +518,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def missions_mission_id_actions_get(self, mission_id: str, ros: bool = 0) -> [int, dict]:
+    def missions_mission_id_actions_get(self, mission_id: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of actions that belong to the mission with the specified mission ID
 
         :param mission_id: mission ID
         :type mission_id: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -536,7 +537,7 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def missions_mission_id_actions_guid_get(self, mission_id: str, guid: str, ros: bool = 0) -> [int, dict]:
+    def missions_mission_id_actions_guid_get(self, mission_id: str, guid: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the details about the action with the specified GUID that belongs to the mission with the specified mission ID
 
         :param mission_id: mission ID
@@ -545,8 +546,8 @@ class MirRestApi:
         :type guid: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -557,7 +558,7 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def missions_mission_id_actions_guid_delete(self, mission_id: str, guid: str, ros: bool = 0) -> [int, dict]:
+    def missions_mission_id_actions_guid_delete(self, mission_id: str, guid: str, ros: bool = 0) -> List[int, dict]:
         """Erase the action with the specified GUID from the mission with the specified mission ID
 
         :param mission_id: mission ID
@@ -566,8 +567,8 @@ class MirRestApi:
         :type guid: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "DELETE"
@@ -580,13 +581,13 @@ class MirRestApi:
 
 
     # ---------- maps----------
-    def maps_get(self, ros: bool = 0) -> [int, dict]:
+    def maps_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of maps
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -597,15 +598,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def sessions_session_id_maps_get(self, session_id: str, ros: bool = 0) -> [int, dict]:
+    def sessions_session_id_maps_get(self, session_id: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of maps that belong to the session with the specified session ID. session_id = site_id
 
         :param session_id: site ID
         :type session_id: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -616,15 +617,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def maps_guid_get(self, guid: str, ros: bool = 0) -> [int, dict]:
+    def maps_guid_get(self, guid: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the details about the map with the specified GUID
 
         :param guid: map GUID
         :type guid: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -635,15 +636,15 @@ class MirRestApi:
         else:
             return self.handle_request()
     
-    def maps_guid_delete(self, guid: str, ros: bool = 0) -> [int, dict]:
+    def maps_guid_delete(self, guid: str, ros: bool = 0) -> List[int, dict]:
         """Erase the map with the specified GUID
 
         :param guid: map GUID
         :type guid: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "DELETE"
@@ -655,15 +656,15 @@ class MirRestApi:
             return self.handle_request()
     
     # ---------- positions ----------
-    def maps_map_id_positions_get(self, map_id: str, ros: bool = 0) -> [int, dict]:
+    def maps_map_id_positions_get(self, map_id: str, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of positions that belong to the map with the specified map ID
 
         :param map_id: map ID
         :type map_id: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"
@@ -674,13 +675,13 @@ class MirRestApi:
         else:
             return self.handle_request()
 
-    def position_transition_lists_get(self, ros: bool = 0) -> [int, dict]:
+    def position_transition_lists_get(self, ros: bool = 0) -> List[int, dict]:
         """Retrieve the list of position transition lists
 
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
-        :return: list containing REST response status code and body
-        :rtype: [int, dict]
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
         """
 
         self.method = "GET"

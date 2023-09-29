@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Working with Docker - MiR100 Robolab</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Working with Docker";
+        var mkdocs_page_input_path = "docker.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> MiR100 Robolab
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">MiR100 Robolab documentation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../connection/">Connect to the robot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../control/">Controlling the robot</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Working with Docker</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#install-docker-engine">Install Docker engine</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#optional-post-installation-steps">Optional post installation steps</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#building-the-image">Building the image</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#running-the-image">Running the image</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#networking">Networking</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#gui-applications">GUI applications</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#nvidia">NVIDIA</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#volume-mounting">Volume mounting</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#example-development-setup-for-a-host-with-the-os-wide-ros-install">Example development setup for a host with the OS wide ROS install:</a>
+    </li>
+    <li class="toctree-l4"><a class="reference internal" href="#example-development-setup-for-a-host-without-the-os-wide-ros-install">Example development setup for a host without the OS wide ROS install:</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#input-devices">Input devices</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">MiR100 Robolab</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Working with Docker</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="working-with-docker">Working with Docker</h1>
+<p>Docker containers allow you flexibility in your setup:</p>
+<ul>
+<li>reproducibility of environments/projects</li>
+<li>no need for OS wide ROS install</li>
+<li>possibility of switching between ROS versions  </li>
+</ul>
+<h2 id="install-docker-engine">Install Docker engine</h2>
+<p>Full install instructions are available at Dockers <a href="https://docs.docker.com/engine/install/ubuntu/">official website</a>.<br />
+Make sure old versions od Docker engine are <a href="https://docs.docker.com/engine/install/ubuntu/#uninstall-docker-engine">uninstalled</a>.</p>
+<pre><code class="language-bash"># update the apt package index and install packages to allow apt to use a repository over HTTPS:
+$ sudo apt-get update
+$ sudo apt-get install ca-certificates curl gnupg
+
+# add Docker’s official GPG key
+$ sudo install -m 0755 -d /etc/apt/keyrings
+$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+$ sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+# set up the repository
+$ echo \
+  &quot;deb [arch=&quot;$(dpkg --print-architecture)&quot; signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  &quot;$(. /etc/os-release &amp;&amp; echo &quot;$VERSION_CODENAME&quot;)&quot; stable&quot; | \
+  sudo tee /etc/apt/sources.list.d/docker.list &gt; /dev/null
+
+# Update the apt package index
+$ sudo apt-get update
+
+# install the latest version
+$ sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+# verify the installation
+$ sudo docker run hello-world
+</code></pre>
+<h3 id="optional-post-installation-steps">Optional post installation steps</h3>
+<p>All optional installation steps are available at Dockers <a href="https://docs.docker.com/engine/install/linux-postinstall/">official website</a>.<br />
+Useful post installation step is to manage Docker as a non sudo user. This allow the omission of <code>sudo</code> in front of docker commands. When allowing this make sure to be aware of how this <a href="https://docs.docker.com/engine/security/#docker-daemon-attack-surface">impacts security of your system</a>.</p>
+<pre><code class="language-bash"># create the docker group
+# on some Linux distributions, the system automatically creates this group when installing Docker Engine using a package manager
+$ sudo groupadd docker
+
+# add your user to the docker group
+$ sudo usermod -aG docker $USER
+
+# log out and log back in so that your group membership is re-evaluated
+# or un the following command to activate the changes to groups
+$ newgrp docker
+
+# verify that you can run docker commands without sudo
+$ docker run hello-world
+</code></pre>
+<h2 id="building-the-image">Building the image</h2>
+<p>If all you want is to connect to the MiR100 <code>roscore</code> for monitoring all you need is a ROS Docker image.<br />
+However, we will build a custom ROS Docker image complete with the same ROS packages as with the OS wide ROS install, so you have a choice of running the project locally or using Docker containers.</p>
+<pre><code class="language-bash"># download the desired packages to the src of your workspace
+# move the Dockerfile in MiR100_robolab folder to the src folder
+$ cd ~/MiR100/ws/src/MiR100_robolab
+$ mv ~/MiR100/ws/src/MiR100_robolab/Dockerfile ~/MiR100/ws/src
+
+# build the Docker image
+$ cd ~/MiR100/ws/src
+$ docker build -t &lt;image-name&gt; --build-arg MYUID=$(id -u) --build-arg MYGID=$(id -g) --build-arg MYUSER=$(id -nu) --build-arg MYGROUP=$(id -ng) .
+
+# list your built Docker images
+# verify that your &lt;image-name&gt; is among the listed images
+$ docker images
+</code></pre>
+<p><em><strong>NOTE:</strong> if you're on a machine with no OS wide ROS install and don't have a <code>catkin ws</code> the steps remain the same. Move the <code>Dockerfile</code> to the root directory of your packages, then build the Docker image in that root directory. The build commands remain the same.</em></p>
+<p>To avoid permissions issues with shared files between the host computer and the image container, we create a user with <code>sudo</code> permissions inside the image (this is especially relevant during <a href="#volume-mounting">development</a>). User profile can be changed when building the image (the <code>build-arg</code> listed above) and inside the <code>Dockerfile</code>.<br />
+The current profile settings are: </p>
+<blockquote>
+<p><strong><em>username</em></strong>: same as the host username that built the image<br />
+<strong><em>password</em></strong>: same as the username</p>
+</blockquote>
+<p>The <code>Dockerfile</code> creates a <code>catkin workspace</code> at <code>/home/&lt;your-user&gt;/ws</code> inside the image. The workspace is also set as the work directory of the image so it will be the starting point of every new container.</p>
+<p>Depending on your use case you will use the Docker image during development (you plan to regularly modify your codebase) or you will only use it for deployment. For deployment you only need to copy your files once, which is what we have done until now. For a development setup see the <a href="#volume-mounting">volume mounting</a> section.</p>
+<p><strong>TODO</strong>
+- dockerfile names
+- dockerignore
+- entrypoints
+- convenience scripts
+- useful tags</p>
+<h2 id="running-the-image">Running the image</h2>
+<p>You can open an interactive bash shell with:</p>
+<pre><code class="language-bash">docker run -it &lt;image-name&gt; bash
+</code></pre>
+<p>This is ok for simple tasks however more advanced tasks require additional commands. Below are explanations for specific commands. However, since the commands can get complicated, we recommend the use of convenience scripts for repetitive cases. Create your own or use one of <a href="/convenience_scripts/">ours</a>.</p>
+<h3 id="networking">Networking</h3>
+<p>There are many options for the network settings of a container that you can read about <a href="https://docs.docker.com/engine/reference/run/#network-settings">here</a>. Depending on your application you may want to use another option, in our case we choose to use the host's network inside the container. Among other things, this allows containers to talk to each other (e.g. one container is running the <code>roscore</code>, the other subscribes to a topic).</p>
+<pre><code class="language-bash">docker run -it --net=host &lt;image-name&gt; bash
+</code></pre>
+<h3 id="gui-applications">GUI applications</h3>
+<p>ROS workflow is full of visual tools, which means that we need graphics capabilities from inside the container. <a href="http://wiki.ros.org/docker/Tutorials/GUI">ROS wiki</a> mentions a few possible methods. Here we take the <strong>simple but unsecure</strong> method using X server. We expose our <code>xhost</code> so that the container can render to the correct display by reading and writing though the X11 unix socket.</p>
+<pre><code class="language-bash">docker run -it --net=host \
+    --env=&quot;DISPLAY&quot; \
+    --env=&quot;QT_X11_NO_MITSHM=1&quot; \
+    --volume=&quot;/tmp/.X11-unix:/tmp/.X11-unix:rw&quot; \
+    --device /dev/dri \
+    &lt;image-name&gt; \
+    bash
+</code></pre>
+<p>Before you start the container, you have to change access permissions to the X server. The easiest is to grant access to everyone, or you can <a href="https://manpages.ubuntu.com/manpages/lunar/en/man1/xhost.1.html">specify</a> a specific user.</p>
+<pre><code class="language-bash"># disables access control
+$ xhost +
+
+# grants access to specific user
+$ xhost +local:&lt;user-name&gt;
+# or
+$ xhost +SI:local:&lt;user-name&gt;
+</code></pre>
+<p>Changes to the X server access only persist until the next logout/login, but it is best practice to enable back the access control once you're finished working with the container.</p>
+<pre><code class="language-bash"># enables access control
+$ xhost -
+</code></pre>
+<h3 id="nvidia">NVIDIA</h3>
+<p>Users of NVIDIA GPUs can download the <a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Container Toolkit</a>, which allows them to build GPU accelerated containers or in some cases solves display issues if the above mentioned setup is not working. The "Graphics inside Docker Containers" paragraph of this <a href="https://roboticseabass.com/2021/04/21/docker-and-ros/"> ROS&amp;Docker guide</a> describes working with such images. </p>
+<pre><code class="language-bash"># example of a docker run command for NVIDIA GPU enabled container
+$ docker run -it --net=host --gpus all \
+    --env=&quot;NVIDIA_DRIVER_CAPABILITIES=all&quot; \
+    --env=&quot;DISPLAY&quot; \
+    --env=&quot;QT_X11_NO_MITSHM=1&quot; \
+    --volume=&quot;/tmp/.X11-unix:/tmp/.X11-unix:rw&quot; \
+    --device /dev/dri \
+    &lt;image-name&gt; \
+    bash
+</code></pre>
+<h3 id="volume-mounting">Volume mounting</h3>
+<p><em><strong>NOTE:</strong> mounted files are available only at runtime. Any files needed for building the image should be copied before then.</em></p>
+<p>For development we want persistent files that are shared between the host machine and the containers, files that can be changed both from the host side and from inside the container, in a setup which does not require us to rebuild the image every time we modify our code. We achieve this using <a href="https://docs.docker.com/storage/volumes/">volumes</a>. To achieve the necessary permissions we create a <code>sudo</code> user inside the image (see "<a href="#building-the-image">Building the image</a>" section).</p>
+<h4 id="example-development-setup-for-a-host-with-the-os-wide-ros-install">Example development setup for a host with the OS wide ROS install:</h4>
+<pre><code class="language-bash">$ docker run -it \
+    --volume=&quot;/home/&lt;host-user&gt;/ws&quot;:&quot;/home/&lt;container-user&gt;/ws&quot;:rw \
+    &lt;image-name&gt; \
+    bash
+</code></pre>
+<p>We mount our host side workspace <code>/home/&lt;host-user&gt;/ws</code> to the container side workspace <code>/home/&lt;container-user&gt;/ws</code> in read-write mode. This means that the two workspaces are connected. Any change that we make in either of the two will affect both.<br />
+It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base.</p>
+<h4 id="example-development-setup-for-a-host-without-the-os-wide-ros-install">Example development setup for a host without the OS wide ROS install:</h4>
+<pre><code class="language-bash">$ docker run -it \
+    --volume=&quot;/home/&lt;host-user&gt;/ws/src&quot;:&quot;/home/&lt;container-user&gt;/ws/src&quot;:rw \
+    &lt;image-name&gt; \
+    bash
+</code></pre>
+<p>Here we mount the <code>src</code> folder of our host side workspace <code>/home/&lt;host-user&gt;/ws/src</code> to the <code>src</code> folder of our container side workspace <code>/home/&lt;container-user&gt;/ws/src</code> in read-write mode. This means that the two folders are connected. Any change that we make in either of the two will affect both.<br />
+However, <strong>since only the <code>src</code> folders of the workspaces are connected, the workspace still needs to be built inside the container with <code>catkin_make</code></strong>. It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base. </p>
+<p>TODO: entrypoints, can you mount whole workspace?</p>
+<h3 id="input-devices">Input devices</h3>
+<p>To use input devices like joysticks inside the Docker container we have to mount it when starting the container.</p>
+<pre><code class="language-bash">docker run -it \
+    --device /dev/input \
+    &lt;image-name&gt; \
+    bash
+</code></pre>
+<p>The above example mounts the whole input directory but you can also specify specific devices. Here we mount joystick 0.</p>
+<pre><code class="language-bash">docker run -it \
+    --device /dev/input/js0 \
+    &lt;image-name&gt; \
+    bash
+</code></pre>
+<p><strong>OPTIONAL:</strong> Some input devices require you to change their permissions so that they become accessible to your application (e.g. <a href="http://wiki.ros.org/joy/Tutorials/ConfiguringALinuxJoystick">"Configuring the Joystick"</a> section of this ROS tutorial). To avoid repetative changing of permissions every time you plug them in, you can create a <code>udev</code> rule.</p>
+<pre><code class="language-bash"># with the desired input device unplugged
+# list the input devices on your host
+$ ls /dev/input
+by-id    event0  event10  event3  event5  event7  event9  mouse0  mouse2
+by-path  event1  event11  event2   event4  event6  event8  mice    mouse1
+
+# plug in the desired input device
+# again list the input devices to see your device name
+$ ls /dev/input
+by-id    event1   event20  event5  event8  mice    mouse2
+by-path  event10  event19  event3   event6  event9  mouse0
+event0   event11  event2   event4   event7  js0     mouse1
+</code></pre>
+<p>Using the above method, we find that our device name is <code>js0</code>. Now we create a <code>udev</code> rule. Add a file <code>/etc/udev/rules.d/99-userdev-input.rules</code> with:</p>
+<pre><code class="language-bash">KERNEL==&quot;js0&quot;, SUBSYSTEM==&quot;input&quot;, ACTION==&quot;add&quot;, RUN+=&quot;/usr/bin/setfacl -m o:rw $env{DEVNAME}&quot;
+</code></pre>
+<p>This udev rule uses <code>ACL</code> to set the read-write permissions of the input device <code>js0</code> for the <code>others</code> group. You can modify the rule using <code>ACL</code> commands.</p>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../control/" class="btn btn-neutral float-left" title="Controlling the robot"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../control/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

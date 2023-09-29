@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Connect to the robot - MiR100 Robolab</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+        <link href="../assets/_mkdocstrings.css" rel="stylesheet" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Connect to the robot";
+        var mkdocs_page_input_path = "connection.md";
+        var mkdocs_page_url = null;
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> MiR100 Robolab
+        </a>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">MiR100 Robolab documentation</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Connect to the robot</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#connect-to-the-mir-web-interface">Connect to the MiR web interface</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#connect-to-the-robot-with-ros">Connect to the robot with ROS</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#internal-roscore">Internal roscore</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#using-mir_driver">Using mir_driver</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#connect-the-robot-to-a-wifi-network">Connect the robot to a WIFI network</a>
+    </li>
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../control/">Controlling the robot</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../docker/">Working with Docker</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">MiR100 Robolab</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Connect to the robot</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="connect-to-the-robot">Connect to the robot</h1>
+<p>There are two possible ways to connect to the robot:  </p>
+<ul>
+<li>using the MiR web interface</li>
+<li>using ROS</li>
+</ul>
+<h2 id="connect-to-the-mir-web-interface">Connect to the MiR web interface</h2>
+<ul>
+<li>connect to the MiR_R**** hotspot</li>
+<li>open mir.com (default IP = 192.168.12.20)</li>
+<li>use your credentials to log in to the web interface</li>
+</ul>
+<h2 id="connect-to-the-robot-with-ros">Connect to the robot with ROS</h2>
+<p>There are two ways of using ROS to connect to the MiR100 robot:</p>
+<ul>
+<li>connect to its internal <code>roscore</code> running on the MiR100 computer</li>
+<li>connect using <code>mir_driver</code>. This method runs <code>roscore</code> on the host computer, connecting to the MiR100 internal <code>roscore</code> over <code>ROS Bridge</code>.</li>
+</ul>
+<h3 id="internal-roscore">Internal <code>roscore</code></h3>
+<p>You have to be connected to the robot hotspot (MiR_R****).<br />
+Set the address of the master to the address of MiR100 internal <code>roscore</code> and test the connection.</p>
+<pre><code class="language-bash"># this needs to be done in every terminal
+export ROS_MASTER_URI=http://192.168.12.20:11311
+export ROS_HOSTNAME=&lt;your IP: 192.168.12.**&gt;
+
+# test the connection
+# test subscriber
+$ rostopic list
+$ rostopic echo /cmd_vel
+
+# test publisher
+$ rostopic pub -r 50 /cmd_vel geometry_msgs/TwistStamped &quot;header:
+  seq: 0
+  stamp:
+    secs: 0
+    nsecs: 0
+  frame_id: ''
+twist:
+  linear:
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  angular:
+    x: 0.0
+    y: 0.0
+    z: 0.2&quot;
+</code></pre>
+<h3 id="using-mir_driver">Using <code>mir_driver</code></h3>
+<ul>
+<li>If connected to the MiR_R**** hotspot:</li>
+</ul>
+<pre><code class="language-bash"># launch mir_driver
+$ roslaunch mir_driver mir.launch
+
+# test the connection
+# test subscriber
+$ rostopic echo /amcl_pose
+
+# test publisher
+$ rostopic pub -r 50 /cmd_vel geometry_msgs/Twist &quot;linear:
+  x: 0.0
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 0.2&quot;
+</code></pre>
+<ul>
+<li>If connected to the same <a href="#connect-the-robot-to-a-wifi-network">outside network</a> as the robot:</li>
+</ul>
+<pre><code class="language-bash"># launch mir_driver and set the robot IP
+$ roslaunch mir_driver mir.launch mir_hostname:=&lt;robot-IP&gt;
+
+# test the connection the same way as the hotspot connection
+</code></pre>
+<p><strong><em>NOTE:</em></strong> when using <code>mir_driver</code> to connect to the robot we send <code>geometry_msgs/Twist</code> type messages instead of <code>geometry_msgs/TwistStamped</code> to the <code>/cmd_vel</code> topic. That is because the <code>mir_driver</code> package expects messages of type <code>geometry_msgs/Twist</code> on the <code>/cmd_vel</code> topic and converts them to <code>geometry_msgs/TwistStamped</code> messages before sending the commands to the robot.</p>
+<h2 id="connect-the-robot-to-a-wifi-network">Connect the robot to a WIFI network</h2>
+<p>You can connect the robot to an outside network:</p>
+<ul>
+<li>turn on the robot and connect to its hotspot</li>
+<li>go to System -&gt; Settings -&gt; WiFi</li>
+<li>select "Add connection"</li>
+<li>select the network and fill in required information</li>
+<li>when you're finished select "Add connection"</li>
+<li>robot IP is displayed under the network connection name. You can use this IP to access the web interface or when using <a href="#TODO"><code>mir_driver</code></a></li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../installation/" class="btn btn-neutral float-left" title="Installation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../control/" class="btn btn-neutral float-right" title="Controlling the robot">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href="../installation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../control/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

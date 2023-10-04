@@ -4,6 +4,9 @@
 - MiR100 robot
 - software version 2.13.3.2
 
+### Acknowledgement
+Thank you to the [DFKI](https://www.dfki.de/en/web) team for developing and maintaining the ROS [**`mir_robot`**](https://github.com/DFKI-NI/mir_robot) package.
+
 ### Table of contents
 - [Dependancies](#dependencies)
 - [Packages overview](#overview)
@@ -17,7 +20,7 @@
 - **`rosdep:`** command-line tool for installing system dependencies. Follow these install [instructions](http://wiki.ros.org/rosdep).
 - **`(optional) Docker:`** allow system flexibility. Viable option for no OS wide ROS install, or for working with multiple ROS versions. See [Working with Docker](#working-with-docker) for details. 
 
-### Overview
+### Packages overview
 - **`mir_robot:`** [DFKI](https://www.dfki.de/web) [package](https://github.com/DFKI-NI/mir_robot#mir_robot) containing the ROS driver and config files for MiR100 robot.
 - **`mir_joy_teleop:`** joystick teleoperation package.
 - **`mir_rest_api:`** MiR100 REST API. Allows direct requests or requests using a ROS service.
@@ -59,7 +62,7 @@ $ source ~/MiR100/ws/devel/setup.bash \
 ```
 
 ## Connect to the robot
-***NOTE:*** everytime before using the robot synchronize system time as best you can. In the MiR interface go to: "System" -> "Settings" -> "Date & Time". For an advanced setup see [this solution](https://github.com/DFKI-NI/mir_robot#advanced).
+***NOTE:** everytime before using the robot synchronize system time as best you can. In the MiR web interface go to: "System" -> "Settings" -> "Date & Time". For an advanced setup see [this solution](https://github.com/DFKI-NI/mir_robot#advanced).*
 
 ### Connect to the web interface
 - connect to the MiR_R**** hotspot
@@ -177,10 +180,10 @@ $ roslaunch mir_joy_teleop joy_teleop.launch device:=js2 roscore:=external
 ```
 
 ## Working with Docker:
-The `mir_robot` package and in turn `mir_driver` use the external computer `roscore` to control the MiR100 robot. With the OS wide ROS install you can only simultaneously use either the external computer `roscore` for controlling the robot or connect to the internal MiR100 computer `roscore` for monitoring. Docker containers allow you flexibility in your setup: 
-- use your computer to control the robot and a Docker image to connect to the robot `roscore` for monitoring and vice versa
-- use Docker containers for both controlling and monitoring the robot
-- no need for OS wide ROS install & possibility of switching between ROS versions  
+Docker containers allow you flexibility in your setup:
+- reproducibility of environments/projects
+- no need for OS wide ROS install
+- possibility of switching between ROS versions  
 
 ### Install Docker engine
 Full install instructions are available at Dockers [official website](https://docs.docker.com/engine/install/ubuntu/).

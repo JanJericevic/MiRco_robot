@@ -32,25 +32,33 @@
     <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
           <a href=".." class="icon icon-home"> MiR100 Robolab
-        </a>
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
       </div>
 
       <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="..">MiR100 Robolab documentation</a>
+                <li class="toctree-l1"><a class="reference internal" href="..">Intro</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Environment setup</span></p>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
-                </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../connection/">Connect to the robot</a>
+                  </li>
               </ul>
+              <p class="caption"><span class="caption-text">Controlling the robot</span></p>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../connection/">Connect to the robot</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../control/">Controlling the robot</a>
-                </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../control/">Controlling the robot</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../control_web/">Web interface</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../control_ros/">ROS</a>
+                  </li>
               </ul>
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href="./">Working with Docker</a>
@@ -163,7 +171,13 @@ $ docker run hello-world
 <h2 id="building-the-image">Building the image</h2>
 <p>If all you want is to connect to the MiR100 <code>roscore</code> for monitoring all you need is a ROS Docker image.<br />
 However, we will build a custom ROS Docker image complete with the same ROS packages as with the OS wide ROS install, so you have a choice of running the project locally or using Docker containers.</p>
-<pre><code class="language-bash"># download the desired packages to the src of your workspace
+<pre><code class="language-bash"># download the desired packages to the &quot;src&quot; of your &quot;workspace&quot;
+$ mkdir -p ~/MiR100/ws/src
+$ cd ~/MiR100/ws/src
+
+$ git clone -b noetic https://github.com/DFKI-NI/mir_robot.git
+$ git clone -b main https://github.com/JanJericevic/MiR100_robolab.git
+
 # move the Dockerfile in MiR100_robolab folder to the src folder
 $ cd ~/MiR100/ws/src/MiR100_robolab
 $ mv ~/MiR100/ws/src/MiR100_robolab/Dockerfile ~/MiR100/ws/src
@@ -195,7 +209,7 @@ The current profile settings are: </p>
 <p>You can open an interactive bash shell with:</p>
 <pre><code class="language-bash">docker run -it &lt;image-name&gt; bash
 </code></pre>
-<p>This is ok for simple tasks however more advanced tasks require additional commands. Below are explanations for specific commands. However, since the commands can get complicated, we recommend the use of convenience scripts for repetitive cases. Create your own or use one of <a href="/convenience_scripts/">ours</a>.</p>
+<p>This is ok for simple tasks however more advanced tasks require additional commands. Below are explanations for specific commands. However, since the commands can get complicated, we recommend the use of convenience scripts for repetitive cases. Create your own or use one of <a href="https://github.com/JanJericevic/MiR100_robolab/tree/main/convenience_scripts">ours</a>.</p>
 <h3 id="networking">Networking</h3>
 <p>There are many options for the network settings of a container that you can read about <a href="https://docs.docker.com/engine/reference/run/#network-settings">here</a>. Depending on your application you may want to use another option, in our case we choose to use the host's network inside the container. Among other things, this allows containers to talk to each other (e.g. one container is running the <code>roscore</code>, the other subscribes to a topic).</p>
 <pre><code class="language-bash">docker run -it --net=host &lt;image-name&gt; bash
@@ -224,7 +238,7 @@ $ xhost +SI:local:&lt;user-name&gt;
 $ xhost -
 </code></pre>
 <h3 id="nvidia">NVIDIA</h3>
-<p>Users of NVIDIA GPUs can download the <a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Container Toolkit</a>, which allows them to build GPU accelerated containers or in some cases solves display issues if the above mentioned setup is not working. The "Graphics inside Docker Containers" paragraph of this <a href="https://roboticseabass.com/2021/04/21/docker-and-ros/"> ROS&amp;Docker guide</a> describes working with such images. </p>
+<p>Users of NVIDIA GPUs can download the <a href="https://github.com/NVIDIA/nvidia-docker">NVIDIA Container Toolkit</a>, which allows them to build GPU accelerated containers or in some cases solve display issues if the above mentioned setup is not working. The "Graphics inside Docker Containers" paragraph of this <a href="https://roboticseabass.com/2021/04/21/docker-and-ros/"> ROS&amp;Docker guide</a> describes working with such images. </p>
 <pre><code class="language-bash"># example of a docker run command for NVIDIA GPU enabled container
 $ docker run -it --net=host --gpus all \
     --env=&quot;NVIDIA_DRIVER_CAPABILITIES=all&quot; \
@@ -245,18 +259,19 @@ $ docker run -it --net=host --gpus all \
     bash
 </code></pre>
 <p>We mount our host side workspace <code>/home/&lt;host-user&gt;/ws</code> to the container side workspace <code>/home/&lt;container-user&gt;/ws</code> in read-write mode. This means that the two workspaces are connected. Any change that we make in either of the two will affect both.<br />
-It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base.</p>
+<strong>It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base.</strong></p>
 <h4 id="example-development-setup-for-a-host-without-the-os-wide-ros-install">Example development setup for a host without the OS wide ROS install:</h4>
 <pre><code class="language-bash">$ docker run -it \
     --volume=&quot;/home/&lt;host-user&gt;/ws/src&quot;:&quot;/home/&lt;container-user&gt;/ws/src&quot;:rw \
     &lt;image-name&gt; \
     bash
 </code></pre>
-<p>Here we mount the <code>src</code> folder of our host side workspace <code>/home/&lt;host-user&gt;/ws/src</code> to the <code>src</code> folder of our container side workspace <code>/home/&lt;container-user&gt;/ws/src</code> in read-write mode. This means that the two folders are connected. Any change that we make in either of the two will affect both.<br />
-However, <strong>since only the <code>src</code> folders of the workspaces are connected, the workspace still needs to be built inside the container with <code>catkin_make</code></strong>. It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base. </p>
+<p>Here we only mount the <code>src</code> folder of our host side workspace <code>/home/&lt;host-user&gt;/ws/src</code> to the <code>src</code> folder of our container side workspace <code>/home/&lt;container-user&gt;/ws/src</code> in read-write mode. This means that the two folders are connected. Any change that we make in either of the two will affect both.<br />
+However, <strong>since only the <code>src</code> folders of the workspaces are connected, the workspace still needs to be built inside the container with <code>catkin_make</code>. It is best practice to build the workspace every time you start a new container and of course, every time you make a change to the code base.</strong></p>
 <p>TODO: entrypoints, can you mount whole workspace?</p>
 <h3 id="input-devices">Input devices</h3>
-<p>To use input devices like joysticks inside the Docker container we have to mount it when starting the container.</p>
+<p>Always plug in your input devices <strong>before</strong> running the Docker container.<br />
+To use input devices like joysticks inside the Docker container we have to mount them when starting the container.</p>
 <pre><code class="language-bash">docker run -it \
     --device /dev/input \
     &lt;image-name&gt; \
@@ -290,7 +305,7 @@ event0   event11  event2   event4   event7  js0     mouse1
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href="../control/" class="btn btn-neutral float-left" title="Controlling the robot"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../control_ros/" class="btn btn-neutral float-left" title="ROS"><span class="icon icon-circle-arrow-left"></span> Previous</a>
     </div>
 
   <hr/>
@@ -313,7 +328,7 @@ event0   event11  event2   event4   event7  js0     mouse1
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href="../control/" style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../control_ros/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
   </span>
@@ -322,6 +337,7 @@ event0   event11  event2   event4   event7  js0     mouse1
     <script>var base_url = "..";</script>
     <script src="../js/theme_extra.js"></script>
     <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
     <script>
         jQuery(function () {
             SphinxRtdTheme.Navigation.enable(true);

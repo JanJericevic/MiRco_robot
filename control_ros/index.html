@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Installation - MiR100 Robolab</title>
+    <title>ROS - MiR100 Robolab</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Installation";
-        var mkdocs_page_input_path = "installation.md";
+        var mkdocs_page_name = "ROS";
+        var mkdocs_page_input_path = "control_ros.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -45,27 +45,29 @@
                 </li>
               </ul>
               <p class="caption"><span class="caption-text">Environment setup</span></p>
-              <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Installation</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#packages-overview">Packages overview</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#workspace-setup">Workspace setup</a>
-    </li>
-    </ul>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../connection/">Connect to the robot</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Controlling the robot</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../control/">Controlling the robot</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../control_web/">Web interface</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../control_ros/">ROS</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">ROS</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#using-a-joystick">Using a joystick</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#internal-roscore">Internal roscore</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#using-mir_driver">Using mir_driver</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
                   </li>
               </ul>
               <ul>
@@ -86,8 +88,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">Environment setup</li>
-      <li class="breadcrumb-item active">Installation</li>
+          <li class="breadcrumb-item">Controlling the robot</li>
+      <li class="breadcrumb-item active">ROS</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -96,60 +98,33 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="installation">Installation</h1>
-<h2 id="dependencies">Dependencies</h2>
-<ul>
-<li><strong><code>ROS noetic:</code></strong> full desktop version is preferred. Can install other variant dependant on your use case.</li>
-<li><strong><code>rosdep:</code></strong> command-line tool for installing system dependencies. Follow these install <a href="http://wiki.ros.org/rosdep">instructions</a>.</li>
-<li><strong><code>(optional) Docker:</code></strong> allows system flexibility. Viable option for no OS wide ROS install, or for working with multiple ROS versions. See <a href="#working-with-docker">Working with Docker</a> for details.</li>
-</ul>
-<h2 id="packages-overview">Packages overview</h2>
-<p>For this setup we will be installing 3 packages: </p>
-<ul>
-<li><strong><code>mir_robot:</code></strong> <a href="https://www.dfki.de/web">DFKI</a> <a href="https://github.com/DFKI-NI/mir_robot#mir_robot">package</a> containing the ROS driver and config files for MiR100 robot.</li>
-<li><strong><code>mir_joy_teleop:</code></strong> joystick teleoperation package.</li>
-<li><strong><code>mir_rest_api:</code></strong> MiR100 REST API. Allows direct requests or requests using a ROS service.</li>
-</ul>
-<h2 id="workspace-setup">Workspace setup</h2>
-<p>We are using the source install of the <code>mir_robot</code> package. For other options see the package <a href="https://github.com/DFKI-NI/mir_robot#mir_robot">github page</a>.</p>
-<pre><code class="language-bash"># create a catkin workspace
-$ mkdir -p ~/MiR100/ws/src
-$ cd ~/MiR100/ws/src
+                <h1 id="ros-control">ROS control</h1>
+<h2 id="using-a-joystick">Using a joystick</h2>
+<p>To control the robot with a joystick use the <code>mir_joy_teleop</code> package.<br />
+As with <a href="../connection/#connect-to-the-robot-with-ros">connecting to the robot</a>, there is a slight difference between sending the joystick commands directly to the robots internal <code>roscore</code> or with the <code>mir_driver</code>.</p>
+<h3 id="internal-roscore">Internal <code>roscore</code></h3>
+<pre><code class="language-bash"># launch a joy_node and a teleop node
+# default input device is js1
+$ roslaunch mir_joy_teleop joy_teleop.launch
 
-# clone mir_robot into the catkin workspace
-$ git clone -b noetic https://github.com/DFKI-NI/mir_robot.git
-
-# clone MiR100_robolab into the catkin workspace
-$ git clone -b main https://github.com/JanJericevic/MiR100_robolab.git
-
-# update and install packages
-$ sudo apt update \
-&amp;&amp; sudo apt upgrade -y \
-&amp;&amp; sudo apt install -y --no-install-recommends python3-catkin-lint python3-catkin-tools
-
-# use rosdep to install all dependencies
-$ cd ~/MiR100/ws/ \
-&amp;&amp; rosdep update \
-&amp;&amp; rosdep install --from-paths src -i -y --rosdistro noetic 
-
-# build all the packages in the catkin workspace
-$ source /opt/ros/noetic/setup.bash \
-&amp;&amp; cd ~/MiR100/ws/src \
-&amp;&amp; catkin_init_workspace \
-&amp;&amp; cd ~/MiR100/ws/ \
-&amp;&amp; catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
-
-# source the workspace and add it to the .bashrc
-$ source ~/MiR100/ws/devel/setup.bash \
-&amp;&amp; echo &quot;source ~/MiR100/ws/devel/setup.bash&quot; &gt;&gt; ~/.bashrc
+# specify input device - e.g. js2
+$ roslaunch mir_joy_teleop joy_teleop.launch device:=js2
 </code></pre>
-<p><em><strong>NOTE:</strong> if you wish to connect to the robot on a computer with no OS wide ROS install, see the <a href="../docker/">"Working with Docker" instructions.</a></em></p>
+<h3 id="using-mir_driver">Using <code>mir_driver</code></h3>
+<pre><code class="language-bash"># launch a joy_node and a teleop node
+# we specify the use of an external roscore (default value is 'internal')
+# default input device is js1
+$ roslaunch mir_joy_teleop joy_teleop.launch roscore:=external
+
+# specify input device - e.g. js2
+$ roslaunch mir_joy_teleop joy_teleop.launch device:=js2 roscore:=external
+</code></pre>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href=".." class="btn btn-neutral float-left" title="Intro"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../connection/" class="btn btn-neutral float-right" title="Connect to the robot">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../control_web/" class="btn btn-neutral float-left" title="Web interface"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../docker/" class="btn btn-neutral float-right" title="Working with Docker">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -172,10 +147,10 @@ $ source ~/MiR100/ws/devel/setup.bash \
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../control_web/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../connection/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../docker/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

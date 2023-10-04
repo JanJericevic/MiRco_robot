@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <link rel="shortcut icon" href="../img/favicon.ico" />
-    <title>Installation - MiR100 Robolab</title>
+    <title>Web interface - MiR100 Robolab</title>
     <link rel="stylesheet" href="../css/theme.css" />
     <link rel="stylesheet" href="../css/theme_extra.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
@@ -13,8 +13,8 @@
     
       <script>
         // Current page data
-        var mkdocs_page_name = "Installation";
-        var mkdocs_page_input_path = "installation.md";
+        var mkdocs_page_name = "Web interface";
+        var mkdocs_page_input_path = "control_web.md";
         var mkdocs_page_url = null;
       </script>
     
@@ -45,25 +45,37 @@
                 </li>
               </ul>
               <p class="caption"><span class="caption-text">Environment setup</span></p>
-              <ul class="current">
-                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Installation</a>
-    <ul class="current">
-    <li class="toctree-l2"><a class="reference internal" href="#dependencies">Dependencies</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#packages-overview">Packages overview</a>
-    </li>
-    <li class="toctree-l2"><a class="reference internal" href="#workspace-setup">Workspace setup</a>
-    </li>
-    </ul>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../installation/">Installation</a>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../connection/">Connect to the robot</a>
                   </li>
               </ul>
               <p class="caption"><span class="caption-text">Controlling the robot</span></p>
-              <ul>
+              <ul class="current">
                   <li class="toctree-l1"><a class="reference internal" href="../control/">Controlling the robot</a>
                   </li>
-                  <li class="toctree-l1"><a class="reference internal" href="../control_web/">Web interface</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Web interface</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#interface-overview">Interface overview</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#top-bar">Top bar</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#navigation">Navigation</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#dashboards">Dashboards</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#map-creation">Map creation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#missions">Missions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#manual-control">Manual control</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#goal">Goal</a>
+    </li>
+    </ul>
                   </li>
                   <li class="toctree-l1"><a class="reference internal" href="../control_ros/">ROS</a>
                   </li>
@@ -86,8 +98,8 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
-          <li class="breadcrumb-item">Environment setup</li>
-      <li class="breadcrumb-item active">Installation</li>
+          <li class="breadcrumb-item">Controlling the robot</li>
+      <li class="breadcrumb-item active">Web interface</li>
     <li class="wy-breadcrumbs-aside">
     </li>
   </ul>
@@ -96,60 +108,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="installation">Installation</h1>
-<h2 id="dependencies">Dependencies</h2>
-<ul>
-<li><strong><code>ROS noetic:</code></strong> full desktop version is preferred. Can install other variant dependant on your use case.</li>
-<li><strong><code>rosdep:</code></strong> command-line tool for installing system dependencies. Follow these install <a href="http://wiki.ros.org/rosdep">instructions</a>.</li>
-<li><strong><code>(optional) Docker:</code></strong> allows system flexibility. Viable option for no OS wide ROS install, or for working with multiple ROS versions. See <a href="#working-with-docker">Working with Docker</a> for details.</li>
-</ul>
-<h2 id="packages-overview">Packages overview</h2>
-<p>For this setup we will be installing 3 packages: </p>
-<ul>
-<li><strong><code>mir_robot:</code></strong> <a href="https://www.dfki.de/web">DFKI</a> <a href="https://github.com/DFKI-NI/mir_robot#mir_robot">package</a> containing the ROS driver and config files for MiR100 robot.</li>
-<li><strong><code>mir_joy_teleop:</code></strong> joystick teleoperation package.</li>
-<li><strong><code>mir_rest_api:</code></strong> MiR100 REST API. Allows direct requests or requests using a ROS service.</li>
-</ul>
-<h2 id="workspace-setup">Workspace setup</h2>
-<p>We are using the source install of the <code>mir_robot</code> package. For other options see the package <a href="https://github.com/DFKI-NI/mir_robot#mir_robot">github page</a>.</p>
-<pre><code class="language-bash"># create a catkin workspace
-$ mkdir -p ~/MiR100/ws/src
-$ cd ~/MiR100/ws/src
-
-# clone mir_robot into the catkin workspace
-$ git clone -b noetic https://github.com/DFKI-NI/mir_robot.git
-
-# clone MiR100_robolab into the catkin workspace
-$ git clone -b main https://github.com/JanJericevic/MiR100_robolab.git
-
-# update and install packages
-$ sudo apt update \
-&amp;&amp; sudo apt upgrade -y \
-&amp;&amp; sudo apt install -y --no-install-recommends python3-catkin-lint python3-catkin-tools
-
-# use rosdep to install all dependencies
-$ cd ~/MiR100/ws/ \
-&amp;&amp; rosdep update \
-&amp;&amp; rosdep install --from-paths src -i -y --rosdistro noetic 
-
-# build all the packages in the catkin workspace
-$ source /opt/ros/noetic/setup.bash \
-&amp;&amp; cd ~/MiR100/ws/src \
-&amp;&amp; catkin_init_workspace \
-&amp;&amp; cd ~/MiR100/ws/ \
-&amp;&amp; catkin_make -DCMAKE_BUILD_TYPE=RelWithDebugInfo
-
-# source the workspace and add it to the .bashrc
-$ source ~/MiR100/ws/devel/setup.bash \
-&amp;&amp; echo &quot;source ~/MiR100/ws/devel/setup.bash&quot; &gt;&gt; ~/.bashrc
-</code></pre>
-<p><em><strong>NOTE:</strong> if you wish to connect to the robot on a computer with no OS wide ROS install, see the <a href="../docker/">"Working with Docker" instructions.</a></em></p>
+                <h1 id="web-interface-control">Web interface control</h1>
+<h2 id="interface-overview">Interface overview</h2>
+<p>Let this serve as a brief overview of the MiR web interface. For detailed instructions see the full interface <a href="TODO">documentation</a>.</p>
+<h3 id="top-bar">Top bar</h3>
+<p>The top bar shows information on the current state of the robot. You can start/pause the robot, check robot status, select you language, select your user, check the robot battery percentage or manually control the robot with the joystick. Robot speed for manual control is fixed when using the joystick from the top bar.</p>
+<p><img alt="top bar" src="../img/web_interface/top_bar.jpg" /></p>
+<h3 id="navigation">Navigation</h3>
+<p>To get to a specific subsection of the interface select an item in the primary menu and then in the relevant sub-menu.</p>
+<p><img alt="navigation menu" src="../img/web_interface/navigation.jpg" /></p>
+<h3 id="dashboards">Dashboards</h3>
+<p>Dashboards are the main way you interact with the robot over the web interface. You can create your own dashboard that displays only relevant information for your use case. Select <em>Dashboards</em> to open the list of dashboards, and select the <em>Create dashboard</em> button to open the dashboard designer. Alternatively, you can select an existing dashboard from the list. </p>
+<p>TODO: dashboard description
+TODO: dashboard picture</p>
+<h2 id="map-creation">Map creation</h2>
+<h2 id="missions">Missions</h2>
+<p>A mission is a predefined series of actions that the robot can be set to perform.</p>
+<h2 id="manual-control">Manual control</h2>
+<p>TODO: test if The joystick for driving the robot in Manual mode cannot be operated on Windows-based devices.</p>
+<h2 id="goal">Goal</h2>
               
             </div>
           </div><footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
-        <a href=".." class="btn btn-neutral float-left" title="Intro"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-        <a href="../connection/" class="btn btn-neutral float-right" title="Connect to the robot">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../control/" class="btn btn-neutral float-left" title="Controlling the robot"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../control_ros/" class="btn btn-neutral float-right" title="ROS">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
 
   <hr/>
@@ -172,10 +155,10 @@ $ source ~/MiR100/ws/devel/setup.bash \
   <span class="rst-current-version" data-toggle="rst-current-version">
     
     
-      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+      <span><a href="../control/" style="color: #fcfcfc">&laquo; Previous</a></span>
     
     
-      <span><a href="../connection/" style="color: #fcfcfc">Next &raquo;</a></span>
+      <span><a href="../control_ros/" style="color: #fcfcfc">Next &raquo;</a></span>
     
   </span>
 </div>

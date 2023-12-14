@@ -159,7 +159,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/lasers.py scripts/odom.py
+  scripts/lasers.py scripts/odom.py scripts/rob_dist.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

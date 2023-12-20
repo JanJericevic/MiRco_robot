@@ -1,8 +1,8 @@
 <launch>
   <!-- input device -->
-  <arg name="device" default="js1" />
+  <arg name="device" default="js0" />
   <!-- select which roscore controls the robot: internal(MiR100) / external(mir_driver). Affects message type for /cmd_vel  -->
-  <arg name="roscore" default="external" />
+  <arg name="roscore" default="internal" />
 
   <!-- joy node -->
   <!-- select correct input device -->

@@ -179,6 +179,11 @@ $ roslaunch mir_joy_teleop joy_teleop.launch roscore:=external
 $ roslaunch mir_joy_teleop joy_teleop.launch device:=js2 roscore:=external
 ```
 
+### TODO
+```
+rviz -d $(rospack find mir_navigation)/rviz/navigation.rviz
+```
+
 ## Working with Docker:
 Docker containers allow you flexibility in your setup:
 - reproducibility of environments/projects

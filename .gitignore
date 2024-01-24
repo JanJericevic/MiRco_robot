@@ -7,3 +7,5 @@ docs/
 mkdocs.yml
 
 MiR100_test/
+
+rosbag/

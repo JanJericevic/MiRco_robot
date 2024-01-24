@@ -1,14 +1,22 @@
 # ROS noetic image
 FROM osrf/ros:noetic-desktop-full
 
-# install network tools, sudo and pip
+# update and install packages
 RUN apt update \
     && apt upgrade -y \
-    && apt install -y net-tools wireless-tools iproute2 arp-scan nmap sudo python3-pip
+    && apt install -y net-tools wireless-tools iproute2 arp-scan nmap sudo python3-pip nano git \
+    && apt install -y --no-install-recommends build-essential python3-rosdep python3-catkin-lint python3-catkin-tools python3-wstool 
+RUN apt install -y ros-noetic-moveit
+# RUN apt update \
+#     && apt install -y ros-noetic-universal-robots
+RUN apt update \
+    && apt install -y ros-noetic-ur-robot-driver ros-noetic-ur-calibration ros-noetic-ur-calibration-dbgsym
+RUN apt update \
+    && apt-get install -y ros-noetic-soem
 
-# update python packages and install virtualenv
+# update and install python packages
 RUN python3 -m pip install --upgrade pip setuptools wheel \
-    && python3 -m pip install virtualenv
+    && python3 -m pip install virtualenv requests scipy
 
 # clean up the apt cache
 RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
@@ -25,19 +33,14 @@ ARG MYGID
 # change the default shell to Bash
 SHELL [ "/bin/bash" , "-c" ]
 
-# update and install packages
-RUN apt update \
-    && apt upgrade -y \
-    && apt install -y --no-install-recommends build-essential python3-rosdep python3-catkin-lint python3-catkin-tools \
-    && python3 -m pip install requests \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
 # create a user (same as on host that builds the image)
 # this is to avoid permission issues with shared files created inside the container
 # user name is host user name. user password is same as user name
 RUN groupadd $MYGROUP -g $MYGID \
     && useradd -m $MYUSER -u $MYUID -g $MYGID -d /home/${MYUSER} \
     && echo "$MYUSER:$MYUSER" | chpasswd && adduser $MYUSER sudo
+# add user to dialout group
+RUN usermod -a -G dialout $MYUSER
 
 # add user directiory to path
 ENV PATH="/home/${MYUSER}/.local/bin:$PATH"
@@ -62,7 +65,7 @@ USER root
 RUN rosdep update \
     && apt update \
     && cd /home/${MYUSER}/ws \
-    && DEBIAN_FRONTEND=noninteractive rosdep install --from-paths src -i -y --rosdistro noetic \
+    && DEBIAN_FRONTEND=noninteractive rosdep install --from-paths src -i -y --ignore-src --rosdistro noetic \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # change back to user

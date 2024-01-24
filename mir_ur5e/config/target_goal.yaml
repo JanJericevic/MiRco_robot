@@ -1,0 +1,40 @@
+mir100:
+  pick_and_place:
+    target_goals: 
+      goal1:
+        position: {
+          x: 9.787,
+          y: 12.549,
+          z: 0.0
+        }
+        orientation: {
+          x: 0.0,
+          y: 0.0,
+          z: -0.703,
+          w:  0.711
+        }
+      # goal1:
+      #   position: {
+      #     x: 8.486,
+      #     y: 8.724,
+      #     z: 0.0
+      #   }
+      #   orientation: {
+      #     x: 0.0,
+      #     y: 0.0,
+      #     z: 0.701,
+      #     w: 0.713
+      #   }
+      # goal2:
+      #   position: {
+      #     x: 8.069, 
+      #     y: 7.616,
+      #     z: 0.0
+      #   } 
+      #   orientation: {
+      #     x: 0.0,
+      #     y: 0.0,
+      #     z: 1.000, 
+      #     w: 0.024
+      #   }
+

@@ -1,6 +1,0 @@
-<launch>
-    <!-- mir pose publisher node -->
-    <node respawn="true" pkg="mir_ur5e" type="pose_pub.py" name="mir_pose_publisher" />
-    <!-- pick and place node -->
-    <node pkg="mir_ur5e" type="pick_and_place.py" name="mir_pick_and_place_node" output="screen"/>
-  </launch>

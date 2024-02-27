@@ -410,4 +410,3 @@ KERNEL=="js0", SUBSYSTEM=="input", ACTION=="add", RUN+="/usr/bin/setfacl -m o:rw
 ```
 
 This udev rule uses `ACL` to set the read-write permissions of the input device `js0` for the `others` group. You can modify the rule using `ACL` commands.
-

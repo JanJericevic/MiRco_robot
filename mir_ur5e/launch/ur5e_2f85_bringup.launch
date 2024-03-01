@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="namespace" default="" doc="namespace for all topics"/>
+  <arg name="arm_prefix" default="ur5e_" doc="prefix for robot arm"/>
+  <arg name="gripper_prefix" default="2f85_" doc="prefix for robot gripper"/>
+
   <arg name="debug" default="false" doc="Debug flag that will get passed on to ur_common.launch"/>
   <arg name="robot_ip" default="192.168.65.245" doc="IP address by which the robot can be reached."/>
   <arg name="reverse_ip" default="" doc="IP of the driver, if set to empty it will detect it automatically."/>
@@ -7,11 +11,10 @@
   <arg name="script_sender_port" default="50002" doc="The driver will offer an interface to receive the program's URScript on this port. If the robot cannot connect to this port, `External Control` will stop immediately."/>
   <arg name="trajectory_port" default="50003" doc="Port that will be opened by the driver to allow trajectory forwarding."/>
   <arg name="script_command_port" default="50004" doc="Port that will be opened by the driver to allow forwarding script commands to the robot."/>
-  <arg name="tf_prefix" default="" doc="tf_prefix used for the robot."/>
+  <arg name="tf_prefix" value="$(arg namespace)$(arg arm_prefix)" doc="tf_prefix used for the robot."/>
   <arg name="controllers" default="joint_state_controller scaled_pos_joint_traj_controller speed_scaling_state_controller force_torque_sensor_controller" doc="Controllers that are activated by default."/>
   <arg name="stopped_controllers" default="pos_joint_traj_controller joint_group_vel_controller" doc="Controllers that are initally loaded, but not started."/>
   <arg name="controller_config_file" default="$(find ur5e_2f85_description)/config/ur5e_controllers.yaml" doc="Config file used for defining the ROS-Control controllers."/>
-  <!-- <arg name="robot_description_file" default="$(find ur_description)/launch/load_ur5e.launch" doc="Robot description launch file."/> -->
   <arg name="robot_description_file" default="$(find ur5e_2f85_description)/launch/load_ur5e_2f85.launch" doc="Robot description launch file."/>
   <arg name="kinematics_config" default="$(find ur5e_2f85_description)/config/ur5e_kinematics_calib.yaml" doc="Kinematics config file used for calibration correction. This will be used to verify the robot's calibration is matching the robot_description."/>
   <arg name="use_tool_communication" default="true" doc="On e-Series robots tool communication can be enabled with this argument"/>
@@ -26,31 +29,63 @@
   <arg name="headless_mode" default="false" doc="Automatically send URScript to robot to execute. On e-Series this does require the robot to be in 'remote-control' mode. With this, the URCap is not needed on the robot."/>
   <arg name="ur_hardware_interface_node_required" default="true" doc="Shut down ros environment if ur_hardware_interface-node dies."/>
 
-
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-      <rosparam param="source_list">[joint_states, gripper_joint_states]</rosparam>
-      <param name="rate" value="200." />
-  </node>
+  <!-- load prefixes to the parameter server for convenience -->
+  <param name="robot_namespace_prefix" value="$(arg arm_prefix)" />
+  <param name="robot_arm_prefix" value="$(arg arm_prefix)" />
+  <param name="robot_gripper_prefix" value="$(arg gripper_prefix)" />
 
   <include file="$(find mir_ur5e)/launch/ur_common.launch" pass_all_args="true" />
 
-  <arg name="gripper_device" default="/tmp/ttyUR" />
-  <node name="gripper_hw" pkg="robotiq_2f_gripper_control" type="Robotiq2FGripperRtuNode.py" args="$(arg gripper_device)">
-    <remap from="Robotiq2FGripperRobotInput" to="~/input" />
-    <remap from="Robotiq2FGripperRobotOutput" to="~/output" />
-  </node>
+  <!-- workaround for empty namespace. If namespace is empty the group in not evaluated. -->
+  <!-- that is why we have two groups - one for when the namespace is set and one for when its not -->
+  <!-- ///////////// NAMESPACE IS SET///////////////////////// -->
+  <group if="$(eval namespace != '')" ns="$(arg namespace)">
+    <!-- tell joint state publisher where to look for joint states -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <rosparam param="source_list">[arm_joint_states, gripper_joint_states]</rosparam>
+        <param name="rate" value="200." />
+    </node>
 
-  <!-- action server -->
-  <include file="$(find robotiq_2f_gripper_action_server)/launch/robotiq_2f_gripper_action_server.launch">
-      <!-- <arg name="min_gap" value="-0.015" />
-      <arg name="max_gap" value="0.140" />  -->
-      <arg name="gripper_name" value="gripper_hw" /> <!-- connect to hw node -->
-  </include>
+    <!-- connect to robotiq gripper over rtu -->
+    <arg name="gripper_device" default="/tmp/ttyUR" />
+    <node name="gripper_control" pkg="robotiq_2f_gripper_control" type="Robotiq2FGripperRtuNode.py" args="$(arg gripper_device)">
+      <remap from="Robotiq2FGripperRobotInput" to="~/input" />
+      <remap from="Robotiq2FGripperRobotOutput" to="~/output" />
+    </node>
 
+    <!-- add a node that translates the gripper data into a joint state -->
+    <node name="gripper_joint_state_publisher" pkg="robotiq_2f_gripper_control" type="gripper_joint_state_publisher.py">
+      <param name="prefix" value="$(arg gripper_prefix)" />
+      <remap from="input" to="gripper_control/input" />
+    </node>
+  </group>
 
-  <!-- add a node that translates the gripper data into a joint state -->
-  <node name="gripper_joint_state_publisher" pkg="robotiq_2f_gripper_control" type="gripper_joint_state_publisher.py">
-    <remap from="input" to="gripper_hw/input" />
-    <remap from="joint_states" to="gripper_joint_states" />
-  </node>
+  <!-- ///////////// NAMESPACE IS NOT SET //////////////////// -->
+  <group if="$(eval namespace == '')">
+    <!-- tell joint state publisher where to look for joint states -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+        <rosparam param="source_list">[arm_joint_states, gripper_joint_states]</rosparam>
+        <param name="rate" value="200." />
+    </node>
+
+    <!-- connect to robotiq gripper over rtu -->
+    <arg name="gripper_device" default="/tmp/ttyUR" />
+    <node name="gripper_control" pkg="robotiq_2f_gripper_control" type="Robotiq2FGripperRtuNode.py" args="$(arg gripper_device)">
+      <remap from="Robotiq2FGripperRobotInput" to="~/input" />
+      <remap from="Robotiq2FGripperRobotOutput" to="~/output" />
+    </node>
+
+    <!-- add a node that translates the gripper data into a joint state -->
+    <node name="gripper_joint_state_publisher" pkg="robotiq_2f_gripper_control" type="gripper_joint_state_publisher.py">
+      <param name="prefix" value="$(arg gripper_prefix)" />
+      <remap from="input" to="gripper_control/input" />
+    </node>
+  </group>
+
+    <!-- action server -->
+    <!-- <include file="$(find robotiq_2f_gripper_action_server)/launch/robotiq_2f_gripper_action_server.launch"> -->
+        <!-- <arg name="min_gap" value="-0.015" />
+        <arg name="max_gap" value="0.140" />  -->
+        <!-- <arg name="gripper_name" value="gripper_hw" />  -->
+    <!-- </include> -->
 </launch>

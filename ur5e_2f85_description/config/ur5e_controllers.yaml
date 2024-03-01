@@ -5,12 +5,12 @@ hardware_control_loop:
 # Settings for ros_control hardware interface
 ur_hardware_interface:
    joints: &robot_joints
-     - shoulder_pan_joint
-     - shoulder_lift_joint
-     - elbow_joint
-     - wrist_1_joint
-     - wrist_2_joint
-     - wrist_3_joint
+     - $(arg namespace)$(arg arm_prefix)shoulder_pan_joint
+     - $(arg namespace)$(arg arm_prefix)shoulder_lift_joint
+     - $(arg namespace)$(arg arm_prefix)elbow_joint
+     - $(arg namespace)$(arg arm_prefix)wrist_1_joint
+     - $(arg namespace)$(arg arm_prefix)wrist_2_joint
+     - $(arg namespace)$(arg arm_prefix)wrist_3_joint
 
 # Publish all joint states ----------------------------------
 joint_state_controller:
@@ -140,7 +140,7 @@ forward_cartesian_traj_controller:
 
 twist_controller:
   type: "ros_controllers_cartesian/TwistController"
-  frame_id: "tool0_controller"
+  frame_id: "$(arg namespace)$(arg arm_prefix)tool0_controller"
   publish_rate: *loop_hz
   joints: *robot_joints
 
@@ -148,16 +148,16 @@ pose_based_cartesian_traj_controller:
     type: pose_controllers/CartesianTrajectoryController
 
     # UR driver convention
-    base: base
-    tip: tool0_controller
+    base: $(arg namespace)$(arg arm_prefix)base
+    tip: $(arg namespace)$(arg arm_prefix)tool0_controller
     joints: *robot_joints
 
 joint_based_cartesian_traj_controller:
     type: position_controllers/CartesianTrajectoryController
 
     # UR driver convention
-    base: base
-    tip: tool0
+    base: $(arg namespace)$(arg arm_prefix)base
+    tip: $(arg namespace)$(arg arm_prefix)tool0
     joints: *robot_joints
 
 robot_status_controller:

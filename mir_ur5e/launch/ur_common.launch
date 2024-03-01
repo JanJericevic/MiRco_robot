@@ -1,5 +1,9 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="namespace" default="" doc="namespace for all topics"/>
+  <arg name="arm_prefix" default="" doc="prefix for robot arm"/>
+  <arg name="gripper_prefix" default="" doc="prefix for robot gripper"/>
+
   <arg name="debug" default="false" doc="Debug flag that will get passed on to ur_control.launch"/>
   <arg name="use_tool_communication" doc="On e-Series robots tool communication can be enabled with this argument"/>
   <arg name="controller_config_file" doc="Config file used for defining the ROS-Control controllers."/>
@@ -26,17 +30,39 @@
   <arg name="ur_hardware_interface_node_required" default="true" doc="Shut down ros environment if ur_hardware_interface-node dies."/>
   <arg name="use_spline_interpolation" default="true" doc="True if splines should be used as interpolation on the robot controller when forwarding trajectory, if false movej or movel commands are used"/>
 
-  <!-- robot model -->
-  <include file="$(arg robot_description_file)">
-    <arg name="kinematics_params" value="$(arg kinematics_config)"/>
-  </include>
+  <!-- workaround for empty namespace. If namespace is empty the group in not evaluated. -->
+  <!-- that is why we have two groups - one for when the namespace is set and one for when its not -->
+  <!-- ///////////// NAMESPACE IS SET///////////////////////// -->
+  <group if="$(eval namespace != '')" ns="$(arg namespace)">
+    <!-- robot model -->
+    <include file="$(arg robot_description_file)">
+      <arg name="kinematics_params" value="$(arg kinematics_config)"/>
+      <arg name="arm_prefix" value="$(arg arm_prefix)"/>
+      <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
+    </include>
 
-  <!-- <group ns="ur5e"> -->
-    <!-- Convert joint states to /tf tranforms -->
-  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+      <remap from="/tf" to="$(arg namespace)tf" />
+  </group>
 
-  <remap from="joint_states" to="ur5_joint_states" />
-  <include file="$(find mir_ur5e)/launch/ur_control.launch">
+  <!-- ///////////// NAMESPACE IS NOT SET //////////////////// -->
+  <group if="$(eval namespace == '')">
+    <!-- robot model -->
+    <include file="$(arg robot_description_file)">
+      <arg name="kinematics_params" value="$(arg kinematics_config)"/>
+      <arg name="arm_prefix" value="$(arg arm_prefix)"/>
+      <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
+    </include>
+
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+      <remap from="/tf" to="$(arg namespace)tf" />
+  </group>
+
+    <remap from="joint_states" to="arm_joint_states" />
+    <include file="$(find mir_ur5e)/launch/ur_control.launch">
+      <arg name="namespace" value="$(arg namespace)" />
+      <arg name="arm_prefix" value="$(arg arm_prefix)" />
+      <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
       <arg name="debug" value="$(arg debug)"/>
       <arg name="use_tool_communication" value="$(arg use_tool_communication)"/>
       <arg name="controller_config_file" value="$(arg controller_config_file)"/>
@@ -61,6 +87,6 @@
       <arg name="tool_tcp_port" value="$(arg tool_tcp_port)"/>
       <arg name="ur_hardware_interface_node_required" value="$(arg ur_hardware_interface_node_required)"/>
       <arg name="use_spline_interpolation" value="$(arg use_spline_interpolation)"/>
-  </include>
-  <!-- </group> -->
+    </include>
+
 </launch>

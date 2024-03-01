@@ -1,5 +1,8 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="namespace" doc="namespace for all topics"/>
+  <arg name="arm_prefix" doc="prefix for robot arm"/>
+  <arg name="gripper_prefix" doc="prefix for robot gripper"/>
 
   <!-- GDB functionality -->
   <arg name="debug" default="false" doc="If set to true, will start the driver inside gdb" />
@@ -35,66 +38,140 @@
   <arg name="ur_hardware_interface_node_required" default="true" doc="Shut down ros environment if ur_hardware_interface-node dies."/>
   <arg name="use_spline_interpolation" default="true" doc="True if splines should be used as interpolation on the robot controller when forwarding trajectory, if false movej or movel commands are used"/>
 
-  <!-- Load hardware interface -->
-  <node name="ur_hardware_interface" pkg="ur_robot_driver" type="ur_robot_driver_node" output="screen" launch-prefix="$(arg launch_prefix)" required="$(arg ur_hardware_interface_node_required)">
-    <param name="robot_ip" type="str" value="$(arg robot_ip)"/>
-    <param name="reverse_ip" value="$(arg reverse_ip)"/>
-    <param name="reverse_port" type="int" value="$(arg reverse_port)"/>
-    <param name="script_sender_port" type="int" value="$(arg script_sender_port)"/>
-    <param name="trajectory_port" value="$(arg trajectory_port)"/>
-    <param name="script_command_port" value="$(arg script_command_port)"/>
-    <rosparam command="load" file="$(arg kinematics_config)" />
-    <param name="script_file" value="$(arg urscript_file)"/>
-    <param name="output_recipe_file" value="$(arg rtde_output_recipe_file)"/>
-    <param name="input_recipe_file" value="$(arg rtde_input_recipe_file)"/>
-    <param name="headless_mode" value="$(arg headless_mode)"/>
-    <param name="tf_prefix" value="$(arg tf_prefix)"/>
-    <param name="use_tool_communication" value="$(arg use_tool_communication)"/>
-    <!--<param name="reverse_port" type="int" value="$(arg reverse_port)" />-->
-    <param name="tool_voltage" value="$(arg tool_voltage)"/>
-    <param name="tool_parity" value="$(arg tool_parity)"/>
-    <param name="tool_baud_rate" value="$(arg tool_baud_rate)"/>
-    <param name="tool_stop_bits" value="$(arg tool_stop_bits)"/>
-    <param name="tool_rx_idle_chars" value="$(arg tool_rx_idle_chars)"/>
-    <param name="tool_tx_idle_chars" value="$(arg tool_tx_idle_chars)"/>
-    <param name="servoj_gain" value="$(arg servoj_gain)"/>
-    <param name="servoj_lookahead_time" value="$(arg servoj_lookahead_time)"/>
-    <param name="use_spline_interpolation" value="$(arg use_spline_interpolation)"/>
-  </node>
 
-  <!-- Starts socat to bridge the robot's tool communication interface to a local tty device -->
-  <node if="$(arg use_tool_communication)" name="ur_tool_communication_bridge" pkg="ur_robot_driver" type="tool_communication" respawn="false" output="screen">
-    <param name="robot_ip" value="$(arg robot_ip)"/>
-    <param name="reverse_ip" value="$(arg reverse_ip)"/>
-    <param name="reverse_port" type="int" value="$(arg reverse_port)"/>
-    <param name="script_sender_port" type="int" value="$(arg script_sender_port)"/>
-    <param name="device_name" value="$(arg tool_device_name)"/>
-    <param name="tcp_port" value="$(arg tool_tcp_port)"/>
-  </node>
+  <!-- workaround for empty namespace. If namespace is empty the group in not evaluated. -->
+  <!-- that is why we have two groups - one for when the namespace is set and one for when its not -->
+  <!-- ///////////// NAMESPACE IS SET///////////////////////// -->
+  <group if="$(eval namespace != '')" ns="$(arg namespace)">
+    <!-- Load hardware interface -->
+    <node name="ur_hardware_interface" pkg="ur_robot_driver" type="ur_robot_driver_node" output="screen" launch-prefix="$(arg launch_prefix)" required="$(arg ur_hardware_interface_node_required)">
+      <param name="robot_ip" type="str" value="$(arg robot_ip)"/>
+      <param name="reverse_ip" value="$(arg reverse_ip)"/>
+      <param name="reverse_port" type="int" value="$(arg reverse_port)"/>
+      <param name="script_sender_port" type="int" value="$(arg script_sender_port)"/>
+      <param name="trajectory_port" value="$(arg trajectory_port)"/>
+      <param name="script_command_port" value="$(arg script_command_port)"/>
+      <rosparam command="load" file="$(arg kinematics_config)" />
+      <param name="script_file" value="$(arg urscript_file)"/>
+      <param name="output_recipe_file" value="$(arg rtde_output_recipe_file)"/>
+      <param name="input_recipe_file" value="$(arg rtde_input_recipe_file)"/>
+      <param name="headless_mode" value="$(arg headless_mode)"/>
+      <param name="tf_prefix" value="$(arg tf_prefix)"/>
+      <param name="use_tool_communication" value="$(arg use_tool_communication)"/>
+      <!--<param name="reverse_port" type="int" value="$(arg reverse_port)" />-->
+      <param name="tool_voltage" value="$(arg tool_voltage)"/>
+      <param name="tool_parity" value="$(arg tool_parity)"/>
+      <param name="tool_baud_rate" value="$(arg tool_baud_rate)"/>
+      <param name="tool_stop_bits" value="$(arg tool_stop_bits)"/>
+      <param name="tool_rx_idle_chars" value="$(arg tool_rx_idle_chars)"/>
+      <param name="tool_tx_idle_chars" value="$(arg tool_tx_idle_chars)"/>
+      <param name="servoj_gain" value="$(arg servoj_gain)"/>
+      <param name="servoj_lookahead_time" value="$(arg servoj_lookahead_time)"/>
+      <param name="use_spline_interpolation" value="$(arg use_spline_interpolation)"/>
+    </node>
 
-  <!-- Load controller settings -->
-  <rosparam file="$(arg controller_config_file)" command="load"/>
+    <!-- Starts socat to bridge the robot's tool communication interface to a local tty device -->
+    <node if="$(arg use_tool_communication)" name="ur_tool_communication_bridge" pkg="ur_robot_driver" type="tool_communication" respawn="false" output="screen">
+      <param name="robot_ip" value="$(arg robot_ip)"/>
+      <param name="reverse_ip" value="$(arg reverse_ip)"/>
+      <param name="reverse_port" type="int" value="$(arg reverse_port)"/>
+      <param name="script_sender_port" type="int" value="$(arg script_sender_port)"/>
+      <param name="device_name" value="$(arg tool_device_name)"/>
+      <param name="tcp_port" value="$(arg tool_tcp_port)"/>
+    </node>
 
-  <!-- spawn controller manager -->
-  <node name="ros_control_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="$(arg controllers) --timeout 600" />
+    <!-- Load controller settings -->
+    <!-- subst_value = true: uses arm prefixes defined as args -->
+    <rosparam file="$(arg controller_config_file)" command="load" subst_value="True"/>
 
-  <!-- load other controller -->
-  <node name="ros_control_stopped_spawner" pkg="controller_manager" type="spawner" respawn="false"
-    output="screen" args="--stopped $(arg stopped_controllers) --timeout 600" unless="$(eval arg('stopped_controllers') == '')"/>
+    <!-- spawn controller manager -->
+    <node name="ros_control_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+      output="screen" args="$(arg controllers) --timeout 600" />
 
-  <node name="controller_stopper" pkg="ur_robot_driver" type="controller_stopper_node" respawn="false" output="screen">
-    <remap from="robot_running" to="ur_hardware_interface/robot_program_running"/>
-    <rosparam param="consistent_controllers">
-       - "joint_state_controller"
-       - "speed_scaling_state_controller"
-       - "force_torque_sensor_controller"
-       - "robot_status_controller"
-    </rosparam>
-  </node>
+    <!-- load other controller -->
+    <node name="ros_control_stopped_spawner" pkg="controller_manager" type="spawner" respawn="false"
+      output="screen" args="--stopped $(arg stopped_controllers) --timeout 600" unless="$(eval arg('stopped_controllers') == '')"/>
 
-  <!-- Make sure to start this in the namespace of the hardware interface -->
-  <node ns="ur_hardware_interface" name="ur_robot_state_helper" pkg="ur_robot_driver" type="robot_state_helper" respawn="false" output="screen">
-  </node>
+    <node name="controller_stopper" pkg="ur_robot_driver" type="controller_stopper_node" respawn="false" output="screen">
+      <remap from="robot_running" to="ur_hardware_interface/robot_program_running"/>
+      <rosparam param="consistent_controllers">
+        - "joint_state_controller"
+        - "speed_scaling_state_controller"
+        - "force_torque_sensor_controller"
+        - "robot_status_controller"
+      </rosparam>
+    </node>
+
+    <!-- Make sure to start this in the namespace of the hardware interface -->
+    <node ns="ur_hardware_interface" name="ur_robot_state_helper" pkg="ur_robot_driver" type="robot_state_helper" respawn="false" output="screen">
+    </node>
+  </group>
+
+
+  <!-- ///////////// NAMESPACE IS NOT SET //////////////////// -->
+  <group if="$(eval namespace == '')">
+    <!-- Load hardware interface -->
+    <node name="ur_hardware_interface" pkg="ur_robot_driver" type="ur_robot_driver_node" output="screen" launch-prefix="$(arg launch_prefix)" required="$(arg ur_hardware_interface_node_required)">
+      <param name="robot_ip" type="str" value="$(arg robot_ip)"/>
+      <param name="reverse_ip" value="$(arg reverse_ip)"/>
+      <param name="reverse_port" type="int" value="$(arg reverse_port)"/>
+      <param name="script_sender_port" type="int" value="$(arg script_sender_port)"/>
+      <param name="trajectory_port" value="$(arg trajectory_port)"/>
+      <param name="script_command_port" value="$(arg script_command_port)"/>
+      <rosparam command="load" file="$(arg kinematics_config)" />
+      <param name="script_file" value="$(arg urscript_file)"/>
+      <param name="output_recipe_file" value="$(arg rtde_output_recipe_file)"/>
+      <param name="input_recipe_file" value="$(arg rtde_input_recipe_file)"/>
+      <param name="headless_mode" value="$(arg headless_mode)"/>
+      <param name="tf_prefix" value="$(arg tf_prefix)"/>
+      <param name="use_tool_communication" value="$(arg use_tool_communication)"/>
+      <!--<param name="reverse_port" type="int" value="$(arg reverse_port)" />-->
+      <param name="tool_voltage" value="$(arg tool_voltage)"/>
+      <param name="tool_parity" value="$(arg tool_parity)"/>
+      <param name="tool_baud_rate" value="$(arg tool_baud_rate)"/>
+      <param name="tool_stop_bits" value="$(arg tool_stop_bits)"/>
+      <param name="tool_rx_idle_chars" value="$(arg tool_rx_idle_chars)"/>
+      <param name="tool_tx_idle_chars" value="$(arg tool_tx_idle_chars)"/>
+      <param name="servoj_gain" value="$(arg servoj_gain)"/>
+      <param name="servoj_lookahead_time" value="$(arg servoj_lookahead_time)"/>
+      <param name="use_spline_interpolation" value="$(arg use_spline_interpolation)"/>
+    </node>
+
+    <!-- Starts socat to bridge the robot's tool communication interface to a local tty device -->
+    <node if="$(arg use_tool_communication)" name="ur_tool_communication_bridge" pkg="ur_robot_driver" type="tool_communication" respawn="false" output="screen">
+      <param name="robot_ip" value="$(arg robot_ip)"/>
+      <param name="reverse_ip" value="$(arg reverse_ip)"/>
+      <param name="reverse_port" type="int" value="$(arg reverse_port)"/>
+      <param name="script_sender_port" type="int" value="$(arg script_sender_port)"/>
+      <param name="device_name" value="$(arg tool_device_name)"/>
+      <param name="tcp_port" value="$(arg tool_tcp_port)"/>
+    </node>
+
+    <!-- Load controller settings -->
+    <!-- subst_value = true: uses arm prefixes defined as args -->
+    <rosparam file="$(arg controller_config_file)" command="load" subst_value="True"/>
+
+    <!-- spawn controller manager -->
+    <node name="ros_control_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+      output="screen" args="$(arg controllers) --timeout 600" />
+
+    <!-- load other controller -->
+    <node name="ros_control_stopped_spawner" pkg="controller_manager" type="spawner" respawn="false"
+      output="screen" args="--stopped $(arg stopped_controllers) --timeout 600" unless="$(eval arg('stopped_controllers') == '')"/>
+
+    <node name="controller_stopper" pkg="ur_robot_driver" type="controller_stopper_node" respawn="false" output="screen">
+      <remap from="robot_running" to="ur_hardware_interface/robot_program_running"/>
+      <rosparam param="consistent_controllers">
+        - "joint_state_controller"
+        - "speed_scaling_state_controller"
+        - "force_torque_sensor_controller"
+        - "robot_status_controller"
+      </rosparam>
+    </node>
+
+    <!-- Make sure to start this in the namespace of the hardware interface -->
+    <node ns="ur_hardware_interface" name="ur_robot_state_helper" pkg="ur_robot_driver" type="robot_state_helper" respawn="false" output="screen">
+    </node>
+  </group>
 
 </launch>

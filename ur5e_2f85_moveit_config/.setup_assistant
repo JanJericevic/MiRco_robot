@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: ur5e_2f85_description
+    relative_path: urdf/ur5e_2f85.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/ur5e_2f85_robot.srdf
+  CONFIG:
+    author_name: Jan Jericevic
+    author_email: jan.jericevic@gmail.com
+    generated_timestamp: 1709129953

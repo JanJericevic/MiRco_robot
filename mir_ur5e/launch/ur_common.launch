@@ -34,9 +34,11 @@
   <!-- that is why we have two groups - one for when the namespace is set and one for when its not -->
   <!-- ///////////// NAMESPACE IS SET///////////////////////// -->
   <group if="$(eval namespace != '')" ns="$(arg namespace)">
+
     <!-- robot model -->
     <include file="$(arg robot_description_file)">
       <arg name="kinematics_params" value="$(arg kinematics_config)"/>
+      <arg name="namespace" value="$(arg namespace)"/>
       <arg name="arm_prefix" value="$(arg arm_prefix)"/>
       <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
     </include>
@@ -50,6 +52,7 @@
     <!-- robot model -->
     <include file="$(arg robot_description_file)">
       <arg name="kinematics_params" value="$(arg kinematics_config)"/>
+      <arg name="namespace" value="$(arg namespace)"/>
       <arg name="arm_prefix" value="$(arg arm_prefix)"/>
       <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
     </include>

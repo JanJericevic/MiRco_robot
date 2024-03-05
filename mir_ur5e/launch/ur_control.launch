@@ -43,6 +43,7 @@
   <!-- that is why we have two groups - one for when the namespace is set and one for when its not -->
   <!-- ///////////// NAMESPACE IS SET///////////////////////// -->
   <group if="$(eval namespace != '')" ns="$(arg namespace)">
+
     <!-- Load hardware interface -->
     <node name="ur_hardware_interface" pkg="ur_robot_driver" type="ur_robot_driver_node" output="screen" launch-prefix="$(arg launch_prefix)" required="$(arg ur_hardware_interface_node_required)">
       <param name="robot_ip" type="str" value="$(arg robot_ip)"/>
@@ -110,6 +111,7 @@
 
   <!-- ///////////// NAMESPACE IS NOT SET //////////////////// -->
   <group if="$(eval namespace == '')">
+  
     <!-- Load hardware interface -->
     <node name="ur_hardware_interface" pkg="ur_robot_driver" type="ur_robot_driver_node" output="screen" launch-prefix="$(arg launch_prefix)" required="$(arg ur_hardware_interface_node_required)">
       <param name="robot_ip" type="str" value="$(arg robot_ip)"/>

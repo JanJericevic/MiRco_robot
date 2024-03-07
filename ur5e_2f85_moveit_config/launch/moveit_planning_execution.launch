@@ -15,6 +15,7 @@
   </include>
 
   <include file="$(find ur5e_2f85_moveit_config)/launch/moveit_rviz.launch" ns="$(arg namespace)">
+    <arg name="rviz_config" value="$(dirname)/cfg/moveit.rviz"/>
     <arg name="debug" value="$(arg debug)" />
   </include>
 </launch>

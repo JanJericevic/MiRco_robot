@@ -14,10 +14,13 @@ class UR5e:
     """
 
     def __init__(self, group_name):
+        #get robot namespace and prefixes
+        self.namespace = rospy.get_param("/robot_namespace_prefix")
+        self.arm_prefix = rospy.get_param("/robot_arm_prefix")
 
         #moveit_commander and rospy node
         self._commander = moveit_commander.roscpp_initialize(sys.argv)
-        rospy.init_node('ur5e_node', anonymous=True)
+        rospy.init_node('ur5e_robot_python_node', anonymous=True)
 
         #RobotCommander 
         self.robot = moveit_commander.RobotCommander()
@@ -109,6 +112,8 @@ class UR5e:
         :type pose_name: _type_
         """
         self.group.clear_pose_targets()
+        # self.group.set_max_velocity_scaling_factor(0.1)
+        # self.group.set_max_acceleration_scaling_factor(0.1)
         
         rospy.loginfo('\033[32m' + "Going to Pose: {}".format(pose_name) + '\033[0m')
 

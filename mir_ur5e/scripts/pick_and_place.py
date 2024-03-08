@@ -7,19 +7,9 @@ from move_base_msgs.msg import MoveBaseActionResult
 from geometry_msgs.msg import PoseStamped
 from pprint import pprint
 
+from robotiq_2f_gripper_control.msg import _Robotiq2FGripper_robot_output as outputMsg
+from six.moves import input
 
-def pick_and_place(data):
-    if data.status.status == 3:
-        print("END GOAL REACHED")
-        print("STARTING MANIPULATOR MOVEMENT")
-
-        manipulator = UR5e("manipulator")
-        manipulator.pick_and_place()
-        del manipulator
-
-        rospy.signal_shutdown("motion concluded")
-    else:
-        pass
 
 def main():
 
@@ -48,10 +38,22 @@ def main():
 
     # ur5e_arm.set_pose(new_pose)
 
-    info = ur5e_arm.get_info()
+    info = ur5e_arm.get_info(print=True)
     ur5e_arm.set_named_pose("arm_home")
+    rospy.sleep(1)
     ur5e_arm.set_named_pose("arm_pickup")
+    rospy.sleep(1)
+    ur5e_arm.set_named_pose("arm_home")
+    rospy.sleep(1)
+    ur5e_arm.set_named_pose("arm_place_intermediate")
+    rospy.sleep(1)
+    ur5e_arm.set_named_pose("arm_place")
+    rospy.sleep(1)
+    ur5e_arm.set_named_pose("arm_place_intermediate")
+    rospy.sleep(1)
+    ur5e_arm.set_named_pose("arm_home")
 
+    rospy.sleep(3)
     rospy.signal_shutdown("motion concluded")
 
 if __name__ == '__main__':

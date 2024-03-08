@@ -5,6 +5,7 @@
   <arg name="namespace" default="ur5e/" doc="namespace for all topics"/>
   <arg name="arm_prefix" default="ur5e_" doc="prefix for robot arm"/>
   <arg name="gripper_prefix" default="2f85_" doc="prefix for robot gripper"/>
+  <arg name="rviz_config" default="$(find ur5e_2f85_moveit_config)/cfg/rviz_moveit.rviz" doc="rviz config"/>
 
   <!-- Launch moveit -->
   <include file="$(find ur5e_2f85_moveit_config)/launch/move_group.launch" ns="$(arg namespace)">
@@ -15,7 +16,6 @@
   </include>
 
   <include file="$(find ur5e_2f85_moveit_config)/launch/moveit_rviz.launch" ns="$(arg namespace)">
-    <arg name="rviz_config" value="$(dirname)/cfg/moveit.rviz"/>
-    <arg name="debug" value="$(arg debug)" />
+    <arg name="rviz_config" value="$(arg rviz_config)"/>
   </include>
 </launch>

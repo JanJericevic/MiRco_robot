@@ -3,6 +3,7 @@
 import rospy
 from mir_ur5e.mir100_class import MiR100
 from mir_ur5e.ur5e_class import UR5e
+from mir_ur5e.robotiq_2f85_class import Robotiq2f85
 from move_base_msgs.msg import MoveBaseActionResult
 from geometry_msgs.msg import PoseStamped
 from pprint import pprint
@@ -13,7 +14,7 @@ from six.moves import input
 
 def main():
 
-    ur5e_arm = UR5e("arm")
+    # ur5e_arm = UR5e("arm")
     # manipulator.pick_and_place()
     # del manipulator
 
@@ -38,26 +39,41 @@ def main():
 
     # ur5e_arm.set_pose(new_pose)
 
-    info = ur5e_arm.get_info(print=True)
-    ur5e_arm.set_named_pose("arm_home")
-    rospy.sleep(1)
-    ur5e_arm.set_named_pose("arm_pickup")
-    rospy.sleep(1)
-    ur5e_arm.set_named_pose("arm_home")
-    rospy.sleep(1)
-    ur5e_arm.set_named_pose("arm_place_intermediate")
-    rospy.sleep(1)
-    ur5e_arm.set_named_pose("arm_place")
-    rospy.sleep(1)
-    ur5e_arm.set_named_pose("arm_place_intermediate")
-    rospy.sleep(1)
-    ur5e_arm.set_named_pose("arm_home")
+    # info = ur5e_arm.get_info(print=True)
+    # ur5e_arm.set_named_pose("arm_home")
+    # rospy.sleep(1)
+    # ur5e_arm.set_named_pose("arm_pickup")
+    # rospy.sleep(1)
+    # ur5e_arm.set_named_pose("arm_home")
+    # rospy.sleep(1)
+    # ur5e_arm.set_named_pose("arm_place_intermediate")
+    # rospy.sleep(1)
+    # ur5e_arm.set_named_pose("arm_place")
+    # rospy.sleep(1)
+    # ur5e_arm.set_named_pose("arm_place_intermediate")
+    # rospy.sleep(1)
+    # ur5e_arm.set_named_pose("arm_home")
 
-    rospy.sleep(3)
-    rospy.signal_shutdown("motion concluded")
+    # rospy.sleep(3)
+    # rospy.signal_shutdown("motion concluded")
+
+    rospy.init_node('gripper_control_python_node', anonymous=True)
+    gripper = Robotiq2f85()
+    # rospy.sleep(3)
+    # gripper.reset()
+    # gripper.calib()
+    # while not rospy.is_shutdown():
+        # print(gripper.is_reset())
+        # print(gripper.gripper_status)
+        # rospy.sleep(0.1)
+        # gripper.get_status(),
+
+    
 
 if __name__ == '__main__':
     try:
         main()
     except rospy.ServiceException as e:
         print("error: %s" %e)
+    except rospy.ROSInterruptException:
+        pass

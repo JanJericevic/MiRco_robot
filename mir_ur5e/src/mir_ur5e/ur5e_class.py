@@ -20,7 +20,6 @@ class UR5e:
 
         #moveit_commander and rospy node
         self._commander = moveit_commander.roscpp_initialize(sys.argv)
-        rospy.init_node('ur5e_robot_python_node', anonymous=True)
 
         #RobotCommander 
         self.robot = moveit_commander.RobotCommander()
@@ -164,6 +163,7 @@ class UR5e:
 
 
 def main():
+    rospy.init_node('ur5e_robot_python_node', anonymous=True)
 
     #Create a new manipulator object
     ur5e_arm = UR5e("arm")

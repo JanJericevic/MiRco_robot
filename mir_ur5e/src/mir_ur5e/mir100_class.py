@@ -13,7 +13,6 @@ class MiR100:
     """
 
     def __init__(self, api: MirRestApi=None):
-        rospy.init_node('mir_robot_node')
         
         #action server
         self.client = actionlib.SimpleActionClient('mir100/move_base', MoveBaseAction)
@@ -212,6 +211,7 @@ class MiR100:
         self.show_light("off")
 
 def main():
+    rospy.init_node('mir_robot_node')
     try:
         # mir_ip = "192.168.65.179"
         # api = MirRestApi("Distributor","distributor",mir_ip)

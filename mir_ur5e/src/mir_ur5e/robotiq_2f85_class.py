@@ -19,7 +19,9 @@ class Robotiq2f85:
 
         #max and min gap
         self.max_gap = max_gap
+        self.max_gap_mm = self.max_gap * 1000
         self.min_gap = min_gap
+        self.min_gap_mm = self.min_gap * 1000
         #values reported by the gripper when opened/closed
         self.gripper_opened = opened_value
         self.gripper_closed = closed_value
@@ -44,6 +46,10 @@ class Robotiq2f85:
             self.gripper_status_received = True
         self.gripper_status = msg
     
+    def pub_cmd_msg(self):
+        rospy.loginfo(self.info_msg)
+        self.cmd_pub.publish(self.cmd_msg)
+    
     #check functions 
     def is_connected(self):
         return self.gripper_status_received
@@ -60,29 +66,7 @@ class Robotiq2f85:
     def is_stopped(self):
         return self.gripper_status.gOBJ != 0
 
-    #wait functions
-    # def wait_stopped(self, timeout=10):
-    #     r = rospy.Rate(30)
-    #     start_time = rospy.get_time()
-    #     while not rospy.is_shutdown():
-    #         if self.is_reset() or (rospy.get_time() - start_time > timeout):
-    #             return False
-    #         if self.is_stopped():
-    #             return True
-    #         r.sleep()
-    #     return False
-    
-    # def wait_moving(self, timeout=10):
-    #     r = rospy.Rate(30)
-    #     start_time = rospy.get_time()
-    #     while not rospy.is_shutdown():
-    #         if self.is_reset() or (rospy.get_time() - start_time > timeout):
-    #             return False
-    #         if not self.is_stopped():
-    #             return True
-    #         r.sleep()
-    #     return False
-
+    #before use the gripper has to be reset
     def reset(self):
         self.cmd_msg = outputMsg.Robotiq2FGripper_robot_output()
         self.info_msg = "Resetting gripper"
@@ -98,7 +82,8 @@ class Robotiq2f85:
         else:
             rospy.loginfo("Reset incomplete")
     
-    def calib(self):
+    #after reset, the gripper has to be activated
+    def activate(self):
         self.cmd_msg = outputMsg.Robotiq2FGripper_robot_output()
         self.info_msg = "Activating gripper"
         #activate command
@@ -115,22 +100,7 @@ class Robotiq2f85:
             rospy.loginfo("Activation complete")
         else:
             rospy.loginfo("Activation incomplete")
-
-        #read real open gripper value
-        self.gripper_opened = self.gripper_status.gPO
-        rospy.loginfo("Calibrating open gripper value: %i", self.gripper_opened)
-
-        #close gripper
-        self.close()
-        #read real closed gripper value
-        self.gripper_closed = self.gripper_status.gPO
-        rospy.loginfo("Calibrating closed gripper value: %i", self.gripper_closed)
-
-        #open gripper
-        self.open()
-
-        rospy.loginfo("Calibration complete")
-
+    
     def close(self):
         self.info_msg = "Closing gripper"
         #close command
@@ -148,6 +118,44 @@ class Robotiq2f85:
         self.pub_cmd_msg()
         #wait for execution
         rospy.sleep(2)
+    
+    def calib(self):
+        #activate gripper
+        self.activate()
+        #read real open gripper value
+        self.gripper_opened = self.gripper_status.gPO
+        rospy.loginfo("Calibrating open gripper value: %i", self.gripper_opened)
+        #close gripper
+        self.close()
+        #read real closed gripper value
+        self.gripper_closed = self.gripper_status.gPO
+        rospy.loginfo("Calibrating closed gripper value: %i", self.gripper_closed)
+        #open gripper
+        self.open()
+        #calibrate gripper range
+        self.gripper_range = self.gripper_closed - self.gripper_opened
+        self.tick_per_dist = self.gripper_range / self.max_gap_mm
+
+        rospy.loginfo("Calibration complete")
+    
+    #close gripper to gap set in mm
+    #before use have to use the calib() method
+    def set_gap_mm(self,mm):
+        self.info_msg = "Closing gripper to gap:" + str(mm) + "mm"
+        #calculate int value to send to gripper from desired gripper gap in mm
+        position = self.tick_per_dist * (self.max_gap_mm - mm)
+        position = round(position)
+
+        set_gap_position(position)
+    
+    #close gripper to gap in values from self.gripper_opened - self.gripper_closed
+    def set_gap_position(self,position):
+        self.info_msg = "Sending gripper to position:" + str(position)
+        self.cmd_msg.rPR = int(position)
+        if self.cmd_msg.rPR > 255:
+            self.cmd_msg.rPR = 255
+        if self.cmd_msg.rPR < 0:
+            self.cmd_msg.rPR = 0
 
     def inc_speed(self):
         self.info_msg = "Increasing gripper speed"
@@ -180,15 +188,3 @@ class Robotiq2f85:
             self.cmd_msg.rFR = 0
     
         self.pub_cmd_msg()
-    
-    def send_to_position(self,position):
-        self.info_msg = "Sending gripper to position:" + str(position)
-        self.cmd_msg.rPR = int(position)
-        if self.cmd_msg.rPR > 255:
-            self.cmd_msg.rPR = 255
-        if self.cmd_msg.rPR < 0:
-            self.cmd_msg.rPR = 0
-
-    def pub_cmd_msg(self):
-        rospy.loginfo(self.info_msg)
-        self.cmd_pub.publish(self.cmd_msg)

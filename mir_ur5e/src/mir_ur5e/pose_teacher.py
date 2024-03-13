@@ -55,8 +55,8 @@ class PoseTeacher(object):
         self.node_name = rospy.get_name()
         self.save_srv_name = self.node_name + "/save_arm_pose"
         self.get_srv_name = self.node_name + "/get_arm_pose"
-        self.loginfo_blue("Save arm pose service available at: " + self.save_srv_name)
-        self.loginfo_blue("Get saved arm pose service available at: " + self.get_srv_name)
+        self.loginfo_blue("Save arm pose service: " + self.save_srv_name)
+        self.loginfo_blue("Get saved arm pose service: " + self.get_srv_name)
         self.loginfo_blue("Pose teacher initialization done")
 
     def loginfo_blue(self, msg):

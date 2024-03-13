@@ -1,0 +1,28 @@
+pickup1:
+  ur5e_elbow_joint: -2.341550588607788
+  ur5e_shoulder_lift_joint: -1.6541725597777308
+  ur5e_shoulder_pan_joint: -0.07695895830263311
+  ur5e_wrist_1_joint: -0.6968241494945069
+  ur5e_wrist_2_joint: 1.5764014720916748
+  ur5e_wrist_3_joint: -0.07814294496645147
+pickup2:
+  ur5e_elbow_joint: -2.3441002368927
+  ur5e_shoulder_lift_joint: -1.6520711384215296
+  ur5e_shoulder_pan_joint: 0.7275176644325256
+  ur5e_wrist_1_joint: -0.7003058952144166
+  ur5e_wrist_2_joint: 1.5601613521575928
+  ur5e_wrist_3_joint: 0.7262287139892578
+place1:
+  ur5e_elbow_joint: -2.3362526893615723
+  ur5e_shoulder_lift_joint: -1.642167707482809
+  ur5e_shoulder_pan_joint: -0.07693130174745733
+  ur5e_wrist_1_joint: -0.7141871613315125
+  ur5e_wrist_2_joint: 1.576458215713501
+  ur5e_wrist_3_joint: -0.07812291780580694
+place2:
+  ur5e_elbow_joint: -2.3430135250091553
+  ur5e_shoulder_lift_joint: -1.649564882318014
+  ur5e_shoulder_pan_joint: 0.7275068759918213
+  ur5e_wrist_1_joint: -0.7038062375834961
+  ur5e_wrist_2_joint: 1.5601576566696167
+  ur5e_wrist_3_joint: 0.7262445688247681

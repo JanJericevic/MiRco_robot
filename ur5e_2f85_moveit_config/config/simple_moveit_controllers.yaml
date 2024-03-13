@@ -10,9 +10,9 @@ controller_list:
     type: FollowJointTrajectory
     default: True
     joints:
-      - $(arg namespace)$(arg arm_prefix)shoulder_pan_joint
-      - $(arg namespace)$(arg arm_prefix)shoulder_lift_joint
-      - $(arg namespace)$(arg arm_prefix)elbow_joint
-      - $(arg namespace)$(arg arm_prefix)wrist_1_joint
-      - $(arg namespace)$(arg arm_prefix)wrist_2_joint
-      - $(arg namespace)$(arg arm_prefix)wrist_3_joint
+      - $(arg arm_prefix)shoulder_pan_joint
+      - $(arg arm_prefix)shoulder_lift_joint
+      - $(arg arm_prefix)elbow_joint
+      - $(arg arm_prefix)wrist_1_joint
+      - $(arg arm_prefix)wrist_2_joint
+      - $(arg arm_prefix)wrist_3_joint

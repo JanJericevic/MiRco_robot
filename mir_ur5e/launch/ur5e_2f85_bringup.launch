@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="namespace" default="ur5e/" doc="namespace for all topics"/>
+  <arg name="namespace" default="/ur5e" doc="namespace for all topics"/>
   <arg name="arm_prefix" default="ur5e_" doc="prefix for robot arm"/>
   <arg name="gripper_prefix" default="2f85_" doc="prefix for robot gripper"/>
 
@@ -11,7 +11,7 @@
   <arg name="script_sender_port" default="50002" doc="The driver will offer an interface to receive the program's URScript on this port. If the robot cannot connect to this port, `External Control` will stop immediately."/>
   <arg name="trajectory_port" default="50003" doc="Port that will be opened by the driver to allow trajectory forwarding."/>
   <arg name="script_command_port" default="50004" doc="Port that will be opened by the driver to allow forwarding script commands to the robot."/>
-  <arg name="tf_prefix" value="$(arg namespace)$(arg arm_prefix)" doc="tf_prefix used for the robot."/>
+  <arg name="tf_prefix" value="$(arg arm_prefix)" doc="tf_prefix used for the robot."/>
   <arg name="controllers" default="joint_state_controller scaled_pos_joint_traj_controller speed_scaling_state_controller force_torque_sensor_controller" doc="Controllers that are activated by default."/>
   <arg name="stopped_controllers" default="pos_joint_traj_controller joint_group_vel_controller" doc="Controllers that are initally loaded, but not started."/>
   <arg name="controller_config_file" default="$(find ur5e_2f85_description)/config/ur5e_controllers.yaml" doc="Config file used for defining the ROS-Control controllers."/>
@@ -36,7 +36,7 @@
 
   <include file="$(find mir_ur5e)/launch/ur_common.launch" pass_all_args="true" />
 
-  <!-- workaround for empty namespace. If namespace is empty the group in not evaluated. -->
+  <!-- workaround for empty namespace. If namespace is empty the group is not evaluated. -->
   <!-- that is why we have two groups - one for when the namespace is set and one for when its not -->
   <!-- ///////////// NAMESPACE IS SET///////////////////////// -->
   <group if="$(eval namespace != '')" ns="$(arg namespace)">
@@ -59,6 +59,13 @@
       <param name="prefix" value="$(arg namespace)$(arg gripper_prefix)" />
       <remap from="input" to="gripper_control/input" />
     </node>
+
+    <!-- gripper action server NEEDS WORK!-->
+    <!-- <include file="$(find robotiq_2f_gripper_action_server)/launch/robotiq_2f_gripper_action_server.launch">
+        <arg name="min_gap" value="-0.015" />
+        <arg name="max_gap" value="0.0623" /> 
+        <arg name="gripper_name" value="gripper_control" /> 
+    </include> -->
   </group>
 
   <!-- ///////////// NAMESPACE IS NOT SET //////////////////// -->
@@ -82,12 +89,12 @@
       <param name="prefix" value="$(arg gripper_prefix)" />
       <remap from="input" to="gripper_control/input" />
     </node>
-  </group>
 
-    <!-- action server -->
-    <!-- <include file="$(find robotiq_2f_gripper_action_server)/launch/robotiq_2f_gripper_action_server.launch"> -->
-        <!-- <arg name="min_gap" value="-0.015" />
-        <arg name="max_gap" value="0.140" />  -->
-        <!-- <arg name="gripper_name" value="gripper_hw" />  -->
-    <!-- </include> -->
+    <!-- gripper action server NEEDS WORK!-->
+    <!-- <include file="$(find robotiq_2f_gripper_action_server)/launch/robotiq_2f_gripper_action_server.launch">
+        <arg name="min_gap" value="-0.015" />
+        <arg name="max_gap" value="0.0623" /> 
+        <arg name="gripper_name" value="gripper_control" /> 
+    </include> -->
+  </group>
 </launch>

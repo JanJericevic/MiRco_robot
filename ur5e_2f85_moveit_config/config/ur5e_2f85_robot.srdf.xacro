@@ -9,23 +9,8 @@
     <xacro:arg name="arm_prefix" default=""/>
     <xacro:property name="arm_prefix" value="$(arg arm_prefix)"/>
 
-    <!-- <xacro:if value="${arm_prefix == ''}">
-        <xacro:property name="arm_prefix" value=""/>
-    </xacro:if>
-    <xacro:unless value="${arm_prefix == ''}">
-        <xacro:property name="arm_prefix" value="${arm_prefix}/"/>
-    </xacro:unless> -->
-
     <xacro:arg name="gripper_prefix" default=""/>
     <xacro:property name="gripper_prefix" value="$(arg gripper_prefix)"/>
-
-    <!-- <xacro:if value="${gripper_prefix == ''}">
-        <xacro:property name="gripper_prefix" value=""/>
-    </xacro:if>
-    <xacro:unless value="${gripper_prefix == ''}">
-        <xacro:property name="gripper_prefix" value="${gripper_prefix}/"/>
-    </xacro:unless> -->
-
 
     <!--GROUPS: Representation of a set of joints and links. This can be useful for specifying DOF to plan for, defining arms, end effectors, etc-->
     <!--LINKS: When a link is specified, the parent joint of that link (if it exists) is automatically included-->
@@ -47,23 +32,23 @@
         <joint name="${gripper_prefix}finger_joint"/>
     </group>
     <!--GROUP STATES: Purpose: Define a named state for a particular group, in terms of joint values. This is useful to define states like 'folded arms'-->
-    <group_state name="arm_home" group="arm">
-        <joint name="${arm_prefix}elbow_joint" value="-2.0511"/>
-        <joint name="${arm_prefix}shoulder_lift_joint" value="-1.0905"/>
-        <joint name="${arm_prefix}shoulder_pan_joint" value="0"/>
-        <joint name="${arm_prefix}wrist_1_joint" value="-1.57"/>
-        <joint name="${arm_prefix}wrist_2_joint" value="1.57"/>
-        <joint name="${arm_prefix}wrist_3_joint" value="0"/>
+    <group_state name="arm_pose1" group="arm">
+        <joint name="${arm_prefix}elbow_joint" value="-2.0104851722717285"/>
+        <joint name="${arm_prefix}shoulder_lift_joint" value="-1.3586670917323609"/>
+        <joint name="${arm_prefix}shoulder_pan_joint" value="-0.05019122758974248"/>
+        <joint name="${arm_prefix}wrist_1_joint" value="-1.3233817231706162"/>
+        <joint name="${arm_prefix}wrist_2_joint" value="1.5779626369476318"/>
+        <joint name="${arm_prefix}wrist_3_joint" value="-0.0704730192767542"/>
     </group_state>
-    <group_state name="arm_pickup" group="arm">
-        <joint name="${arm_prefix}elbow_joint" value="-2.5184"/>
-        <joint name="${arm_prefix}shoulder_lift_joint" value="-1.2462"/>
-        <joint name="${arm_prefix}shoulder_pan_joint" value="0"/>
-        <joint name="${arm_prefix}wrist_1_joint" value="-0.9347"/>
-        <joint name="${arm_prefix}wrist_2_joint" value="1.57"/>
-        <joint name="${arm_prefix}wrist_3_joint" value="0"/>
+    <group_state name="arm_pose2" group="arm">
+        <joint name="${arm_prefix}elbow_joint" value="-2.341134548187256"/>
+        <joint name="${arm_prefix}shoulder_lift_joint" value="-1.6496316395201625"/>
+        <joint name="${arm_prefix}shoulder_pan_joint" value="-0.06845552126039678"/>
+        <joint name="${arm_prefix}wrist_1_joint" value="-0.7018266481212159"/>
+        <joint name="${arm_prefix}wrist_2_joint" value="1.5763225555419922"/>
+        <joint name="${arm_prefix}wrist_3_joint" value="-0.0696480909930628"/>
     </group_state>
-    <group_state name="arm_place_intermediate" group="arm">
+    <group_state name="arm_pose3" group="arm">
         <joint name="${arm_prefix}elbow_joint" value="-2.2068"/>
         <joint name="${arm_prefix}shoulder_lift_joint" value="-0.8827"/>
         <joint name="${arm_prefix}shoulder_pan_joint" value="1.5578"/>
@@ -71,7 +56,7 @@
         <joint name="${arm_prefix}wrist_2_joint" value="1.57"/>
         <joint name="${arm_prefix}wrist_3_joint" value="0"/>
     </group_state>
-    <group_state name="arm_place" group="arm">
+    <group_state name="arm_pose4" group="arm">
         <joint name="${arm_prefix}elbow_joint" value="-1.9212"/>
         <joint name="${arm_prefix}shoulder_lift_joint" value="-1.7655"/>
         <joint name="${arm_prefix}shoulder_pan_joint" value="1.5578"/>

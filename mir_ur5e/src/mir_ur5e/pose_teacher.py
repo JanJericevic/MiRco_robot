@@ -63,7 +63,7 @@ class PoseTeacher(object):
         self.loginfo_blue("Pose teacher initialization done")
 
     def loginfo_blue(self, msg:str) -> None:
-        """Helper function. Print loginfo message with blue text
+        """Helper function. Print loginfo message with light blue text
 
         :param msg: message
         :type msg: str
@@ -76,7 +76,6 @@ class PoseTeacher(object):
         :param jointState: latest joints states
         :type jointState: JointState
         """
-
         with self.jointStateLock:
             self.latestJointState = jointState
 

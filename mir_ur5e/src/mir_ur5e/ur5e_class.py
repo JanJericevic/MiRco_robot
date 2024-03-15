@@ -14,10 +14,10 @@ from mir_ur5e.srv import *
 from sensor_msgs.msg import JointState
 
 class UR5e:
-    """simple ur5e robot arm class
+    """Simple ur5e robot arm class. Provides moveit functionalities and custom service
     """
-
     def __init__(self, group_name:str, pipeline="pilz_industrial_motion_planner", planner="LIN"):
+        self.loginfo_cyan("Initializing UR5e robot python commander")
         # get robot namespace and prefixes
         if rospy.has_param("/robot_namespace_prefix"):
             self.namespace = rospy.get_param("/robot_namespace_prefix")
@@ -72,15 +72,15 @@ class UR5e:
         self.get_info(print=True)
 
         # end of robot initialization
-        self.loginfo_magenta("ur5e python moveit initialization is done.")
+        self.loginfo_cyan("UR5e robot python commander initialization complete.")
     
-    def loginfo_magenta(self, msg:str) -> None:
-        """Helper function. Print loginfo message with light magenta text
+    def loginfo_cyan(self, msg:str) -> None:
+        """Helper function. Print loginfo message with light cyan text
 
         :param msg: message
         :type msg: str
         """
-        rospy.loginfo('\033[95m' + "UR5e: " + msg + '\033[0m')
+        rospy.loginfo('\033[96m' + "UR5e: " + msg + '\033[0m')
 
     def get_info(self, print = False) -> dict:
         """Get robot and move group info
@@ -90,7 +90,6 @@ class UR5e:
         :return: dictionary with robot and move group info
         :rtype: dict
         """
-
         self.group_names = self.robot.get_group_names()
         self.group_name = self.group.get_name()
         self.planning_frame = self.group.get_planning_frame()
@@ -102,18 +101,18 @@ class UR5e:
 
         if print:
             # print the info
-            self.loginfo_magenta("-----INFO-----")
-            self.loginfo_magenta("Available planning groups: {}".format(self.group_names))
-            self.loginfo_magenta("Selected planning group: {}".format(self.group_name))
-            self.loginfo_magenta("Planning Frame: {}".format(self.planning_frame))
-            self.loginfo_magenta("Planning pipeline: {}".format(self.planning_pipeline))
-            self.loginfo_magenta("Planner: {}".format(self.planner))
-            self.loginfo_magenta("Goal tolerances [joint, position, orientation]: {}".format(self.goal_tolerances))
-            self.loginfo_magenta("End Effector Link: {}".format(self.eef_link))
-            self.loginfo_magenta("Current joint values: {}".format(self.current_joint_values))
-            self.loginfo_magenta("Pose reference frame: {}".format(self.pose_reference_frame))
-            # self.loginfo_magenta("Current pose: {}".format(self.current_pose))
-            self.loginfo_magenta("--------------")
+            self.loginfo_cyan("-----INFO-----")
+            self.loginfo_cyan("Available planning groups: {}".format(self.group_names))
+            self.loginfo_cyan("Selected planning group: {}".format(self.group_name))
+            self.loginfo_cyan("Planning Frame: {}".format(self.planning_frame))
+            self.loginfo_cyan("Planning pipeline: {}".format(self.planning_pipeline))
+            self.loginfo_cyan("Planner: {}".format(self.planner))
+            self.loginfo_cyan("Goal tolerances [joint, position, orientation]: {}".format(self.goal_tolerances))
+            self.loginfo_cyan("End Effector Link: {}".format(self.eef_link))
+            self.loginfo_cyan("Current joint values: {}".format(self.current_joint_values))
+            self.loginfo_cyan("Pose reference frame: {}".format(self.pose_reference_frame))
+            # self.loginfo_cyan("Current pose: {}".format(self.current_pose))
+            self.loginfo_cyan("--------------")
 
         # return a dict with info
         info = {"group_names": self.group_names, "group_name": self.group_name, "planning_frame": self.planning_frame,"goal_tolerances": self.goal_tolerances , "eef_link": self.eef_link, "current_joint_values": self.current_joint_values, "pose_reference_frame": self.pose_reference_frame, "current_pose": self.current_pose}
@@ -152,10 +151,9 @@ class UR5e:
         :param pose: target robot pose
         :type pose: PoseStamped, Pose, [x, y, z, rot_x, rot_y, rot_z] or [x, y, z, qx, qy, qz, qw]
         """
-
         # clear all pose targets
         self.group.clear_pose_targets()
-        self.loginfo_magenta('\033[32m' + "Going to pose: {}".format(pose))
+        self.loginfo_cyan("Going to pose: {}".format(pose))
 
         # set goal
         self.group.set_pose_target(pose)
@@ -170,7 +168,7 @@ class UR5e:
         self.execute_trajectory_client.wait_for_result()
         # print the current pose
         self.current_pose = self.group.get_current_pose()
-        self.loginfo_magenta('\033[32m' + "Now at Pose: {}".format(self.current_pose))
+        self.loginfo_cyan("Now at Pose: {}".format(self.current_pose))
 
     def set_named_pose(self, pose_name:str) -> None:
         """Set a joint configuration by name specified in the SRDF
@@ -178,10 +176,9 @@ class UR5e:
         :param pose_name: pose name in SRDF
         :type pose_name: str
         """
-
         # clear all pose targets
         self.group.clear_pose_targets()
-        self.loginfo_magenta('\033[32m' + "Going to named pose: {}".format(pose_name))
+        self.loginfo_cyan("Going to named pose: {}".format(pose_name))
 
         # set goal
         self.group.set_named_target(pose_name)
@@ -196,7 +193,7 @@ class UR5e:
         self.execute_trajectory_client.wait_for_result()
         # Print the current pose
         #  self.current_pose = self.group.get_current_pose()
-        #  self.loginfo_magenta('\033[32m' + "Now at Pose: {}".format(self.current_pose))
+        #  self.loginfo_cyan("Now at Pose: {}".format(self.current_pose))
     
     def move_l(self, goal) -> None:
         """Linear move in cartesian space
@@ -204,14 +201,17 @@ class UR5e:
         :param goal: goal
         :type goal: JointState or Pose
         """
+
         # planning pipeline check
         if self.planning_pipeline != "pilz_industrial_motion_planner":
-            self.loginfo_magenta('\033[32m' + "Setting the planning pipeline to: 'pilz_industrial_motion_planner'")
+            self.loginfo_cyan("Setting the planning pipeline to: 'pilz_industrial_motion_planner'")
             self.group.set_planning_pipeline_id("pilz_industrial_motion_planner")
+            self.group.planning_pipeline("pilz_industrial_motion_planner")
         # planner id check
-        if self.set_planner_id != "LIN":
-            self.loginfo_magenta('\033[32m' + "Setting the planner ID to: 'LIN'")
+        if self.planner != "LIN":
+            self.loginfo_cyan("Setting the planner ID to: 'LIN'")
             self.group.set_planner_id("LIN")
+            self.planner = "LIN"
 
         # clear all pose targets
         self.group.clear_pose_targets()
@@ -219,7 +219,7 @@ class UR5e:
         self.group.set_max_velocity_scaling_factor(0.4)
         self.group.set_max_acceleration_scaling_factor(0.2)
         # execute move
-        self.loginfo_magenta('\033[32m' + "Setting joint value target")
+        self.loginfo_cyan("Setting joint value target")
         self.group.go(goal, wait=True) 
     
     def move_j(self, goal) -> None:
@@ -230,12 +230,14 @@ class UR5e:
         """
          # planning pipeline check
         if self.planning_pipeline != "pilz_industrial_motion_planner":
-            self.loginfo_magenta('\033[32m' + "Setting the planning pipeline to: 'pilz_industrial_motion_planner'")
+            self.loginfo_cyan("Setting the planning pipeline to: 'pilz_industrial_motion_planner'")
             self.group.set_planning_pipeline_id("pilz_industrial_motion_planner")
+            self.group.planning_pipeline("pilz_industrial_motion_planner")
         # planner id check
-        if self.set_planner_id != "PTP":
-            self.loginfo_magenta('\033[32m' + "Setting the planner ID to: 'PTP'")
+        if self.planner != "PTP":
+            self.loginfo_cyan("Setting the planner ID to: 'PTP'")
             self.group.set_planner_id("PTP")
+            self.planner = "PTP"
 
         # clear all pose targets
         self.group.clear_pose_targets()
@@ -243,14 +245,14 @@ class UR5e:
         self.group.set_max_velocity_scaling_factor(0.4)
         self.group.set_max_acceleration_scaling_factor(0.2)
         # execute move
-        self.loginfo_magenta('\033[32m' + "Setting joint value target")
+        self.loginfo_cyan("Setting joint value target")
         self.group.go(goal, wait=True)   
 
     #  Class Destructor
     def __del__(self):
         # when the actions are finished, shut down the moveit commander
         moveit_commander.roscpp_shutdown()
-        self.loginfo_magenta(
+        self.loginfo_cyan(
             "Object of class ur5e Deleted.")
 
 

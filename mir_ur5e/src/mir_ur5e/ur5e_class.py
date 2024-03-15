@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-#Include the necessary libraries 
+# Include the necessary libraries 
 import sys
 import copy
 import rospy
@@ -9,12 +9,16 @@ import moveit_msgs.msg
 import geometry_msgs.msg
 import actionlib
 
+from mir_ur5e.pose_teacher import PoseTeacher
+from mir_ur5e.srv import *
+from sensor_msgs.msg import JointState
+
 class UR5e:
     """simple ur5e robot arm class
     """
 
-    def __init__(self, group_name, pipeline="pilz_industrial_motion_planner", planner="LIN"):
-        #get robot namespace and prefixes
+    def __init__(self, group_name:str, pipeline="pilz_industrial_motion_planner", planner="LIN"):
+        # get robot namespace and prefixes
         if rospy.has_param("/robot_namespace_prefix"):
             self.namespace = rospy.get_param("/robot_namespace_prefix")
         else:
@@ -24,15 +28,15 @@ class UR5e:
         else:
             self.arm_prefix = ""
 
-        #moveit_commander and rospy node
+        # moveit_commander and rospy node
         self._commander = moveit_commander.roscpp_initialize(sys.argv)
 
-        #RobotCommander 
+        # RobotCommander 
         self.robot = moveit_commander.RobotCommander()
-        #PlanningSceneInterface object
+        # PlanningSceneInterface object
         self.scene = moveit_commander.PlanningSceneInterface()
         
-        #movegroup
+        # movegroup
         self.planning_group = group_name
         self.group = moveit_commander.MoveGroupCommander(self.planning_group)
 
@@ -42,30 +46,51 @@ class UR5e:
         self.group.set_max_velocity_scaling_factor(0.4)
         self.group.set_max_acceleration_scaling_factor(0.4)
 
-        #set default planning pipeline and planner
+        # set default planning pipeline and planner
         self.planning_pipeline = pipeline
         self.planner = planner
         self.group.set_planning_pipeline_id(self.planning_pipeline)
         self.group.set_planner_id(self.planner)
         
-        #DisplayTrajectory publisher - RViz
+        # DisplayTrajectory publisher - RViz
         self.display_trajectory_publisher = rospy.Publisher('move_group/display_planned_path', moveit_msgs.msg.DisplayTrajectory, queue_size=20)
 
-        #action client for the Execute Trajectory action server
+        # action client for the Execute Trajectory action server
         self.execute_trajectory_client = actionlib.SimpleActionClient('execute_trajectory', moveit_msgs.msg.ExecuteTrajectoryAction)
         self.execute_trajectory_client.wait_for_server()
 
-        rospy.loginfo('\033[95m' + "ur5e python moveit initialization is done." + '\033[0m')
-
-        #print robot and move group info
+        # initialize pose teacher
+        self.pt = PoseTeacher()
+        # wait for pose teacher services
+        rospy.wait_for_service(self.pt.save_srv_name)
+        rospy.wait_for_service(self.pt.get_srv_name)
+        # create service clients
+        self.save_pose_srv = rospy.ServiceProxy(self.pt.save_srv_name, SavePose)
+        self.get_pose_srv = rospy.ServiceProxy(self.pt.get_srv_name, GetPose)
+        
+        # print robot and move group info
         self.get_info(print=True)
 
-    def get_info(self, print = False):
-        """get robot and move group info 
+        # end of robot initialization
+        self.loginfo_magenta("ur5e python moveit initialization is done.")
+    
+    def loginfo_magenta(self, msg:str) -> None:
+        """Helper function. Print loginfo message with light magenta text
 
-        :return: _description_
-        :rtype: _type_
+        :param msg: message
+        :type msg: str
         """
+        rospy.loginfo('\033[95m' + "UR5e: " + msg + '\033[0m')
+
+    def get_info(self, print = False) -> dict:
+        """Get robot and move group info
+
+        :param print: print the info as loginfo, defaults to False
+        :type print: bool, optional
+        :return: dictionary with robot and move group info
+        :rtype: dict
+        """
+
         self.group_names = self.robot.get_group_names()
         self.group_name = self.group.get_name()
         self.planning_frame = self.group.get_planning_frame()
@@ -76,113 +101,167 @@ class UR5e:
         self.current_pose = self.group.get_current_pose()
 
         if print:
-            #print the info
-            rospy.loginfo('\033[95m' + "-----INFO-----" + '\033[0m')
-            rospy.loginfo('\033[95m' + "Available planning groups: {}".format(self.group_names) + '\033[0m')
-            rospy.loginfo('\033[95m' + "Selected planning group: {}".format(self.group_name) + '\033[0m')
-            rospy.loginfo('\033[95m' + "Planning Frame: {}".format(self.planning_frame) + '\033[0m')
-            rospy.loginfo('\033[95m' + "Planning pipeline: {}".format(self.planning_pipeline) + '\033[0m')
-            rospy.loginfo('\033[95m' + "Planner: {}".format(self.planner) + '\033[0m')
-            rospy.loginfo('\033[95m' + "Goal tolerances [joint, position, orientation]: {}".format(self.goal_tolerances) + '\033[0m')
-            rospy.loginfo('\033[95m' + "End Effector Link: {}".format(self.eef_link) + '\033[0m')
-            rospy.loginfo('\033[95m' + "Current joint values: {}".format(self.current_joint_values) + '\033[0m')
-            rospy.loginfo('\033[95m' + "Pose reference frame: {}".format(self.pose_reference_frame) + '\033[0m')
-            # rospy.loginfo('\033[95m' + "Current pose: {}".format(self.current_pose) + '\033[0m')
-            rospy.loginfo('\033[95m' + "--------------" + '\033[0m')
+            # print the info
+            self.loginfo_magenta("-----INFO-----")
+            self.loginfo_magenta("Available planning groups: {}".format(self.group_names))
+            self.loginfo_magenta("Selected planning group: {}".format(self.group_name))
+            self.loginfo_magenta("Planning Frame: {}".format(self.planning_frame))
+            self.loginfo_magenta("Planning pipeline: {}".format(self.planning_pipeline))
+            self.loginfo_magenta("Planner: {}".format(self.planner))
+            self.loginfo_magenta("Goal tolerances [joint, position, orientation]: {}".format(self.goal_tolerances))
+            self.loginfo_magenta("End Effector Link: {}".format(self.eef_link))
+            self.loginfo_magenta("Current joint values: {}".format(self.current_joint_values))
+            self.loginfo_magenta("Pose reference frame: {}".format(self.pose_reference_frame))
+            # self.loginfo_magenta("Current pose: {}".format(self.current_pose))
+            self.loginfo_magenta("--------------")
 
-            #'\033[95m' is the color "LightMagenta" (https://pkg.go.dev/github.com/whitedevops/colors)
-            #'\033[0m' is the default color
-
-        #return a dict with info
+        # return a dict with info
         info = {"group_names": self.group_names, "group_name": self.group_name, "planning_frame": self.planning_frame,"goal_tolerances": self.goal_tolerances , "eef_link": self.eef_link, "current_joint_values": self.current_joint_values, "pose_reference_frame": self.pose_reference_frame, "current_pose": self.current_pose}
 
         return info
+    
+    def teacher_save_pose(self, pose_name:str) -> str:
+        """Save current robot pose to file
 
-    def set_pose(self, pose):
-        """set pose as PoseStamped, Pose, [x, y, z, rot_x, rot_y, rot_z] or [x, y, z, qx, qy, qz, qw]
-
-        :param pose: _description_
-        :type pose: _type_
+        :param pose_name: pose name
+        :type pose_name: str
+        :return: service result message
+        :rtype: str
         """
-        self.group.clear_pose_targets()
-        
-        rospy.loginfo('\033[32m' + "Going to pose: {}".format(pose) + '\033[0m')
+        request = SavePoseRequest(pose_name)
+        response = self.save_pose_srv(request)
 
-        #set goal
+        return response.result
+    
+    def teacher_get_pose(self, pose_name:str) -> JointState:
+        """Get saved robot pose
+
+        :param pose_name: requested pose name
+        :type pose_name: str
+        :return: robot joint states of requested pose
+        :rtype: JointState
+        """
+        request = GetPoseRequest(pose_name)
+        response = self.get_pose_srv(request)
+
+        return response.result
+
+    def set_pose(self, pose) -> None:
+        """Set target pose
+
+        :param pose: target robot pose
+        :type pose: PoseStamped, Pose, [x, y, z, rot_x, rot_y, rot_z] or [x, y, z, qx, qy, qz, qw]
+        """
+
+        # clear all pose targets
+        self.group.clear_pose_targets()
+        self.loginfo_magenta('\033[32m' + "Going to pose: {}".format(pose))
+
+        # set goal
         self.group.set_pose_target(pose)
-        #plan to goal using the default planner
+        # plan to goal using the default planner
         plan_success, plan, planning_time, error_code = self.group.plan()
-        #goal message
+        # goal message
         goal = moveit_msgs.msg.ExecuteTrajectoryGoal()
-        #update the trajectory in the goal message
+        # update the trajectory in the goal message
         goal.trajectory = plan
-        #send the goal to the action server
+        # send the goal to the action server
         self.execute_trajectory_client.send_goal(goal)
         self.execute_trajectory_client.wait_for_result()
-        #Print the current pose
+        # print the current pose
         self.current_pose = self.group.get_current_pose()
-        rospy.loginfo('\033[32m' + "Now at Pose: {}".format(self.current_pose) + '\033[0m')
+        self.loginfo_magenta('\033[32m' + "Now at Pose: {}".format(self.current_pose))
 
-    def set_named_pose(self, pose_name):
+    def set_named_pose(self, pose_name:str) -> None:
         """Set a joint configuration by name specified in the SRDF
 
-        :param pose_name: _description_
-        :type pose_name: _type_
+        :param pose_name: pose name in SRDF
+        :type pose_name: str
         """
-        self.group.clear_pose_targets()
-        
-        rospy.loginfo('\033[32m' + "Going to named pose: {}".format(pose_name) + '\033[0m')
 
-        #set goal
+        # clear all pose targets
+        self.group.clear_pose_targets()
+        self.loginfo_magenta('\033[32m' + "Going to named pose: {}".format(pose_name))
+
+        # set goal
         self.group.set_named_target(pose_name)
-        #plan to goal using the default planner
+        # plan to goal using the default planner
         plan_success, plan, planning_time, error_code = self.group.plan()
-        #goal message
+        # goal message
         goal = moveit_msgs.msg.ExecuteTrajectoryGoal()
-        #update the trajectory in the goal message
+        # update the trajectory in the goal message
         goal.trajectory = plan
-        #send the goal to the action server
+        # send the goal to the action server
         self.execute_trajectory_client.send_goal(goal)
         self.execute_trajectory_client.wait_for_result()
-        #Print the current pose
-        # self.current_pose = self.group.get_current_pose()
-        # rospy.loginfo('\033[32m' + "Now at Pose: {}".format(self.current_pose) + '\033[0m')
+        # Print the current pose
+        #  self.current_pose = self.group.get_current_pose()
+        #  self.loginfo_magenta('\033[32m' + "Now at Pose: {}".format(self.current_pose))
     
-    def set_joint_value(self, joint_state):
+    def move_l(self, goal) -> None:
+        """Linear move in cartesian space
+
+        :param goal: goal
+        :type goal: JointState or Pose
+        """
+        # planning pipeline check
+        if self.planning_pipeline != "pilz_industrial_motion_planner":
+            self.loginfo_magenta('\033[32m' + "Setting the planning pipeline to: 'pilz_industrial_motion_planner'")
+            self.group.set_planning_pipeline_id("pilz_industrial_motion_planner")
+        # planner id check
+        if self.set_planner_id != "LIN":
+            self.loginfo_magenta('\033[32m' + "Setting the planner ID to: 'LIN'")
+            self.group.set_planner_id("LIN")
+
+        # clear all pose targets
         self.group.clear_pose_targets()
+        # set scaling factors
         self.group.set_max_velocity_scaling_factor(0.4)
         self.group.set_max_acceleration_scaling_factor(0.2)
+        # execute move
+        self.loginfo_magenta('\033[32m' + "Setting joint value target")
+        self.group.go(goal, wait=True) 
+    
+    def move_j(self, goal) -> None:
+        """Joint move in joint space
 
-        rospy.loginfo('\033[32m' + "Setting joint value target" + '\033[0m')
+        :param goal: goal
+        :type goal: JointState or Pose
+        """
+         # planning pipeline check
+        if self.planning_pipeline != "pilz_industrial_motion_planner":
+            self.loginfo_magenta('\033[32m' + "Setting the planning pipeline to: 'pilz_industrial_motion_planner'")
+            self.group.set_planning_pipeline_id("pilz_industrial_motion_planner")
+        # planner id check
+        if self.set_planner_id != "PTP":
+            self.loginfo_magenta('\033[32m' + "Setting the planner ID to: 'PTP'")
+            self.group.set_planner_id("PTP")
 
-         #set joint values
-        self.group.set_joint_value_target(joint_state)
-        #plan to goal using the default planner
-        plan_success, plan, planning_time, error_code = self.group.plan()
-        #goal message
-        goal = moveit_msgs.msg.ExecuteTrajectoryGoal()
-        #update the trajectory in the goal message
-        goal.trajectory = plan
-        #send the goal to the action server
-        self.execute_trajectory_client.send_goal(goal)
-        self.execute_trajectory_client.wait_for_result()
+        # clear all pose targets
+        self.group.clear_pose_targets()
+        # set scaling factors
+        self.group.set_max_velocity_scaling_factor(0.4)
+        self.group.set_max_acceleration_scaling_factor(0.2)
+        # execute move
+        self.loginfo_magenta('\033[32m' + "Setting joint value target")
+        self.group.go(goal, wait=True)   
 
-    # Class Destructor
+    #  Class Destructor
     def __del__(self):
-        #When the actions are finished, shut down the moveit commander
+        # when the actions are finished, shut down the moveit commander
         moveit_commander.roscpp_shutdown()
-        rospy.loginfo(
-            '\033[95m' + "Object of class ur5e Deleted." + '\033[0m')
+        self.loginfo_magenta(
+            "Object of class ur5e Deleted.")
 
 
 def main():
     rospy.init_node('ur5e_robot_python_node', anonymous=True)
 
-    #Create a new manipulator object
+    # create a new manipulator object
     ur5e_arm = UR5e("arm")
     ur5e_arm.get_info(print=True)
 
-    #delete the manipulator object
+    # delete the manipulator object
     del manipulator
 
     rospy.signal_shutdown("motion concluded")

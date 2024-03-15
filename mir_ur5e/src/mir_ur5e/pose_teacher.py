@@ -5,12 +5,14 @@ import rospkg
 import threading
 import yaml
 
-from mir_ur5e.srv import SavePose, GetPose
+from mir_ur5e.srv import *
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
 
 class PoseTeacher(object):
+    """Save and get robot poses as joint states
+    """
     def __init__(self):
         self.loginfo_blue("Initializing pose teacher")
 
@@ -46,12 +48,13 @@ class PoseTeacher(object):
         # joint state subscriber
         self.jointListener = rospy.Subscriber("joint_states", JointState, self.setLatestJointState, queue_size=5)
 
-        # provide a service to save a pose
+        # provide a service to save a pose as joint states
         self.savePoseServer = rospy.Service("~save_arm_pose", SavePose, self.saveArmPose)
 
-        # provide a service to drive to a pose
+        # provide a service to get a pose as joint states
         self.driveToPoseServer = rospy.Service("~get_arm_pose", GetPose, self.getArmPose)
-
+        
+        # print service addresses
         self.node_name = rospy.get_name()
         self.save_srv_name = self.node_name + "/save_arm_pose"
         self.get_srv_name = self.node_name + "/get_arm_pose"
@@ -59,14 +62,33 @@ class PoseTeacher(object):
         self.loginfo_blue("Get saved arm pose service: " + self.get_srv_name)
         self.loginfo_blue("Pose teacher initialization done")
 
-    def loginfo_blue(self, msg):
-        rospy.loginfo('\033[94m' + msg + '\033[0m')
+    def loginfo_blue(self, msg:str) -> None:
+        """Helper function. Print loginfo message with blue text
 
-    def setLatestJointState(self, jointState):
+        :param msg: message
+        :type msg: str
+        """
+        rospy.loginfo('\033[94m' + "Pose Teacher: " + msg + '\033[0m')
+
+    def setLatestJointState(self, jointState:JointState) -> None:
+        """Update robot joint states
+
+        :param jointState: latest joints states
+        :type jointState: JointState
+        """
+
         with self.jointStateLock:
             self.latestJointState = jointState
 
-    def saveArmPose(self, request):
+    def saveArmPose(self, request:SavePoseRequest) -> str:
+        """Save the robot pose as joint states
+
+        :param request: service request. calls SavePose service
+        :type request: SavePoseRequest
+        :raises Exception: if no JointState is received
+        :return: message when finished
+        :rtype: str
+        """
         with self.jointStateLock:
             if self.latestJointState is None:
                 raise Exception("No JointState received yet")
@@ -85,7 +107,7 @@ class PoseTeacher(object):
             if request.name in poses:
                 joints = poses[request.name]
 
-            # update values
+            # update joint values
             for joint in self.relevantJoints:
                 index = self.latestJointState.name.index(joint)
                 value = self.latestJointState.position[index]
@@ -97,10 +119,19 @@ class PoseTeacher(object):
             with open(self.filename, 'w') as poseFile:
                 yaml.dump(poses, poseFile)
 
+        self.loginfo_blue("Pose saved as: '" + request.name + "'")
         return "Pose saved"
 
 
-    def getArmPose(self, request):
+    def getArmPose(self, request:GetPoseRequest) -> JointState:
+        """Get a saved robot pose as joint states
+
+        :param request: service request. calls GetPose service
+        :type request: GetPoseRequest
+        :raises Exception: if saved poses list is empty
+        :return: saved joint states
+        :rtype: JointState
+        """
         with self.jointStateLock:
             # read the config file
             try:
@@ -122,6 +153,7 @@ class PoseTeacher(object):
                 msg.name.append(key)
                 msg.position.append(value)
 
+            self.loginfo_blue("Returned pose: '" + request.name + "'")
             return msg
 
 if __name__ == '__main__':

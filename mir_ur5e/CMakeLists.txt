@@ -166,7 +166,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/pick_and_place.py scripts/pose_pub.py src/mir_ur5e/ur5e_class.py src/mir_ur5e/mir100_class.py src/mir_ur5e/robotiq_2f85_class.py src/mir_ur5e/pose_teacher.py scripts/testt.py scripts/test_ur5e_gripper.py
+  scripts/pick_and_place.py scripts/pose_pub.py src/mir_ur5e/ur5e_class.py src/mir_ur5e/mir100_class.py src/mir_ur5e/robotiq_2f85_class.py src/mir_ur5e/pose_teacher.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

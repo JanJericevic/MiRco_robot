@@ -8,7 +8,7 @@
   <arg name="arm_prefix" default=""/>
   <arg name="gripper_prefix" default=""/>
    
-  <param name="robot_description" command="$(find xacro)/xacro '$(find ur5e_2f85_description)/urdf/ur5e_2f85.xacro'
+  <param name="robot_description" command="$(find xacro)/xacro '$(find ur5e_2f85_description)/urdf/ur5e_2f85.urdf.xacro'
     kinematics_params:=$(arg kinematics_params)
     arm_prefix:=$(arg arm_prefix)
     gripper_prefix:=$(arg gripper_prefix)"

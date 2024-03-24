@@ -10,7 +10,7 @@
   <!-- gripper args -->
   <arg name="gripper_prefix" default="" />
   <!-- load urdf -->
-  <param name="robot_description" command="$(find xacro)/xacro $(find mia_description)/urdf/mia.urdf.xacro 
+  <param name="robot_description" command="$(find xacro)/xacro $(find moca_description)/urdf/moca.urdf.xacro 
     mir_type:=$(arg mir_type) 
     mir_prefix:=$(arg mir_prefix)
     arm_prefix:=$(arg arm_prefix)

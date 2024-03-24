@@ -11,7 +11,7 @@
   <arg name="gripper_prefix" default="test3" doc="TF prefix to use for all of the gripper's TF frames"/>
 
   <!-- load urdf -->
-  <include file="$(find mia_description)/launch/load_mia.launch">
+  <include file="$(find moca_description)/launch/load_moca.launch">
     <arg name="mir_type" value="$(arg mir_type)"/>
     <arg name="mir_prefix" value="$(arg mir_prefix)"/>
     <arg name="arm_prefix" value="$(arg arm_prefix)"/>
@@ -22,5 +22,5 @@
   <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
   <!-- start rviz -->
-  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mia_description)/cfg/rviz.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find moca_description)/cfg/rviz.rviz"/>
 </launch>

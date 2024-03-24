@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<robot xmlns:xacro="http://ros.org/wiki/xacro" name="mia_robot">
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="moca_robot">
 
   <!-- include robot macro -->
-  <xacro:include filename="$(find mia_description)/urdf/mia_macro.xacro" />
+  <xacro:include filename="$(find moca_description)/urdf/moca_macro.xacro" />
 
   <!-- mir100 parameters -->
   <xacro:arg name="mir_type" default="mir_100" />
@@ -14,7 +14,7 @@
   <xacro:arg name="gripper_prefix" default="2f85_" />
 
   <!-- instantiate robot with gripper macro -->
-  <xacro:mia_robot 
+  <xacro:moca_robot 
     mir_prefix="$(arg mir_prefix)"
     arm_prefix="$(arg arm_prefix)" 
     kinematics_parameters_file="$(arg kinematics_params)"

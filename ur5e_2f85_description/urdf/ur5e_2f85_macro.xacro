@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="ur5e_2f85_robot" params="
+    arm_prefix
+    kinematics_parameters_file
+    gripper_prefix">
+  
+    <!-- include robot and gripper xacro macros -->
+    <xacro:include filename="$(find ur5e_2f85_description)/urdf/ur5e_macro.xacro" />
+    <xacro:include filename="$(find robotiq_2f_85_gripper_visualization)/urdf/robotiq_arg2f_85_model_macro.xacro" />
+
+    <!-- instantiate robot and gripper macros -->
+    <xacro:ur5e_robot 
+      prefix="${arm_prefix}" 
+      kinematics_parameters_file="${kinematics_parameters_file}"
+    />
+    <xacro:robotiq_arg2f_85 
+      prefix="${gripper_prefix}"
+    />
+
+    <!-- add gripper to robot -->
+    <joint name="${arm_prefix}robotiq_arg2f_base_joint" type="fixed">
+      <origin xyz="0 0 0" rpy="0 0 ${-pi/2}" />
+      <parent link="${arm_prefix}tool0" />
+      <child link="${gripper_prefix}robotiq_arg2f_base_link"/>
+    </joint>
+  </xacro:macro>
+</robot>

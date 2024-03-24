@@ -1,0 +1,20 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- set robot args -->
+  <!-- mir args -->
+  <arg name="mir_type"  default="mir_100"/>
+  <arg name="mir_prefix" default=""/>
+  <!-- ur5e args -->
+  <arg name="arm_prefix" default="" />
+  <arg name="kinematics_params" default="$(find ur5e_2f85_description)/config/ur5e_kinematics_calib.yaml" />
+  <!-- gripper args -->
+  <arg name="gripper_prefix" default="" />
+  <!-- load urdf -->
+  <param name="robot_description" command="$(find xacro)/xacro $(find mia_description)/urdf/mia.urdf.xacro 
+    mir_type:=$(arg mir_type) 
+    mir_prefix:=$(arg mir_prefix)
+    arm_prefix:=$(arg arm_prefix)
+    kinematics_params:=$(arg kinematics_params)
+    gripper_prefix:=$(arg gripper_prefix)"
+    />
+</launch>

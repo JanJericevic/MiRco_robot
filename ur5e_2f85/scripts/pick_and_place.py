@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import rospy
-from mir_ur5e.mir100_class import MiR100
+from mir_control.mir100_class import MiR100
 from ur5e_2f85.ur5e_class import UR5e
 from ur5e_2f85.robotiq_2f85_class import Robotiq2f85
 from pprint import pprint

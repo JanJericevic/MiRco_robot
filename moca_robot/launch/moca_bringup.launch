@@ -1,0 +1,93 @@
+<launch>
+  <!-- set robot args -->
+  <arg name="namespace" default="" doc="namespace of the whole robot cell"/>
+  <!-- mir args -->
+  <arg name="mir_hostname" default="192.168.65.179" doc="MiR IP address"/>
+  <arg name="mir_type" default="mir_100" doc="MiR variant. Can be 'mir_100' or 'mir_250'"/>
+  <arg name="mir_prefix" default="mir100_" doc="TF prefix to use for all of the MiR TF frames"/>
+
+  <!-- ur5e args -->
+  <arg name="arm_prefix" default="ur5e_" doc="TF prefix to use for all of the UR5e TF frames"/>
+  <arg name="kinematics_params" default="$(find ur5e_2f85_description)/config/ur5e_kinematics_calib.yaml" doc="robot arm kinematics calibration file"/>
+  <arg name="ur5e_ip" default="192.168.77.245" doc="UR5e IP address"/>
+
+  <!-- gripper args -->
+  <arg name="gripper_prefix" default="2f85_" doc="TF prefix to use for all of the gripper TF frames"/>
+
+  <!-- load prefixes to the parameter server for convenience -->
+  <param name="robot_namespace_prefix" value="$(arg namespace)" />
+  <param name="robot_base_prefix" value="$(arg mir_prefix)" />
+  <param name="robot_arm_prefix" value="$(arg arm_prefix)" />
+  <param name="robot_gripper_prefix" value="$(arg gripper_prefix)" />
+
+  <!-- robot model -->
+  <include file="$(find moca_description)/launch/load_moca.launch">
+    <arg name="mir_type" value="$(arg mir_type)" />
+    <arg name="mir_prefix" value="$(arg mir_prefix)" />
+    <arg name="arm_prefix" value="$(arg arm_prefix)" />
+    <arg name="kinematics_params" value="$(arg kinematics_params)" />
+    <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
+  </include>
+
+  <!-- robot state publisher -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+    <remap from="/tf"        to="tf_robot_state_publisher" />
+    <remap from="/tf_static" to="tf_static_robot_state_publisher" />
+  </node>
+
+  <!-- remove those TFs that are also published by the MiR to avoid conflicts -->
+  <node name="tf_remove_child_frames" pkg="mir_driver" type="tf_remove_child_frames.py" output="screen">
+    <remap from="tf_in"         to="tf_robot_state_publisher" />
+    <remap from="tf_out"        to="/tf" />
+    <remap from="tf_static_in"  to="tf_static_robot_state_publisher" />
+    <remap from="tf_static_out" to="/tf_static" />
+    <rosparam param="remove_frames" subst_value="True">
+      - $(arg mir_prefix)base_link
+      - $(arg mir_prefix)front_laser_link
+      - $(arg mir_prefix)back_laser_link
+      - $(arg mir_prefix)camera_top_link
+      - $(arg mir_prefix)camera_top_depth_optical_frame
+      - $(arg mir_prefix)camera_floor_link
+      - $(arg mir_prefix)camera_floor_depth_optical_frame
+      - $(arg mir_prefix)imu_link
+    </rosparam>
+  </node>
+
+  <!-- MiR base -->
+  <node name="mir_bridge" pkg="mir_driver" type="mir_bridge.py" output="screen">
+    <param name="hostname" value="$(arg mir_hostname)" />
+    <param name="tf_prefix" value="$(arg mir_prefix)" />
+  </node>
+
+  <node name="b_rep117_laser_filter" pkg="mir_driver" type="rep117_filter.py" output="screen">
+    <remap from="scan" to="b_scan" />
+    <remap from="scan_filtered" to="b_scan_rep117" />
+  </node>
+
+  <node name="f_rep117_laser_filter" pkg="mir_driver" type="rep117_filter.py" output="screen">
+    <remap from="scan" to="f_scan" />
+    <remap from="scan_filtered" to="f_scan_rep117" />
+  </node>
+
+  <node name="fake_mir_joint_publisher" pkg="mir_driver" type="fake_mir_joint_publisher.py" output="screen">
+    <param name="prefix" value="$(arg mir_prefix)" />
+    <remap from="joint_states" to="mir_joint_states" />
+  </node>
+
+  <!-- joint state publisher - publishes MiR, UR5e and gripper joint states -->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <rosparam param="source_list">[mir_joint_states, arm_joint_states, gripper_joint_states]</rosparam>
+    <param name="rate" value="200" />
+  </node>
+
+  <!-- UR5e robot arm -->
+  <include file="$(find ur5e_2f85)/launch/ur_control.launch">
+    <arg name="controller_config_file" value="$(find mobipick_bringup)/config/empty.yaml" /> <!-- hack: avoid loading wrong parameters by loading none -->
+    <arg name="robot_ip" value="$(arg ur5e_ip)" />
+    <arg name="kinematics_config" value="$(arg ur5_kinematics_file)" />
+    <arg name="tf_prefix" value="$(arg prefix)" />
+    <arg name="use_tool_communication" value="false" />
+    <arg name="controllers" value="joint_state_controller arm_controller force_torque_sensor_controller" />
+  </include>
+
+</launch>

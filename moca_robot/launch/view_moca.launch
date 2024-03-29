@@ -1,0 +1,4 @@
+<launch>
+  <!-- start rviz -->
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find moca_robot)/cfg/moca_rviz.rviz"/>
+</launch>

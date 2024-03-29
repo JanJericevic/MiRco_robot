@@ -2,7 +2,7 @@
 <launch>
   <!-- set robot args -->
   <!-- mir args -->
-  <arg name="mir_type"  default="mir_100" doc="The MiR variant. Can be 'mir_100' or 'mir_250' for now." />
+  <arg name="mir_type"  default="mir_100" doc="MiR variant. Can be 'mir_100' or 'mir_250'" />
   <arg name="mir_prefix" default="mir100_" doc="TF prefix to use for all of the MiR's TF frames"/>
   <!-- ur5e args -->
   <arg name="arm_prefix" default="ur5e_" doc="TF prefix to use for all of the UR's TF frames"/>

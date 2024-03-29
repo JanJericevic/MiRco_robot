@@ -1,7 +1,7 @@
 <launch>
     <arg name="namespace" default="/ur5e" doc="namespace for all topics"/>
     
-    <node name="ur5e_robot_python_node" pkg="mir_ur5e" type="pick_and_place.py" ns="$(arg namespace)" respawn="false"  output="screen">
+    <node name="ur5e_robot_python_node" pkg="ur5e_2f85" type="pick_and_place.py" ns="$(arg namespace)" respawn="false"  output="screen">
       <remap from="input" to="gripper_control/input" />
       <remap from="output" to="gripper_control/output" />
   </node>

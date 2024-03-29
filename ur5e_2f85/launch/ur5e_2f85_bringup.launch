@@ -34,7 +34,7 @@
   <param name="robot_arm_prefix" value="$(arg arm_prefix)" />
   <param name="robot_gripper_prefix" value="$(arg gripper_prefix)" />
 
-  <include file="$(find mir_ur5e)/launch/ur_common.launch" pass_all_args="true" />
+  <include file="$(find ur5e_2f85)/launch/ur_common.launch" pass_all_args="true" />
 
   <!-- workaround for empty namespace. If namespace is empty the group is not evaluated. -->
   <!-- that is why we have two groups - one for when the namespace is set and one for when its not -->

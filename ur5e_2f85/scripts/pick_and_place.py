@@ -2,8 +2,8 @@
 
 import rospy
 from mir_ur5e.mir100_class import MiR100
-from mir_ur5e.ur5e_class import UR5e
-from mir_ur5e.robotiq_2f85_class import Robotiq2f85
+from ur5e_2f85.ur5e_class import UR5e
+from ur5e_2f85.robotiq_2f85_class import Robotiq2f85
 from pprint import pprint
 
 def main():

@@ -5,7 +5,7 @@ import rospkg
 import threading
 import yaml
 
-from mir_ur5e.srv import *
+from ur5e_2f85.srv import *
 from sensor_msgs.msg import JointState
 from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 
@@ -18,7 +18,7 @@ class PoseTeacher(object):
 
         # get a filename to save the poses to
         rospack = rospkg.RosPack()
-        package = "mir_ur5e"
+        package = "ur5e_2f85"
         self.filename = rospack.get_path(package) + "/config/ur5e_saved_poses.yaml"
 
         # subscribe to joint states

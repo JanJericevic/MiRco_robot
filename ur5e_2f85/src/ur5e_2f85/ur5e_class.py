@@ -6,11 +6,10 @@ import copy
 import rospy
 import moveit_commander
 import moveit_msgs.msg
-import geometry_msgs.msg
 import actionlib
 
-from mir_ur5e.pose_teacher import PoseTeacher
-from mir_ur5e.srv import *
+from ur5e_2f85.pose_teacher import PoseTeacher
+from ur5e_2f85.srv import *
 from sensor_msgs.msg import JointState
 
 class UR5e:

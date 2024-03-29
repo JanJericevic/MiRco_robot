@@ -38,7 +38,6 @@
     <!-- robot model -->
     <include file="$(arg robot_description_file)">
       <arg name="kinematics_params" value="$(arg kinematics_config)"/>
-      <arg name="namespace" value="$(arg namespace)"/>
       <arg name="arm_prefix" value="$(arg arm_prefix)"/>
       <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
     </include>
@@ -62,7 +61,7 @@
   </group>
 
     <remap from="joint_states" to="arm_joint_states" />
-    <include file="$(find mir_ur5e)/launch/ur_control.launch">
+    <include file="$(find ur5e_2f85)/launch/ur_control.launch">
       <arg name="namespace" value="$(arg namespace)" />
       <arg name="arm_prefix" value="$(arg arm_prefix)" />
       <arg name="gripper_prefix" value="$(arg gripper_prefix)" />

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(mir_ur5e)
+project(ur5e_2f85)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,15 +8,12 @@ project(mir_ur5e)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  actionlib
-  actionlib_msgs
-  move_base_msgs
-  geometry_msgs
-  message_generation
   rospy
-  std_msgs
+  actionlib
+  moveit_msgs
   sensor_msgs
   trajectory_msgs
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -26,7 +23,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-catkin_python_setup()
+# catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -60,9 +57,11 @@ catkin_python_setup()
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-# )
+add_service_files(
+  FILES
+  SavePose.srv
+  GetPose.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,9 +71,10 @@ catkin_python_setup()
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-# )
+generate_messages(
+  DEPENDENCIES
+  sensor_msgs
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -107,8 +107,8 @@ catkin_python_setup()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES mir_ur5e
-  CATKIN_DEPENDS actionlib actionlib_msgs rospy std_msgs message_runtime geometry_msgs sensor_msgs trajectory_msgs
+#  LIBRARIES ur5e_2f85
+  CATKIN_DEPENDS CATKIN_DEPENDS rospy actionlib moveit_msgs sensor_msgs trajectory_msgs message_runtime
 #  DEPENDS system_lib
 )
 
@@ -125,7 +125,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/mir_ur5e.cpp
+#   src/${PROJECT_NAME}/ur5e_2f85.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -136,7 +136,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/mir_ur5e_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/ur5e_2f85_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -163,7 +163,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/pose_pub.py src/mir_ur5e/mir100_class.py
+  scripts/pick_and_place.py src/ur5e_2f85/pose_teacher.py src/ur5e_2f85/robotiq_2f85_class.py src/ur5e_2f85/ur5e_class.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -200,7 +200,7 @@ catkin_install_python(PROGRAMS
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_mir_ur5e.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_ur5e_2f85.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

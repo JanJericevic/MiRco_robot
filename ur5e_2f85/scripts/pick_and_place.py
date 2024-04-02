@@ -10,10 +10,14 @@ def main():
     # init node
     rospy.init_node('ur5e_2f85_python_node', anonymous=True)
     # get robot namespace and prefixes
-    if rospy.has_param("/robot_namespace_prefix"):
-        namespace = rospy.get_param("/robot_namespace_prefix")
+    if rospy.has_param("/robot_namespace"):
+        namespace = rospy.get_param("/robot_namespace")
     else:
         namespace = ""
+    if rospy.has_param("/robot_arm_namespace"):
+        arm_namespace = rospy.get_param("/robot_arm_namespace")
+    else:
+        arm_namespace = ""
 
     # init robot arm
     ur5e_arm = UR5e("arm","pilz_industrial_motion_planner","LIN")

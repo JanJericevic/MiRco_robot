@@ -30,7 +30,7 @@
   <arg name="ur_hardware_interface_node_required" default="true" doc="Shut down ros environment if ur_hardware_interface-node dies."/>
 
   <!-- load prefixes to the parameter server for convenience -->
-  <param name="robot_namespace_prefix" value="$(arg namespace)" />
+  <param name="robot_namespace" value="$(arg namespace)" />
   <param name="robot_arm_prefix" value="$(arg arm_prefix)" />
   <param name="robot_gripper_prefix" value="$(arg gripper_prefix)" />
 

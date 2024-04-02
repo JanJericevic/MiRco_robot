@@ -1,0 +1,4 @@
+source_list:
+  - $(arg namespace)$(arg mir_namespace)/mir_joint_states
+  - $(arg namespace)$(arg arm_namespace)/arm_joint_states
+  - $(arg namespace)$(arg arm_namespace)/gripper_joint_states

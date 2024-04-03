@@ -1,0 +1,34 @@
+<launch>
+  <arg name="debug" default="false" />
+
+  <!-- our robot args -->
+  <!-- namespaces -->
+  <arg name="namespace" default="/moca" doc="namespace for the whole robot cell"/>
+  <arg name="arm_namespace" default="/ur5e" doc="namespace for the robot arm"/>
+  <arg name="moveit_namespace" default="$(arg namespace)$(arg arm_namespace)" doc="moveit namespace"/>
+  <!-- prefixes -->
+  <arg name="mir_prefix" default="mir100_" doc="TF namespace for all topics"/>
+  <arg name="arm_prefix" default="ur5e_" doc="TF prefix for robot arm"/>
+  <arg name="gripper_prefix" default="2f85_" doc="TF prefix for robot gripper"/>
+  <!-- rviz -->
+  <arg name="rviz_config" default="$(find moca_moveit_config)/cfg/rviz_moveit.rviz" doc="rviz config"/>
+
+  <!-- Launch moveit -->
+  <include file="$(find moca_moveit_config)/launch/move_group.launch" ns="$(arg moveit_namespace)">
+    <arg name="debug" value="$(arg debug)" />
+    <arg name="moveit_namespace" value="$(arg moveit_namespace)" />
+    <arg name="mir_prefix" value="$(arg mir_prefix)" />
+    <arg name="arm_prefix" value="$(arg arm_prefix)" />
+    <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
+  </include>
+
+  <!-- <param name="$(arg namespace)/robot_description_semantic" command="$(find xacro)/xacro '$(find moca_moveit_config)/config/moca_robot.srdf.xacro' 
+    mir_prefix:=$(arg mir_prefix)
+    arm_prefix:=$(arg arm_prefix)
+    gripper_prefix:=$(arg gripper_prefix)" 
+    /> -->
+
+  <include file="$(find moca_moveit_config)/launch/moveit_rviz.launch" ns="$(arg moveit_namespace)">
+    <arg name="rviz_config" value="$(arg rviz_config)"/>
+  </include>
+</launch>

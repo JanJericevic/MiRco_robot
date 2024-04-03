@@ -1,2 +1,12 @@
 controller_list:
-  []
+  - name: scaled_pos_joint_traj_controller
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: True
+    joints:
+      - $(arg arm_prefix)shoulder_pan_joint
+      - $(arg arm_prefix)shoulder_lift_joint
+      - $(arg arm_prefix)elbow_joint
+      - $(arg arm_prefix)wrist_1_joint
+      - $(arg arm_prefix)wrist_2_joint
+      - $(arg arm_prefix)wrist_3_joint

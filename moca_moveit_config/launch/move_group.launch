@@ -1,4 +1,9 @@
 <launch>
+  <!-- robot namespace and prefixes -->
+  <arg name="moveit_namespace" default="" doc="moveit namespace"/>
+  <arg name="mir_prefix" default="" doc="TF prefix for robot base"/>
+  <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
 
   <!-- GDB Debug Option -->
   <arg name="debug" default="false" />
@@ -12,7 +17,7 @@
   <arg     if="$(arg info)" name="command_args" value="--debug" />
 
   <!-- move_group settings -->
-  <arg name="pipeline" default="ompl" />
+  <arg name="pipeline" default="pilz_industrial_motion_planner" />
   <arg name="allow_trajectory_execution" default="true"/>
   <arg name="moveit_controller_manager" default="simple" />
   <arg name="fake_execution_type" default="interpolate"/>
@@ -37,10 +42,14 @@
                 " />
   -->
 
-  <arg name="load_robot_description" default="false" />
+  <arg name="load_robot_description" default="true" />
   <!-- load URDF, SRDF and joint_limits configuration -->
   <include file="$(dirname)/planning_context.launch">
     <arg name="load_robot_description" value="$(arg load_robot_description)" />
+    <arg name="moveit_namespace" value="$(arg moveit_namespace)" />
+    <arg name="mir_prefix" value="$(arg mir_prefix)" />
+    <arg name="arm_prefix" value="$(arg arm_prefix)" />
+    <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
   </include>
 
   <!-- Planning Pipelines -->
@@ -73,6 +82,9 @@
     <arg name="moveit_manage_controllers" value="true" />
     <arg name="moveit_controller_manager" value="$(arg moveit_controller_manager)" />
     <arg name="fake_execution_type" value="$(arg fake_execution_type)" />
+    <arg name="mir_prefix" value="$(arg mir_prefix)" />
+    <arg name="arm_prefix" value="$(arg arm_prefix)" />
+    <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
   </include>
 
   <!-- Sensors Functionality -->

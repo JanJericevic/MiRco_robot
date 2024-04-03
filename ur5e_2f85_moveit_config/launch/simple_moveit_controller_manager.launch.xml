@@ -1,9 +1,8 @@
 <launch>
 
-  <!-- robot namespace and prefixes -->
-  <arg name="namespace" default="" doc="namespace for all topics"/>
-  <arg name="arm_prefix" default="" doc="prefix for robot arm"/>
-  <arg name="gripper_prefix" default="" doc="prefix for robot gripper"/>
+  <!-- robot prefixes -->
+  <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
 
   <!-- Define the MoveIt controller manager plugin to use for trajectory execution -->
   <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager" />

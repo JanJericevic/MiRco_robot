@@ -5,7 +5,6 @@
 -->
 <robot xmlns:xacro="http://ros.org/wiki/xacro" name="ur5e_2f85_robot">
     <!-- robot prefixes -->
-    <!-- Use the arg tf_prefix to set the prefix property. Use a dummy prefix property to avoid a leading / if the prefix is not set -->
     <xacro:arg name="arm_prefix" default=""/>
     <xacro:property name="arm_prefix" value="$(arg arm_prefix)"/>
 

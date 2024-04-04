@@ -1,6 +1,6 @@
 <launch>
   <!-- robot namespace and prefixes -->
-  <arg name="moveit_namespace" default="" doc="namespace for the whole robot cell"/>
+  <arg name="namespace" default="" doc="namespace for the whole robot cell"/>
   <arg name="mir_prefix" default="" doc="TF prefix for robot base"/>
   <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
   <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
@@ -12,7 +12,7 @@
   <arg name="load_robot_description" default="false"/>
 
   <!-- The name of the parameter under which the URDF is loaded -->
-  <arg name="robot_description" default="$(arg moveit_namespace)/robot_description"/>
+  <arg name="robot_description" default="robot_description"/>
 
   <!-- Load universal robot description format (URDF) -->
   <include if="$(arg load_robot_description)" file="$(arg robot_description_file)">

@@ -62,15 +62,7 @@
         - $(arg mir_prefix)imu_link
       </rosparam>
     </node>
-
-    <!-- MiR, UR5e and gripper joint state topics are defined in the joint_state_publisher_sources_file -->
-    <!-- This joint state publisher collects the joint states of the robot arm and gripper --> 
-    <!-- and publishes them to the /$(arg namespace)/ur5e/joint_states topic -->
-    <node name="joint_state_publisher_arm_gripper" pkg="joint_state_publisher" type="joint_state_publisher">
-      <rosparam file="$(arg arm_gripper_joint_sources_file)" command="load" subst_value="True" />
-      <param name="rate" value="200" />
-      <remap from="joint_states" to="jan" />
-    </node>
+  
     <!-- This joint state publisher collects the arm and gripper joint states from /$(arg namespace)/ur5e/joint_states topic and -->
     <!-- the joint states of the robot base and publishes them on the /$(arg namespace)/joint_states topic -->
     <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
@@ -107,6 +99,14 @@
 
   <!-- namespace of the robot arm + gripper-->
   <group ns="$(arg namespace)$(arg arm_namespace)">
+
+    <!-- This joint state publisher collects the joint states of the robot arm and gripper --> 
+    <!-- and publishes them to the /$(arg namespace)/ur5e/joint_states topic -->
+    <node name="arm_gripper_joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+      <rosparam file="$(arg arm_gripper_joint_sources_file)" command="load" subst_value="True" />
+      <param name="rate" value="200" />
+      <remap from="robot_description" to="$(arg namespace)/robot_description" />
+    </node>
 
     <!-- UR5e robot arm -->
     <include file="$(find moca_robot)/launch/ur_control.launch">

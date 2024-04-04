@@ -16,17 +16,12 @@
   <!-- Launch moveit -->
   <include file="$(find moca_moveit_config)/launch/move_group.launch" ns="$(arg moveit_namespace)">
     <arg name="debug" value="$(arg debug)" />
+    <arg name="namespace" value="$(arg namespace)" />
     <arg name="moveit_namespace" value="$(arg moveit_namespace)" />
     <arg name="mir_prefix" value="$(arg mir_prefix)" />
     <arg name="arm_prefix" value="$(arg arm_prefix)" />
     <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
   </include>
-
-  <!-- <param name="$(arg namespace)/robot_description_semantic" command="$(find xacro)/xacro '$(find moca_moveit_config)/config/moca_robot.srdf.xacro' 
-    mir_prefix:=$(arg mir_prefix)
-    arm_prefix:=$(arg arm_prefix)
-    gripper_prefix:=$(arg gripper_prefix)" 
-    /> -->
 
   <include file="$(find moca_moveit_config)/launch/moveit_rviz.launch" ns="$(arg moveit_namespace)">
     <arg name="rviz_config" value="$(arg rviz_config)"/>

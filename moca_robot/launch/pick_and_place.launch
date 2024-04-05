@@ -1,0 +1,9 @@
+<launch>
+    <arg name="namespace" default="/moca" doc="namespace of the whole robot cell"/>
+    <arg name="arm_namespace" default="/ur5e" doc="robot arm namespace"/>
+    
+    <node name="moca_robot_python_node" pkg="moca_robot" type="pick_and_place.py" ns="$(arg namespace)$(arg arm_namespace)" respawn="false"  output="screen">
+      <remap from="input" to="gripper_control/input" />
+      <remap from="output" to="gripper_control/output" />
+  </node>
+</launch>

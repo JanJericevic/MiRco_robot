@@ -23,7 +23,7 @@
     <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
   </include>
 
-  <include file="$(find moca_moveit_config)/launch/moveit_rviz.launch" ns="$(arg moveit_namespace)">
+  <!-- <include file="$(find moca_moveit_config)/launch/moveit_rviz.launch" ns="$(arg moveit_namespace)">
     <arg name="rviz_config" value="$(arg rviz_config)"/>
-  </include>
+  </include> -->
 </launch>

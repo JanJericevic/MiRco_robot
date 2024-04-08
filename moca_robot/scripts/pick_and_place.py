@@ -28,7 +28,8 @@ def main():
         arm_namespace = ""
 
     # init robot base
-    
+    mir_ip = rospy.get_param("/robot_base_ip")
+    api = MirRestApi("Distributor","distributor", mir_ip)
     mir = MiR100(api)
 
     # init robot arm
@@ -65,18 +66,18 @@ def main():
     #     if "place" in pose:
     #         gripper.open()
 
-    rospy.sleep(2)
-    for idx, pose in enumerate(pose_list):
-        joint_state = ur5e_arm.teacher_get_pose(pose)
-        # if "entry" in pose:
-        #     if (idx <len (pose_list) -1) and ("entry" in pose_list[idx+1]):
-        #         ur5e_arm.move_j(joint_state) 
-        #         continue
-        ur5e_arm.move_l(joint_state)
-        if "pickup" in pose:
-            gripper.close()
-        if "place" in pose:
-            gripper.open()
+    # rospy.sleep(2)
+    # for idx, pose in enumerate(pose_list):
+    #     joint_state = ur5e_arm.teacher_get_pose(pose)
+    #     # if "entry" in pose:
+    #     #     if (idx <len (pose_list) -1) and ("entry" in pose_list[idx+1]):
+    #     #         ur5e_arm.move_j(joint_state) 
+    #     #         continue
+    #     ur5e_arm.move_l(joint_state)
+    #     if "pickup" in pose:
+    #         gripper.close()
+    #     if "place" in pose:
+    #         gripper.open()
 
     rospy.spin()
 

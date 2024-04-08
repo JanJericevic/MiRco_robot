@@ -51,6 +51,7 @@ class MiR100:
         self.cyan_color_guid = next(item for item in light_missions[1] if item["name"] == "show_cyan_light")["guid"]
 
         # end of robot initialization
+        self.log_status_state()
         self.loginfo_magenta("MiR100 robot python commander initialization complete.")
 
     def handle_result(self,msg:MoveBaseActionResult) -> None:
@@ -68,7 +69,7 @@ class MiR100:
         :param msg: message
         :type msg: str
         """
-        rospy.loginfo('\033[95m' + "Pose Teacher: " + msg + '\033[0m')
+        rospy.loginfo('\033[95m' + msg + '\033[0m')
     
     def show_light(self, state: str) -> None:
         """Workaround for showing color indicators on MiR100. Infinite loop mission defined on web interface that are then triggered over REST api
@@ -102,6 +103,18 @@ class MiR100:
             rospy.logwarn("Invalid light indicator state selected. Possible states: {planner, blocked_path, off}")
             return
             
+    def log_status_state(self) -> None:
+        """Log MiR state
+        """
+
+        status_state = self.api.status_state_get()
+        if status_state[0] == 200:
+            state_id = status_state[1]['state_id']
+            state_text = status_state[1]['state_text']
+            self.loginfo_magenta("MiR100 state: " + state_text)
+        else:
+            self.logwarn("Unable to get MiR state")
+    
     def get_position_guids(self) -> list:
         """Get positions for the active map that were defined in the MiR web interface.
 

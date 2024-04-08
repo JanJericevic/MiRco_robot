@@ -7,63 +7,73 @@ import actionlib
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal,MoveBaseActionResult
 from mir_rest_api.api import MirRestApi
 from pprint import pprint
+from typing import List, Union
 
 class MiR100:
-    """simple MiR100 robot class
+    """Simple MiR100 robot class
     """
 
     def __init__(self, api: MirRestApi=None):
-        
-        #action server
-        self.client = actionlib.SimpleActionClient('mir100/move_base', MoveBaseAction)
-        # rospy.loginfo("Waiting for move_base action server...")
-        # wait = self.client.wait_for_server(rospy.Duration(5.0))
-        # if not wait:
-        #     rospy.logerr("Action server not available!")
-        #     rospy.signal_shutdown("Action server not available!")
-        # rospy.loginfo("Connected to move base server")
+        self.loginfo_magenta("Initializing UR5e robot python commander")
 
-        #move base result subscriber
-        self.result_sub = rospy.Subscriber("/mir100/move_base/result", MoveBaseActionResult, self.handle_result)
+        # get robot namespaces
+        if rospy.has_param("/robot_namespace"):
+            self.namespace = rospy.get_param("/robot_namespace")
+        else:
+            self.namespace = ""
+        if rospy.has_param("/robot_base_namespace"):
+            self.base_namespace = rospy.get_param("/robot_base_namespace")
+        else:
+            self.base_namespace = ""
 
-        #move base goal retry counter and bool
+        # action server
+        self.client = actionlib.SimpleActionClient(self.namespace + self.base_namespace + "/move_base", MoveBaseAction)
+        self.loginfo_magenta("Waiting for move_base action server...")
+        wait = self.client.wait_for_server(rospy.Duration(5.0))
+        if not wait:
+            rospy.logerr("Action server not available!")
+            rospy.signal_shutdown("Action server not available!")
+        self.loginfo_magenta("Connected to move base server")
+
+        # move base result subscriber
+        self.result_sub = rospy.Subscriber(self.namespace + self.base_namespace + "/move_base/result", MoveBaseActionResult, self.handle_result)
+
+        # move base goal retry counter and bool
         self.retry_counter = 1
         self.retry_target = True
 
-        #MiR REST api
+        # MiR REST api
         self.api = api
 
-        #Get mission guids for color missions
+        # Get mission guids for color missions
         light_missions = self.api.missions_groups_group_name_missions_get("FE_robolab_light")
         self.magenta_color_guid = next(item for item in light_missions[1] if item["name"] == "show_magenta_light")["guid"]
         self.cyan_color_guid = next(item for item in light_missions[1] if item["name"] == "show_cyan_light")["guid"]
 
-    def handle_result(self,msg):
+    def handle_result(self,msg:MoveBaseActionResult) -> None:
+        """Move base result callback function
+
+        :param msg: move base action result msg
+        :type msg: MoveBaseActionResult
+        """
         self.result_status = msg.status.status
         rospy.loginfo("Move base result: " + str(msg.status.text))
     
-    def loginfo_magenta(self,msg):
-        """Wrapper around rospy.loginfo to print messages in magenta color.
-        """
+    def loginfo_magenta(self,msg:str) -> None:
+        """Helper function. Print loginfo message with light magenta text
 
-        magenta_start = '\033[95m'
-        color_reset = '\033[0m'
-        rospy.loginfo(magenta_start + str(msg) + color_reset)
-    
-    def loginfo_cyan(self,msg):
-        """Wrapper around rospy.loginfo to print messages in magenta color.
+        :param msg: message
+        :type msg: str
         """
-
-        magenta_start = '\033[36m'
-        color_reset = '\033[0m'
-        rospy.loginfo(magenta_start + str(msg) + color_reset)
+        rospy.loginfo('\033[95m' + "Pose Teacher: " + msg + '\033[0m')
     
-    def show_light(self, state: str):
+    def show_light(self, state: str) -> None:
         """Workaround for showing color indicators on MiR100. Infinite loop mission defined on web interface that are then triggered over REST api
 
         :param state: robot operational state
         :type color: str
         """
+        # put robot in 'ready' state
         self.api.status_state_id_put(3)
 
         if state == "planner":
@@ -71,7 +81,7 @@ class MiR100:
             if delete != 204:
                 rospy.logwarn("Mission queue unsuccessfully deleted. Light indication aborted")
                 return
-            self.loginfo_cyan("Setting light indicator to: planner mode")
+            self.loginfo_magenta("Setting light indicator to: planner mode")
             self.api.mission_queue_post(self.cyan_color_guid)
 
         elif state == "blocked_path":
@@ -89,8 +99,11 @@ class MiR100:
             rospy.logwarn("Invalid light indicator state selected. Possible states: {planner, blocked_path, off}")
             return
             
-    def get_position_guids(self):
+    def get_position_guids(self) -> list:
         """Get positions for the active map that were defined in the MiR web interface.
+
+        :return: list of position guids
+        :rtype: list
         """
 
         status = self.api.status_get()
@@ -103,8 +116,11 @@ class MiR100:
         
         return(position_guids)
 
-    def get_position_data(self, position_guids):
+    def get_position_data(self, position_guids) -> list:
         """get pose data of positions defined by position guids
+
+        :return: list of positions data
+        :rtype: list
         """
 
         positions = []

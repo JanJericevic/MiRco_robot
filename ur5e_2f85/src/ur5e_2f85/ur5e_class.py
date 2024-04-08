@@ -17,11 +17,8 @@ class UR5e:
     """
     def __init__(self, group_name:str, pipeline="pilz_industrial_motion_planner", planner="LIN"):
         self.loginfo_cyan("Initializing UR5e robot python commander")
-        # get robot namespace and prefixes
-        if rospy.has_param("/robot_namespace_prefix"):
-            self.namespace = rospy.get_param("/robot_namespace_prefix")
-        else:
-            self.namespace = ""
+        
+        # get robot prefix
         if rospy.has_param("/robot_arm_prefix"):
             self.arm_prefix = rospy.get_param("/robot_arm_prefix")
         else:
@@ -265,7 +262,7 @@ def main():
     # delete the manipulator object
     del manipulator
 
-    rospy.signal_shutdown("motion concluded")
+    rospy.signal_shutdown("UR5e robot python commander deleted")
 
 
 if __name__ == '__main__':

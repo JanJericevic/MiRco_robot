@@ -14,7 +14,7 @@ class MiR100:
     """
 
     def __init__(self, api: MirRestApi=None):
-        self.loginfo_magenta("Initializing UR5e robot python commander")
+        self.loginfo_magenta("Initializing MiR100 robot python commander")
 
         # get robot namespaces
         if rospy.has_param("/robot_namespace"):
@@ -49,6 +49,9 @@ class MiR100:
         light_missions = self.api.missions_groups_group_name_missions_get("FE_robolab_light")
         self.magenta_color_guid = next(item for item in light_missions[1] if item["name"] == "show_magenta_light")["guid"]
         self.cyan_color_guid = next(item for item in light_missions[1] if item["name"] == "show_cyan_light")["guid"]
+
+        # end of robot initialization
+        self.loginfo_magenta("MiR100 robot python commander initialization complete.")
 
     def handle_result(self,msg:MoveBaseActionResult) -> None:
         """Move base result callback function

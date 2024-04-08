@@ -10,7 +10,7 @@ class Robotiq2f85:
     """
 
     def __init__(self, max_gap = 0.085, min_gap = 0, opened_value = 0, closed_value = 255):
-        self.loginfo_magenta("Initializing 2f85 gripper python commander")
+        self.loginfo_yellow("Initializing 2f85 gripper python commander")
         self.gripper_status_received = False
 
         # gripper command publisher
@@ -31,12 +31,12 @@ class Robotiq2f85:
         self.gripper_closed = closed_value
 
         if self.is_connected():
-            self.loginfo_magenta("Connected to gripper")
+            self.loginfo_yellow("Connected to gripper")
         else:
             for i in range(10):
-                self.loginfo_magenta("Failed to connect to gripper. Retrying (" + str(i+1) + "/10)")
+                self.loginfo_yellow("Failed to connect to gripper. Retrying (" + str(i+1) + "/10)")
                 if self.is_connected():
-                    self.loginfo_magenta("Connected to gripper")
+                    self.loginfo_yellow("Connected to gripper")
                     break
                 if i == 9:
                     rospy.logerr("Failed to connect to gripper.")
@@ -47,22 +47,22 @@ class Robotiq2f85:
 
 
         # gripper reset
-        self.loginfo_magenta("Gripper reset needed")
+        self.loginfo_yellow("Gripper reset needed")
         self.reset()
 
         # calibrate gripper
-        self.loginfo_magenta("Calibrating gripper")
+        self.loginfo_yellow("Calibrating gripper")
         self.calib()
 
-        self.loginfo_magenta("2f85 gripper python commander initialization complete")
+        self.loginfo_yellow("2f85 gripper python commander initialization complete")
     
-    def loginfo_magenta(self, msg:str) -> None:
-        """Helper function. Print loginfo message with light magenta text
+    def loginfo_yellow(self, msg:str) -> None:
+        """Helper function. Print loginfo message with light yellow text
 
         :param msg: message
         :type msg: str
         """
-        rospy.loginfo('\033[95m' + "Gripper: " + msg + '\033[0m')
+        rospy.loginfo('\033[93m' + "Gripper: " + msg + '\033[0m')
 
     def get_status(self,msg):
         """Update gripper status
@@ -77,7 +77,7 @@ class Robotiq2f85:
     def pub_cmd_msg(self):
         """Publish gripper command to gripper output topic
         """
-        self.loginfo_magenta(self.info_msg)
+        self.loginfo_yellow(self.info_msg)
         self.cmd_pub.publish(self.cmd_msg)
     
     # check functions 
@@ -135,7 +135,7 @@ class Robotiq2f85:
         rospy.sleep(1)
         # check if reset
         if self.is_reset():
-            self.loginfo_magenta("Reset complete")
+            self.loginfo_yellow("Reset complete")
         else:
             rospy.logwarn("Reset incomplete")
     
@@ -156,7 +156,7 @@ class Robotiq2f85:
         rospy.sleep(2)
         # check if ready
         if self.is_ready():
-            self.loginfo_magenta("Activation complete")
+            self.loginfo_yellow("Activation complete")
         else:
             rospy.logwarn("Activation incomplete")
     
@@ -190,20 +190,20 @@ class Robotiq2f85:
         # read real open gripper value
         self.gripper_opened = self.gripper_status.gPO
         self.info_msg = "Calibrating open gripper value: " + str(self.gripper_opened)
-        self.loginfo_magenta(self.info_msg)
+        self.loginfo_yellow(self.info_msg)
         # close gripper
         self.close()
         # read real closed gripper value
         self.gripper_closed = self.gripper_status.gPO
         self.info_msg = "Calibrating closed gripper value: " + str(self.gripper_closed)
-        self.loginfo_magenta(self.info_msg)
+        self.loginfo_yellow(self.info_msg)
         # open gripper
         self.open()
         # calibrate gripper range
         self.gripper_range = self.gripper_closed - self.gripper_opened
         self.tick_per_dist = self.gripper_range / self.max_gap_mm
 
-        self.loginfo_magenta("Calibration complete")
+        self.loginfo_yellow("Calibration complete")
     
     #ACCURACY CAN BE IMPROVED
     def set_gap_mm(self,mm):

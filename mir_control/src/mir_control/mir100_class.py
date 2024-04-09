@@ -8,6 +8,7 @@ from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal,MoveBaseActionResult
 from mir_rest_api.api import MirRestApi
 from pprint import pprint
 from typing import List, Union
+from mir_control.goal_teacher import GoalTeacher
 
 class MiR100:
     """Simple MiR100 robot class
@@ -49,6 +50,12 @@ class MiR100:
         light_missions = self.api.missions_groups_group_name_missions_get("FE_robolab_light")
         self.magenta_color_guid = next(item for item in light_missions[1] if item["name"] == "show_magenta_light")["guid"]
         self.cyan_color_guid = next(item for item in light_missions[1] if item["name"] == "show_cyan_light")["guid"]
+
+        # initialize pose teacher
+        self.gt = GoalTeacher()
+        # wait for pose teacher services
+        rospy.wait_for_service(self.gt.save_srv_name)
+        rospy.wait_for_service(self.gt.get_srv_name)
 
         # end of robot initialization
         self.log_status_state()

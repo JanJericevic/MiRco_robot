@@ -1,4 +1,4 @@
-# Publish the desired joint states saved under the given name to the arm controller
+# Publish the desired target goal saved under the given name
 string name
 ---
 geometry_msgs/Pose goal

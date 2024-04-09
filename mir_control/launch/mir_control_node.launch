@@ -1,0 +1,6 @@
+<launch>
+
+  <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" ns="/moca/mir100" respawn="false"  output="screen">
+  </node> 
+
+</launch>

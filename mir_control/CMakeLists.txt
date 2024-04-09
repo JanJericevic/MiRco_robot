@@ -64,6 +64,7 @@ add_service_files(
   FILES
   SaveGoal.srv
   GetGoal.srv
+  GoToGoal.srv
 )
 
 ## Generate actions in the 'action' folder

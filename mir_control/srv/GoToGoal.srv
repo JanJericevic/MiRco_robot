@@ -1,0 +1,4 @@
+# go to target goal specified with goal name
+string name
+---
+string result

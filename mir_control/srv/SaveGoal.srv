@@ -1,4 +1,4 @@
-# save the current joint states of the arm under the given name
+# save the current pose ('goal') of the mobile robot
 string name
 ---
 string result

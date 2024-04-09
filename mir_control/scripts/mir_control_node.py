@@ -10,8 +10,7 @@ def main():
 
     # init mobile base
     mir_ip = rospy.get_param("/robot_base_ip")
-    api = MirRestApi("Distributor","distributor", mir_ip)
-    mir = MiR100(api)
+    mir = MiR100(use_api=True, api_uname="Distributor", api_pass="distributor", mir_ip=mir_ip)
 
     rospy.spin()
 

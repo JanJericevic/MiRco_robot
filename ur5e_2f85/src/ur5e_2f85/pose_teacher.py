@@ -16,7 +16,7 @@ class PoseTeacher(object):
     def __init__(self):
         self.loginfo_blue("Initializing pose teacher")
 
-        # get a filename to save the poses to
+        # get a filename to save the poses
         rospack = rospkg.RosPack()
         package = "ur5e_2f85"
         self.filename = rospack.get_path(package) + "/config/ur5e_saved_poses.yaml"
@@ -90,8 +90,8 @@ class PoseTeacher(object):
 
             # read from file
             try:
-                with open(self.filename) as poseFile:
-                    poses = yaml.load(poseFile, Loader=yaml.SafeLoader)
+                with open(self.filename) as pose_file:
+                    poses = yaml.load(pose_file, Loader=yaml.SafeLoader)
                     if poses == None:
                         poses = {}
             except IOError as err:
@@ -111,8 +111,8 @@ class PoseTeacher(object):
             poses[request.name] = joints
 
             # save to file
-            with open(self.filename, 'w') as poseFile:
-                yaml.dump(poses, poseFile)
+            with open(self.filename, 'w') as pose_file:
+                yaml.dump(poses, pose_file)
 
         self.loginfo_blue("Pose saved as: '" + request.name + "'")
         return "Pose saved"
@@ -130,8 +130,8 @@ class PoseTeacher(object):
         with self.jointStateLock:
             # read the config file
             try:
-                with open(self.filename) as poseFile:
-                    poses = yaml.load(poseFile, Loader=yaml.SafeLoader)
+                with open(self.filename) as pose_file:
+                    poses = yaml.load(pose_file, Loader=yaml.SafeLoader)
                     if poses == None:
                         rospy.logwarn("Saved poses list is empty")
             except IOError as err:

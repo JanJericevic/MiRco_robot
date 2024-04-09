@@ -25,11 +25,7 @@ class PoseTeacher(object):
         self.latestJointState = None
         self.jointStateLock = threading.Lock()
 
-        # get robot namespace and prefixes
-        if rospy.has_param("/robot_namespace_prefix"):
-            self.namespace = rospy.get_param("/robot_namespace_prefix")
-        else:
-            self.namespace = ""
+        # get robot prefix
         if rospy.has_param("/robot_arm_prefix"):
             self.arm_prefix = rospy.get_param("/robot_arm_prefix")
         else:
@@ -46,13 +42,13 @@ class PoseTeacher(object):
         ]
 
         # joint state subscriber
-        self.jointListener = rospy.Subscriber("joint_states", JointState, self.setLatestJointState, queue_size=5)
+        self.jointListener = rospy.Subscriber("joint_states", JointState, self.set_latest_joint_state, queue_size=5)
 
         # provide a service to save a pose as joint states
-        self.savePoseServer = rospy.Service("~save_arm_pose", SavePose, self.saveArmPose)
+        self.save_pose_server = rospy.Service("~save_arm_pose", SavePose, self.save_arm_pose)
 
         # provide a service to get a pose as joint states
-        self.driveToPoseServer = rospy.Service("~get_arm_pose", GetPose, self.getArmPose)
+        self.get_pose_server = rospy.Service("~get_arm_pose", GetPose, self.get_arm_pose)
         
         # print service addresses
         self.node_name = rospy.get_name()
@@ -70,7 +66,7 @@ class PoseTeacher(object):
         """
         rospy.loginfo('\033[94m' + "Pose Teacher: " + msg + '\033[0m')
 
-    def setLatestJointState(self, jointState:JointState) -> None:
+    def set_latest_joint_state(self, jointState:JointState) -> None:
         """Update robot joint states
 
         :param jointState: latest joints states
@@ -79,7 +75,7 @@ class PoseTeacher(object):
         with self.jointStateLock:
             self.latestJointState = jointState
 
-    def saveArmPose(self, request:SavePoseRequest) -> str:
+    def save_arm_pose(self, request:SavePoseRequest) -> str:
         """Save the robot pose as joint states
 
         :param request: service request. calls SavePose service
@@ -122,7 +118,7 @@ class PoseTeacher(object):
         return "Pose saved"
 
 
-    def getArmPose(self, request:GetPoseRequest) -> JointState:
+    def get_arm_pose(self, request:GetPoseRequest) -> JointState:
         """Get a saved robot pose as joint states
 
         :param request: service request. calls GetPose service

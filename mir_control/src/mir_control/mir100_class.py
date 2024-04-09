@@ -51,9 +51,9 @@ class MiR100:
         self.magenta_color_guid = next(item for item in light_missions[1] if item["name"] == "show_magenta_light")["guid"]
         self.cyan_color_guid = next(item for item in light_missions[1] if item["name"] == "show_cyan_light")["guid"]
 
-        # initialize pose teacher
+        # initialize goal teacher
         self.gt = GoalTeacher()
-        # wait for pose teacher services
+        # wait for goal teacher services
         rospy.wait_for_service(self.gt.save_srv_name)
         rospy.wait_for_service(self.gt.get_srv_name)
 

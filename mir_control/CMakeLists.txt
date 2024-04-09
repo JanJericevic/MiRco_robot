@@ -166,7 +166,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/pose_pub.py src/mir_control/mir100_class.py src/mir_control/goal_teacher.py
+  scripts/pose_pub.py scripts/mir_control_node.py src/mir_control/mir100_class.py src/mir_control/goal_teacher.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

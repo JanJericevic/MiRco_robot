@@ -90,38 +90,39 @@ class GoalTeacher(object):
         return "Target goal saved"
 
 
-    # def get_target_goal(self, request:GetPoseRequest) -> JointState:
-    #     """Get a saved robot pose as joint states
+    def get_target_goal(self, request:GetPoseRequest) -> JointState:
+        """Get a saved robot pose as joint states
 
-    #     :param request: service request. calls GetPose service
-    #     :type request: GetPoseRequest
-    #     :raises Exception: if saved poses list is empty
-    #     :return: saved joint states
-    #     :rtype: JointState
-    #     """
-    #     with self.jointStateLock:
-    #         # read the config file
-    #         try:
-    #             with open(self.filename) as poseFile:
-    #                 poses = yaml.load(poseFile, Loader=yaml.SafeLoader)
-    #                 if poses == None:
-    #                     rospy.logwarn("Saved poses list is empty")
-    #         except IOError as err:
-    #             print("Could not open %s to read poses" % self.filename)
-    #             print(err)
-    #             raise
+        :param request: service request. calls GetPose service
+        :type request: GetPoseRequest
+        :raises Exception: if saved poses list is empty
+        :return: saved joint states
+        :rtype: JointState
+        """
+        continue
+        # with self.jointStateLock:
+        #     # read the config file
+        #     try:
+        #         with open(self.filename) as poseFile:
+        #             poses = yaml.load(poseFile, Loader=yaml.SafeLoader)
+        #             if poses == None:
+        #                 rospy.logwarn("Saved poses list is empty")
+        #     except IOError as err:
+        #         print("Could not open %s to read poses" % self.filename)
+        #         print(err)
+        #         raise
 
-    #         if request.name not in poses:
-    #             raise Exception("Unknown pose: %s" % request.name)
+        #     if request.name not in poses:
+        #         raise Exception("Unknown pose: %s" % request.name)
 
-    #         # create a JointState message
-    #         msg = JointState()
-    #         for key, value in poses[request.name].items():
-    #             msg.name.append(key)
-    #             msg.position.append(value)
+        #     # create a JointState message
+        #     msg = JointState()
+        #     for key, value in poses[request.name].items():
+        #         msg.name.append(key)
+        #         msg.position.append(value)
 
-    #         self.loginfo_blue("Returned pose: '" + request.name + "'")
-    #         return msg
+        #     self.loginfo_blue("Returned pose: '" + request.name + "'")
+        #     return msg
 
 if __name__ == '__main__':
     rospy.init_node("goal_teacher")

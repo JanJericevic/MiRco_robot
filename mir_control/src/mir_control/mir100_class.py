@@ -14,7 +14,7 @@ class MiR100:
     """Simple MiR100 robot class
     """
 
-    def __init__(self, api: MirRestApi=None):
+    def __init__(self, use_api=False, api_uname="", api_pass="", mir_ip="192.168.12.20"):
         self.loginfo_magenta("Initializing MiR100 robot python commander")
 
         # get robot namespaces
@@ -44,7 +44,8 @@ class MiR100:
         self.retry_target = True
 
         # MiR REST api
-        self.api = api
+        if use_api:
+            self.api = MirRestApi(api_uname,api_pass, mir_ip)
 
         # Get mission guids for color missions
         light_missions = self.api.missions_groups_group_name_missions_get("FE_robolab_light")

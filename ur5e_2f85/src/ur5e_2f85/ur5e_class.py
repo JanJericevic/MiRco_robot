@@ -15,7 +15,7 @@ from sensor_msgs.msg import JointState
 class UR5e:
     """Simple ur5e robot arm class. Provides moveit functionalities and custom service
     """
-    def __init__(self, group_name:str, pipeline="pilz_industrial_motion_planner", planner="LIN"):
+    def __init__(self, group_name:str, pipeline="pilz_industrial_motion_planner", planner="LIN", pose_file: str = None):
         self.loginfo_cyan("Initializing UR5e robot python commander")
         
         # get robot prefix
@@ -56,7 +56,11 @@ class UR5e:
         self.execute_trajectory_client.wait_for_server()
 
         # initialize pose teacher
-        self.pt = PoseTeacher()
+        # get a filename to save the poses
+        if pose_file == None:
+            self.pt = PoseTeacher()
+        else:
+            self.pt = PoseTeacher(pose_file)
         # wait for pose teacher services
         rospy.wait_for_service(self.pt.save_srv_name)
         rospy.wait_for_service(self.pt.get_srv_name)

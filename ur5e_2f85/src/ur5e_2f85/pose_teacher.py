@@ -13,13 +13,16 @@ from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
 class PoseTeacher(object):
     """Save and get robot poses as joint states
     """
-    def __init__(self):
+    def __init__(self,pose_file: str = None):
         self.loginfo_blue("Initializing pose teacher")
 
         # get a filename to save the poses
-        rospack = rospkg.RosPack()
-        package = "ur5e_2f85"
-        self.filename = rospack.get_path(package) + "/config/ur5e_saved_poses.yaml"
+        if pose_file == None:
+            rospack = rospkg.RosPack()
+            package = "ur5e_2f85"
+            self.filename = rospack.get_path(package) + "/config/ur5e_saved_poses.yml"
+        else:
+            self.filename = pose_file
 
         # subscribe to joint states
         self.latestJointState = None

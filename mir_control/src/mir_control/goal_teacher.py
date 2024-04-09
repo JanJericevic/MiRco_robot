@@ -58,7 +58,7 @@ class GoalTeacher(object):
 
         :param request: service request. calls SaveGoal service
         :type request: SaveGoalRequest
-        :raises Exception: if no PoseStamped is received
+        :raises Exception: if no transform is received
         :return: message when finished
         :rtype: str
         """
@@ -66,63 +66,87 @@ class GoalTeacher(object):
         # get transform 
         try:
             self.tf_listener.waitForTransform("/map", self.mobile_frame, rospy.Time(), rospy.Duration(4.0))
-            (trans,rot) = listener.lookupTransform('/map', self.mobile_frame, rospy.Time(0))
-            test = (trans,rot)
+            (trans,rot) = self.tf_listener.lookupTransform('/map', self.mobile_frame, rospy.Time(0))
+
         except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
             raise Exception("/map to " + self.mobile_frame + " transform not received")
         
         # read from file
-        # try:
-        #     with open(self.filename) as goal_file:
-        #         goals = yaml.load(goal_file, Loader=yaml.SafeLoader)
-        #         if goals == None:
-        #             goals = {}
-        # except IOError as err:
-        #     print("Could not open %s to read target goals" % self.filename)
-        #     print(err)
+        try:
+            with open(self.filename) as goal_file:
+                saved_goals = yaml.load(goal_file, Loader=yaml.SafeLoader)
+                if saved_goals == None:
+                    saved_goals = {}
+        except IOError as err:
+            print("Could not open %s to read target goals" % self.filename)
+            print(err)
 
+        # check if goal already exists
+        goal = {}
+        if request.name in saved_goals:
+            goal = saved_goals[request.name]
+
+        # update goal values
+        position={}
+        position["x"] = trans[0]
+        position["y"] = trans[1]
+        position["z"] = trans[2]
+        goal['position'] = position
+
+        orientation={}
+        orientation["x"] = rot[0]
+        orientation["y"] = rot[1]
+        orientation["z"] = rot[2]
+        orientation["w"] = rot[3]
+        goal['orientation'] = orientation
+     
+        saved_goals[request.name] = goal
 
         # save to file
         with open(self.filename, 'w') as goal_file:
-            yaml.dump(test, goal_file)
+            yaml.dump(saved_goals, goal_file)
 
         self.loginfo_blue("Target goal saved as: '" + request.name + "'")
         return "Target goal saved"
 
 
-    def get_target_goal(self, request:GetPoseRequest) -> JointState:
-        """Get a saved robot pose as joint states
+    def get_target_goal(self, request:GetGoalRequest):
+        """Get a saved mobile robot pose as a Pose msg
 
         :param request: service request. calls GetPose service
         :type request: GetPoseRequest
-        :raises Exception: if saved poses list is empty
+        :raises Exception: if requested goal does not exist
         :return: saved joint states
         :rtype: JointState
         """
-        continue
-        # with self.jointStateLock:
-        #     # read the config file
-        #     try:
-        #         with open(self.filename) as poseFile:
-        #             poses = yaml.load(poseFile, Loader=yaml.SafeLoader)
-        #             if poses == None:
-        #                 rospy.logwarn("Saved poses list is empty")
-        #     except IOError as err:
-        #         print("Could not open %s to read poses" % self.filename)
-        #         print(err)
-        #         raise
+        # read the config file
+        try:
+            with open(self.filename) as goal_file:
+                target_goals = yaml.load(goal_file, Loader=yaml.SafeLoader)
+                if target_goals == None:
+                    rospy.logwarn("Saved goals list is empty")
+        except IOError as err:
+            print("Could not open %s to read target goals" % self.filename)
+            print(err)
+            raise
 
-        #     if request.name not in poses:
-        #         raise Exception("Unknown pose: %s" % request.name)
+        if request.name not in target_goals:
+            raise Exception("Unknown target goal: %s" % request.name)
 
-        #     # create a JointState message
-        #     msg = JointState()
-        #     for key, value in poses[request.name].items():
-        #         msg.name.append(key)
-        #         msg.position.append(value)
+        goal = target_goals[request.name]
+        # create a Pose message
+        msg = Pose()
+        msg.position.x = goal['position']['x']
+        msg.position.y = goal['position']['y']
+        msg.position.z = goal['position']['z']
 
-        #     self.loginfo_blue("Returned pose: '" + request.name + "'")
-        #     return msg
+        msg.orientation.x = goal['orientation']['x']
+        msg.orientation.y = goal['orientation']['y']
+        msg.orientation.z = goal['orientation']['z']
+        msg.orientation.w = goal['orientation']['w']
+            
+        self.loginfo_blue("Returned target goal: '" + request.name + "'")
+        return msg
 
 if __name__ == '__main__':
     rospy.init_node("goal_teacher")

@@ -1,15 +1,26 @@
 #! /usr/bin/env python
 
 import rospy
+import rospkg
 from mir_control.mir100_class import MiR100
+from mir_control.srv import *
 from mir_rest_api.api import MirRestApi
 from ur5e_2f85.ur5e_class import UR5e
 from ur5e_2f85.robotiq_2f85_class import Robotiq2f85
 from pprint import pprint
 
+def send2goal(service_name, target_goal):
+    try:
+        goal_service = rospy.ServiceProxy(service_name, GoToGoal)
+        result = goal_service(target_goal) 
+        print(result)
+
+    except rospy.ServiceException as e:
+        print("Service call failed: %s"%e)
+
 def main():
     # init node
-    rospy.init_node('moca_robot_python_node', anonymous=True)
+    rospy.init_node('moca_delivery_node', anonymous=True)
 
     # get robot namespace and prefixes
     if rospy.has_param("/robot_namespace"):
@@ -27,17 +38,27 @@ def main():
     else:
         arm_namespace = ""
 
-    # init robot base
-    mir_ip = rospy.get_param("/robot_base_ip")
-    api = MirRestApi("Distributor","distributor", mir_ip)
-    mir = MiR100(api)
-
     # init robot arm
-    # ur5e_arm = UR5e("robot_arm","pilz_industrial_motion_planner","LIN")
+    rospack = rospkg.RosPack()
+    package = "moca_robot"
+    file_name = rospack.get_path(package) + "/config/ur5e_saved_poses.yml" 
+    ur5e_arm = UR5e("robot_arm", pose_file = file_name)
     # go home
-    # ur5e_arm.set_named_pose("home")
+    ur5e_arm.set_named_pose("home")
+
     # init robot gripper
-    # gripper = Robotiq2f85(max_gap=0.062)
+    gripper = Robotiq2f85(max_gap=0.062)
+
+    # ros service clients for controling mir
+    goal_service_name = namespace + robot_base_namespace + "/mir_control_node/send_to_goal"
+    rospy.wait_for_service(goal_service_name)
+
+    
+    # ------- DELIVERY -------
+    rospy.sleep(3)
+    # send mir to goal1
+    send2goal(goal_service_name,"start")
+    send2goal(goal_service_name,"delivery")
 
     # arm poses
     pose_list = [
@@ -54,17 +75,18 @@ def main():
         "zobnik1_entry"
     ]
 
-    # for idx, pose in enumerate(pose_list):
-    #     joint_state = ur5e_arm.teacher_get_pose(pose)
-    #     # if "entry" in pose:
-    #     #     if (idx <len (pose_list) -1) and ("entry" in pose_list[idx+1]):
-    #     #         ur5e_arm.move_j(joint_state) 
-    #     #         continue
-    #     ur5e_arm.move_l(joint_state)
-    #     if "pickup" in pose:
-    #         gripper.close()
-    #     if "place" in pose:
-    #         gripper.open()
+    for idx, pose in enumerate(pose_list):
+        joint_state = ur5e_arm.teacher_get_pose(pose)
+        ur5e_arm.move_l(joint_state)
+        if "pickup" in pose:
+            gripper.close()
+        if "place" in pose:
+            gripper.open()
+
+    ur5e_arm.set_named_pose("home")
+    rospy.sleep(1)
+
+    send2goal(goal_service_name,"end")
 
     # rospy.sleep(2)
     # for idx, pose in enumerate(pose_list):
@@ -79,7 +101,7 @@ def main():
     #     if "place" in pose:
     #         gripper.open()
 
-    rospy.spin()
+    # rospy.spin()
 
     
 

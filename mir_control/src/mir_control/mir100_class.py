@@ -40,6 +40,9 @@ class MiR100:
 
         # provide a service to send robot to target goal
         self.goal_server = rospy.Service("~send_to_goal", GoToGoal, self.send_to_goal)
+        self.send_srv_name = rospy.get_name()+ "/send_to_goal"
+        rospy.wait_for_service(self.send_srv_name)
+        self.loginfo_magenta("Send to goal service: " + self.send_srv_name)
 
         # move base result subscriber
         self.result_sub = rospy.Subscriber(self.namespace + self.base_namespace + "/move_base/result", MoveBaseActionResult, self.handle_result)
@@ -68,8 +71,8 @@ class MiR100:
         rospy.wait_for_service(self.gt.get_srv_name)
 
         # end of robot initialization
-        self.log_status_state()
         self.loginfo_magenta("MiR100 robot python commander initialization complete.")
+        self.log_status_state()
 
     def handle_result(self,msg:MoveBaseActionResult) -> None:
         """Move base result callback function
@@ -78,7 +81,11 @@ class MiR100:
         :type msg: MoveBaseActionResult
         """
         self.result_status = msg.status.status
-        self.loginfo_magenta("Move base result: " + str(msg.status.text))
+        self.result_status_text = msg.status.text
+        if self.result_status == 2:
+            self.loginfo_magenta("Move base: received a cancel request")
+            return
+        self.loginfo_magenta("Move base: " + str(msg.status.text))
     
     # def handle_status(self,msg:GoalStatusArray) -> None:
     #     """Move base status callback function
@@ -95,7 +102,7 @@ class MiR100:
         :param msg: message
         :type msg: str
         """
-        rospy.loginfo('\033[95m' + "MiR100: " + + msg + '\033[0m')
+        rospy.loginfo('\033[95m' + "MiR100: " + msg + '\033[0m')
     
     def show_light(self, state: str) -> None:
         """Workaround for showing color indicators on MiR100. Infinite loop mission defined on web interface that are then triggered over REST api
@@ -145,6 +152,7 @@ class MiR100:
         else:
             rospy.logwarn("Invalid light indicator state selected. Possible states: {planner, blocked_path, goal_reached, error, off}")
             return
+        rospy.sleep(2)
             
     def log_status_state(self) -> None:
         """Log MiR state
@@ -154,7 +162,7 @@ class MiR100:
         if status_state[0] == 200:
             state_id = status_state[1]['state_id']
             state_text = status_state[1]['state_text']
-            self.loginfo_magenta("MiR100 state: " + state_text)
+            self.loginfo_magenta("Current MiR100 state: " + state_text)
         else:
             self.logwarn("Unable to get MiR state")
     
@@ -196,77 +204,57 @@ class MiR100:
 
         return positions
 
-    def go2goal(self,target_goal:Pose) -> MoveBaseActionResult:
+    def go2goal(self,target_goal:Pose) -> bool:
         """go to goal
 
         :param target_goal: target goal
         :type target_goal: Pose
         :return: move base action result
-        :rtype: _type_
+        :rtype: bool
         """
-
         # goal
         goal = MoveBaseGoal()
         goal.target_pose.header.frame_id = "map"
         goal.target_pose.header.stamp = rospy.Time.now()
         goal.target_pose.pose = target_goal
+        self.current_goal = goal
 
-        self.loginfo_magenta("Going to goal: \n" + str(goal))
+        # self.loginfo_magenta("Going to goal: \n" + str(goal))
 
+        # light indication
         self.show_light("planner")
-        self.retry_target = True
-        self.retry_counter = 1
-        self.goal_blocked = False
-
+        
         # Sends the goal to the action server
         self.client.send_goal(goal)
 
         # Waits for the server to finish performing the action
         result = self.client.wait_for_result()
-        print(type(result))
         while self.result_status == 4 and self.retry_target:
             self.goal_blocked = True
             result = self.retry_goal()
-                
-            rospy.sleep(3)
         
-        self.show_light("goal_reached")
-        return result
+        if self.result_status == 3:
+            self.show_light("goal_reached")
+        if self.result_status == 4:
+            self.show_light("blocked_path")
+
+        return self.result_status_text
     
     def retry_goal(self):
         """Retry navigating to goal
         """
 
         if self.retry_counter >= 5:
-            rospy.logwarn("Goal is still blocked, moving on...")
+            rospy.logwarn("Goal is still blocked, canceling...")
             self.retry_target = False
-            self.client.cancel_goal()
-            return
+            self.client.cancel_all_goals()
+            return False
 
         rospy.logwarn("Goal is blocked, retrying in 3s. Retry attempt (%i/5)", self.retry_counter)
         rospy.sleep(3)
         self.retry_counter += 1
-        result = self.go2goal(self.current_goal)
-        return result
-
-    def go2goals(self, target_goals):
-        """go to series of goals
-        """
-
-        for tg in target_goals.poses:
-            self.show_light("planner")
-            self.retry_target = True
-            self.retry_counter = 1
-            self.current_goal = tg
-            self.goal_blocked = False
-            result = self.go2goal(self.current_goal)
-
-            while self.result_status == 4 and self.retry_target:
-                self.goal_blocked = True
-                result = self.retry_goal()
-                
-            rospy.sleep(3)
-        self.show_light("off")
+        self.client.send_goal(self.current_goal)
+        return
     
     def send_to_goal(self, request:GoToGoal) -> GoToGoalResponse:
         """ROS service callback function. Sends robot to target goal
@@ -277,6 +265,7 @@ class MiR100:
         # wait for get goal service
         get_goal_service_name = self.gt.get_srv_name
         rospy.wait_for_service(get_goal_service_name)
+
         # get target goal
         try:
             get_goal_service = rospy.ServiceProxy(get_goal_service_name, GetGoal)
@@ -284,6 +273,7 @@ class MiR100:
 
         except rospy.ServiceException as e:
             print("Service call failed: %s"%e)
+
         # convert to Pose msg
         goal = Pose()
         goal.position.x = target_goal.goal.position.x
@@ -294,10 +284,17 @@ class MiR100:
         goal.orientation.y = target_goal.goal.orientation.y
         goal.orientation.z = target_goal.goal.orientation.z
         goal.orientation.w = target_goal.goal.orientation.w
+
+        self.retry_target = True
+        self.goal_blocked = False
+        self.retry_counter = 1
+
         # send robot to goal
-        self.go2goal(goal)
+        result = self.go2goal(goal)
         # return service response
-        return GoToGoalResponse("Sending the robot to target goal: " + str(request.name))
+        if self.result_status == 2:
+            return GoToGoalResponse("Move base: received a cancel request")
+        return GoToGoalResponse("Move base: " + str(result))
 
 def main():
     rospy.init_node('mir_robot_node')

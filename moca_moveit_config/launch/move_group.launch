@@ -1,7 +1,6 @@
 <launch>
   <!-- robot namespace and prefixes -->
   <arg name="namespace" default="" doc="namespace for the whole robot cell"/>
-  <arg name="moveit_namespace" default="" doc="moveit namespace"/>
   <arg name="mir_prefix" default="" doc="TF prefix for robot base"/>
   <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
   <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>

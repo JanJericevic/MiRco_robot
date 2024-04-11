@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import rospy
+import tf
 from geometry_msgs.msg import Pose, PoseStamped, PoseArray
 from std_msgs.msg import Header
 import actionlib
@@ -11,6 +12,10 @@ from pprint import pprint
 from typing import List, Union
 from mir_control.goal_teacher import GoalTeacher
 from mir_control.srv import *
+
+import numpy as np
+import yaml
+import math
 
 class MiR100:
     """Simple MiR100 robot class
@@ -37,8 +42,9 @@ class MiR100:
             rospy.logerr("Action server not available!")
             rospy.signal_shutdown("Action server not available!")
         self.loginfo_magenta("Connected to move base server")
-
-        # provide a service to send robot to target goal
+        
+        # services
+        # send robot to target goal service
         self.goal_server = rospy.Service("~send_to_goal", GoToGoal, self.send_to_goal)
         self.send_srv_name = rospy.get_name()+ "/send_to_goal"
         rospy.wait_for_service(self.send_srv_name)
@@ -69,6 +75,10 @@ class MiR100:
         # wait for goal teacher services
         rospy.wait_for_service(self.gt.save_srv_name)
         rospy.wait_for_service(self.gt.get_srv_name)
+
+        # save map positions to file
+        self.loginfo_magenta("Saving map positions to file")
+        self.save_positions_2_file()
 
         # end of robot initialization
         self.loginfo_magenta("MiR100 robot python commander initialization complete.")
@@ -166,6 +176,27 @@ class MiR100:
         else:
             self.logwarn("Unable to get MiR state")
     
+    def euler_2_quaternion(self, roll, pitch, yaw):
+        """Euler angle to a quaternion.
+
+        :param roll: roll
+        :type roll: _type_
+        :param pitch: pitch
+        :type pitch: _type_
+        :param yaw: yaw
+        :type yaw: _type_
+        :return: list
+        :rtype: list of quaternion values
+        """
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        # return a list of floats, not numpy floats
+        return [qx.item(), qy.item(), qz.item(), qw.item()]
+    
     def get_position_guids(self) -> list:
         """Get positions for the active map that were defined in the MiR web interface.
 
@@ -203,8 +234,60 @@ class MiR100:
             positions.append(position)
 
         return positions
+    
+    def save_positions_2_file(self):
+        guids = self.get_position_guids()
+        positions = self.get_position_data(guids)
 
-    def go2goal(self,target_goal:Pose) -> bool:
+        if positions == []:
+            self.loginfo_magenta("No saved positions detected on map")
+            return
+
+        # uses same file as goal teacher
+        # read from file
+        try:
+            with open(self.gt.filename) as goal_file:
+                saved_goals = yaml.load(goal_file, Loader=yaml.SafeLoader)
+                if saved_goals == None:
+                    saved_goals = {}
+        except IOError as err:
+            print("Could not open %s to read target goals" % self.gt.filename)
+            print(err)
+        
+        for p in positions:
+            # check if position already exists
+            goal = {}
+            if p["name"] in saved_goals:
+                goal = saved_goals[p["name"]]
+                self.loginfo_magenta("Position with name: '" + p["name"] + "' already exists. Overwriting...")
+
+            # position position
+            position = {}
+            position["x"] = p["x"]
+            position["y"] = p["y"]
+            position["z"] = 0
+            goal['position'] = position
+            # position orientation
+            euler = p["orientation"]
+            quaternions = self.euler_2_quaternion(0,0,math.radians(euler))
+            orientation={}
+            orientation["x"] = quaternions[0]
+            orientation["y"] = quaternions[1]
+            orientation["z"] = quaternions[2]
+            orientation["w"] = quaternions[3]
+            goal['orientation'] = orientation
+
+            saved_goals[p["name"]] = goal
+
+            self.loginfo_magenta("Position saved as: '" + p["name"] + "'")
+
+        # save to file
+        with open(self.gt.filename, 'w') as goal_file:
+            yaml.dump(saved_goals, goal_file)
+        
+        self.loginfo_magenta("Positions saved to file")
+
+    def go_2_goal(self,target_goal:Pose) -> bool:
         """go to goal
 
         :param target_goal: target goal
@@ -290,7 +373,7 @@ class MiR100:
         self.retry_counter = 1
 
         # send robot to goal
-        result = self.go2goal(goal)
+        result = self.go_2_goal(goal)
         # return service response
         if self.result_status == 2:
             return GoToGoalResponse("Move base: received a cancel request")
@@ -309,7 +392,7 @@ def main():
         # pprint(positions)
 
         # target_goals = mir.get_goals_from_parameter("mir100/pick_and_place/target_goals")
-        # mir.go2goals(target_goals)
+        # mir.go_2_goals(target_goals)
 
         # mir.show_light("planner")
         # rospy.sleep(3)

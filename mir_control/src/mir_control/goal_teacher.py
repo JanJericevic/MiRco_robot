@@ -35,6 +35,9 @@ class GoalTeacher(object):
 
         # provide a service to get a target goal as a PoseStamped msg
         self.get_goal_server = rospy.Service("~get_mobile_goal", GetGoal, self.get_target_goal)
+
+        # provide a service to get a list of saved goals
+        self.get_goal_server = rospy.Service("~get_mobile_goal_names", GetGoalNames, self.get_target_goal_names)
         
         # print service addresses
         self.node_name = rospy.get_name()
@@ -85,6 +88,7 @@ class GoalTeacher(object):
         goal = {}
         if request.name in saved_goals:
             goal = saved_goals[request.name]
+            self.loginfo_blue("Goal with name: '" + request.name +  "' already exists. Overwriting...")
 
         # update goal values
         position={}
@@ -147,6 +151,33 @@ class GoalTeacher(object):
             
         self.loginfo_blue("Returned target goal: '" + request.name + "'")
         return msg
+
+    def get_target_goal_names(self, request:GetGoalNamesRequest):
+        """Get a saved mobile robot pose as a Pose msg
+
+        :param request: service request. calls GetPose service
+        :type request: GetPoseRequest
+        :raises Exception: if requested goal does not exist
+        :return: saved joint states
+        :rtype: JointState
+        """
+        # read the config file
+        try:
+            with open(self.filename) as goal_file:
+                target_goals = yaml.load(goal_file, Loader=yaml.SafeLoader)
+                if target_goals == None:
+                    rospy.logwarn("Saved goals list is empty")
+        except IOError as err:
+            print("Could not open %s to read target goals" % self.filename)
+            print(err)
+            raise
+        
+        target_goal_names = []
+        for key in target_goals.keys():
+            target_goal_names.append(key)
+        
+        return [target_goal_names]
+
 
 if __name__ == '__main__':
     rospy.init_node("goal_teacher")

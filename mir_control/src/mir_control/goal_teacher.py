@@ -177,6 +177,7 @@ class GoalTeacher(object):
         for key in target_goals.keys():
             target_goal_names.append(key)
         
+        self.loginfo_blue("Returned target goal names")
         return [target_goal_names]
 
 

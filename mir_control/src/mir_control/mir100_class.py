@@ -43,7 +43,6 @@ class MiR100:
             rospy.signal_shutdown("Action server not available!")
         self.loginfo_magenta("Connected to move base server")
         
-        # services
         # send robot to target goal service
         self.goal_server = rospy.Service("~send_to_goal", GoToGoal, self.send_to_goal)
         self.send_srv_name = rospy.get_name()+ "/send_to_goal"
@@ -344,6 +343,8 @@ class MiR100:
 
         :param request: service request
         :type request: GoToGoal
+        :return: service response
+        :rtype: GoToGoalResponse
         """
         # wait for get goal service
         get_goal_service_name = self.gt.get_srv_name

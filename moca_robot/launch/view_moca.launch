@@ -1,4 +1,5 @@
 <launch>
+  <arg name="rviz_config" default="$(find moca_robot)/cfg/moca.rviz" />
   <!-- start rviz -->
-    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find moca_robot)/cfg/moca_rviz.rviz"/>
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config)" output="screen"/>
 </launch>

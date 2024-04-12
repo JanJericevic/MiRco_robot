@@ -10,6 +10,8 @@
   <arg name="arm_prefix" default="ur5e_" doc="TF prefix to use for all of the UR5e TF frames"/>
   <!-- gripper args -->
   <arg name="gripper_prefix" default="2f85_" doc="TF prefix to use for all of the gripper TF frames"/>
+   <!-- rviz -->
+  <arg name="rviz_config" default="$(find moca_robot)/cfg/moca_moveit.rviz" doc="rviz config"/>
 
   <!-- namespace of the robot base -->
   <group ns="$(arg namespace)$(arg mir_namespace)">
@@ -29,6 +31,10 @@
       <arg name="mir_prefix" value="$(arg mir_prefix)" />
       <arg name="arm_prefix" value="$(arg arm_prefix)" />
       <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
+    </include>
+
+    <include file="$(find moca_robot)/launch/view_moca.launch">
+      <arg name="rviz_config" value="$(arg rviz_config)"/>
     </include>
 
   </group>

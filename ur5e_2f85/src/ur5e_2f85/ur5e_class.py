@@ -13,7 +13,7 @@ from ur5e_2f85.srv import *
 from sensor_msgs.msg import JointState
 
 class UR5e:
-    """Simple ur5e robot arm class. Provides moveit functionalities and custom service
+    """Simple ur5e robot arm class. Provides moveit functionalities and custom services
     """
     def __init__(self, group_name:str, pipeline="pilz_industrial_motion_planner", planner="LIN", pose_file: str = None):
         self.loginfo_cyan("Initializing UR5e robot python commander")
@@ -54,6 +54,12 @@ class UR5e:
         # action client for the Execute Trajectory action server
         self.execute_trajectory_client = actionlib.SimpleActionClient('execute_trajectory', moveit_msgs.msg.ExecuteTrajectoryAction)
         self.execute_trajectory_client.wait_for_server()
+
+        # set robot arm pose service
+        self.set_pose_server = rospy.Service("~set_arm_pose", SetPose, self.set_pose_service)
+        self.set_pose_srv_name = rospy.get_name()+ "/set_arm_pose"
+        rospy.wait_for_service(self.set_pose_srv_name)
+        self.loginfo_cyan("Set robot arm pose service: " + self.set_pose_srv_name)
 
         # initialize pose teacher
         # get a filename to save the poses
@@ -144,6 +150,31 @@ class UR5e:
         response = self.get_pose_srv(request)
 
         return response.result
+    
+    def set_pose_service(self, request: SetPoseRequest) -> SetPoseResponse:
+        """ROS service callback function. Sets robot arm pose
+
+        :param request: service request
+        :type request: SetPoseRequest
+        :return: service response
+        :rtype: SetPoseResponse
+        """
+        # wait for get pose service
+        get_pose_service_name = self.pt.get_srv_name
+        rospy.wait_for_service(get_pose_service_name)
+
+        # get robot pose
+        try:
+            get_pose_service = rospy.ServiceProxy(get_pose_service_name, GetPose)
+            pose = get_pose_service(request.name)            
+
+        except rospy.ServiceException as e:
+            print("Service call failed: %s"%e)
+        
+        self.move_j(pose.result)
+
+        return SetPoseResponse("Set robot pose: '" + request.name + "'")
+
 
     def set_pose(self, pose) -> None:
         """Set target pose

@@ -1,0 +1,4 @@
+# Set the desired robot pose saved under the given name
+string name
+---
+string result

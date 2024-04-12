@@ -52,6 +52,9 @@ class PoseTeacher(object):
 
         # provide a service to get a pose as joint states
         self.get_pose_server = rospy.Service("~get_arm_pose", GetPose, self.get_arm_pose)
+
+        # provide a service to get a list of saved poses
+        self.get_pose_names_server = rospy.Service("~get_arm_pose_names", GetPoseNames, self.get_arm_pose_names)
         
         # print service addresses
         self.node_name = rospy.get_name()
@@ -153,6 +156,34 @@ class PoseTeacher(object):
 
             self.loginfo_blue("Returned pose: '" + request.name + "'")
             return msg
+        
+    def get_arm_pose_names(self, request:GetPoseNamesRequest) -> list:
+        """Get a list of saved poses
+
+        :param request: service request. calls GetPoseNames service
+        :type request: GetPoseNamesRequest
+        :raises Exception: if saved poses list is empty
+        :return: saved poses names
+        :rtype: list
+        """
+        with self.jointStateLock:
+            # read the config file
+            try:
+                with open(self.filename) as pose_file:
+                    poses = yaml.load(pose_file, Loader=yaml.SafeLoader)
+                    if poses == None:
+                        rospy.logwarn("Saved poses list is empty")
+            except IOError as err:
+                print("Could not open %s to read poses" % self.filename)
+                print(err)
+                raise
+
+            pose_names = []
+            for key in poses.keys():
+                pose_names.append(key)
+
+            self.loginfo_blue("Returned saved pose names")
+            return [pose_names]
 
 if __name__ == '__main__':
     rospy.init_node("pose_teacher")

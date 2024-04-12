@@ -1,0 +1,12 @@
+<launch>
+  <!-- set robot args -->
+  <arg name="namespace" default="/moca" doc="namespace of the whole robot cell"/>
+  <!-- ur5e args -->
+  <arg name="arm_namespace" default="/ur5e" doc="robot arm namespace"/>
+
+  <!-- launch arm with gripper control node -->
+  <node name="ur5e_2f85_control_node" pkg="ur5e_2f85" type="ur5e_2f85_control_node.py" ns="$(arg namespace)$(arg arm_namespace)" respawn="false"  output="screen">
+    <remap from="input" to="gripper_control/input" />
+    <remap from="output" to="gripper_control/output" />
+  </node>
+</launch>

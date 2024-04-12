@@ -61,6 +61,8 @@ add_service_files(
   FILES
   SavePose.srv
   GetPose.srv
+  GetPoseNames.srv
+  SetPose.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -163,7 +165,7 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/pick_and_place.py src/ur5e_2f85/pose_teacher.py src/ur5e_2f85/robotiq_2f85_class.py src/ur5e_2f85/ur5e_class.py
+  scripts/pick_and_place.py scripts/ur5e_2f85_control_node.py src/ur5e_2f85/pose_teacher.py src/ur5e_2f85/robotiq_2f85_class.py src/ur5e_2f85/ur5e_class.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

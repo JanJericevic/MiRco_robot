@@ -1,0 +1,4 @@
+# # Publish saved robot poses names
+
+---
+string[] poses

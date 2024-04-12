@@ -1,4 +1,4 @@
-# Publish the desired target goal saved under the given name
+# Publish saved target goal names
 
 ---
 string[] goal_names

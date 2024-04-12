@@ -9,7 +9,7 @@ from mir_control.srv import *
 from geometry_msgs.msg import Pose
 
 class GoalTeacher(object):
-    """Save and get mobile robot goals
+    """Save and get mobile robot goals to/from file
     """
     def __init__(self):
         self.loginfo_blue("Initializing goal teacher")
@@ -33,18 +33,20 @@ class GoalTeacher(object):
         # provide a service to save a target goal
         self.save_goal_server = rospy.Service("~save_mobile_goal", SaveGoal, self.save_target_goal)
 
-        # provide a service to get a target goal as a PoseStamped msg
+        # provide a service to get a target goal
         self.get_goal_server = rospy.Service("~get_mobile_goal", GetGoal, self.get_target_goal)
 
         # provide a service to get a list of saved goals
-        self.get_goal_server = rospy.Service("~get_mobile_goal_names", GetGoalNames, self.get_target_goal_names)
+        self.get_names_server = rospy.Service("~get_mobile_goal_names", GetGoalNames, self.get_target_goal_names)
         
         # print service addresses
         self.node_name = rospy.get_name()
         self.save_srv_name = self.node_name + "/save_mobile_goal"
         self.get_srv_name = self.node_name + "/get_mobile_goal"
+        self.get_names_srv_name = self.node_name + "/get_mobile_goal_names"
         self.loginfo_blue("Save mobile goal service: " + self.save_srv_name)
         self.loginfo_blue("Get mobile goal service: " + self.get_srv_name)
+        self.loginfo_blue("Get mobile goal names service: " + self.get_names_srv_name)
         self.loginfo_blue("Goal teacher initialization done")
 
     def loginfo_blue(self, msg:str) -> None:
@@ -57,7 +59,7 @@ class GoalTeacher(object):
 
 
     def save_target_goal(self, request:SaveGoalRequest) -> str:
-        """Save current mobile robot pose
+        """Save current mobile robot pose as a target goal
 
         :param request: service request. calls SaveGoal service
         :type request: SaveGoalRequest
@@ -114,14 +116,14 @@ class GoalTeacher(object):
         return "Target goal saved"
 
 
-    def get_target_goal(self, request:GetGoalRequest):
-        """Get a saved mobile robot pose as a Pose msg
+    def get_target_goal(self, request:GetGoalRequest) -> Pose:
+        """Get a saved target goal as a Pose msg
 
         :param request: service request. calls GetPose service
         :type request: GetPoseRequest
         :raises Exception: if requested goal does not exist
-        :return: saved joint states
-        :rtype: JointState
+        :return: target goal as a Pose msg
+        :rtype: Pose
         """
         # read the config file
         try:
@@ -152,14 +154,13 @@ class GoalTeacher(object):
         self.loginfo_blue("Returned target goal: '" + request.name + "'")
         return msg
 
-    def get_target_goal_names(self, request:GetGoalNamesRequest):
-        """Get a saved mobile robot pose as a Pose msg
+    def get_target_goal_names(self, request:GetGoalNamesRequest) -> list:
+        """Get a list of saved target goal names
 
-        :param request: service request. calls GetPose service
-        :type request: GetPoseRequest
-        :raises Exception: if requested goal does not exist
-        :return: saved joint states
-        :rtype: JointState
+        :param request: service request. calls GetGoalNames service
+        :type request: GetGoalNamesRequest
+        :return: saved target goal names
+        :rtype: list
         """
         # read the config file
         try:

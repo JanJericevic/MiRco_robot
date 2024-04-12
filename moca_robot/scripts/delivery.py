@@ -52,32 +52,33 @@ def main():
     # ros service clients for controling mir
     goal_service_name = namespace + robot_base_namespace + "/mir_control_node/send_to_goal"
     rospy.wait_for_service(goal_service_name)
-
     
     # ------- DELIVERY -------
     rospy.sleep(3)
     # send mir to goal1
-    send2goal(goal_service_name,"start")
-    send2goal(goal_service_name,"delivery")
+    # send2goal(goal_service_name,"start")
+    # send2goal(goal_service_name,"delivery")
 
-    # arm poses
+    # pick and place sequence
     pose_list = [
-        "zobnik1_entry",
         "zobnik1_pickup",
         "zobnik1_entry",
-        "zobnik2_entry",
-        "zobnik2_place",
-        "zobnik2_entry",
-        "zobnik2_pickup",
-        "zobnik2_entry",
-        "zobnik1_entry",
-        "zobnik1_place",
-        "zobnik1_entry"
+        "conveyor_start",
+        "conveyor_entry",
+        "conveyor_place",
+        "conveyor_entry",
+        "conveyor_start"
     ]
 
     for idx, pose in enumerate(pose_list):
+        print(pose)
         joint_state = ur5e_arm.teacher_get_pose(pose)
-        ur5e_arm.move_l(joint_state)
+        if idx >=1 and pose_list[idx-1] == "conveyor_start" and pose_list[idx] == "conveyor_entry":
+            ur5e_arm.move_j(joint_state)
+        elif idx >=1 and pose_list[idx-1] == "conveyor_entry" and pose_list[idx] == "conveyor_start":
+            ur5e_arm.move_j(joint_state)
+        else:
+            ur5e_arm.move_l(joint_state)
         if "pickup" in pose:
             gripper.close()
         if "place" in pose:
@@ -86,20 +87,7 @@ def main():
     ur5e_arm.set_named_pose("home")
     rospy.sleep(1)
 
-    send2goal(goal_service_name,"end")
-
-    # rospy.sleep(2)
-    # for idx, pose in enumerate(pose_list):
-    #     joint_state = ur5e_arm.teacher_get_pose(pose)
-    #     # if "entry" in pose:
-    #     #     if (idx <len (pose_list) -1) and ("entry" in pose_list[idx+1]):
-    #     #         ur5e_arm.move_j(joint_state) 
-    #     #         continue
-    #     ur5e_arm.move_l(joint_state)
-    #     if "pickup" in pose:
-    #         gripper.close()
-    #     if "place" in pose:
-    #         gripper.open()
+    # send2goal(goal_service_name,"end")
 
     # rospy.spin()
 

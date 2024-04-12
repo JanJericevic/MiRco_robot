@@ -1,10 +1,52 @@
+conveyor_entry:
+  ur5e_elbow_joint: -0.7930684089660645
+  ur5e_shoulder_lift_joint: -2.158947607079977
+  ur5e_shoulder_pan_joint: -1.47011644044985
+  ur5e_wrist_1_joint: -1.7663427791991175
+  ur5e_wrist_2_joint: 1.57383131980896
+  ur5e_wrist_3_joint: -1.4576390425311487
+conveyor_entry_testing:
+  ur5e_elbow_joint: -1.113823413848877
+  ur5e_shoulder_lift_joint: -1.990284105340475
+  ur5e_shoulder_pan_joint: -1.4615510145770472
+  ur5e_wrist_1_joint: -1.6142450771727503
+  ur5e_wrist_2_joint: 1.5734314918518066
+  ur5e_wrist_3_joint: -1.4486940542804163
+conveyor_place:
+  ur5e_elbow_joint: -1.1366829872131348
+  ur5e_shoulder_lift_joint: -2.1502515278258265
+  ur5e_shoulder_pan_joint: -1.4700363318072718
+  ur5e_wrist_1_joint: -1.431402937774994
+  ur5e_wrist_2_joint: 1.5732641220092773
+  ur5e_wrist_3_joint: -1.4562433401690882
+conveyor_place_testing:
+  ur5e_elbow_joint: -1.344301462173462
+  ur5e_shoulder_lift_joint: -2.012773653069967
+  ur5e_shoulder_pan_joint: -1.4615591208087366
+  ur5e_wrist_1_joint: -1.3613255780986329
+  ur5e_wrist_2_joint: 1.5729365348815918
+  ur5e_wrist_3_joint: -1.4476812521563929
+conveyor_start:
+  ur5e_elbow_joint: -1.0463955402374268
+  ur5e_shoulder_lift_joint: -1.4759762671640893
+  ur5e_shoulder_pan_joint: -0.00012857118715459137
+  ur5e_wrist_1_joint: -2.167675634423727
+  ur5e_wrist_2_joint: 1.5716447830200195
+  ur5e_wrist_3_joint: -0.0005052725421350601
+home:
+  ur5e_elbow_joint: -1.57
+  ur5e_shoulder_lift_joint: -1.57
+  ur5e_shoulder_pan_joint: 0
+  ur5e_wrist_1_joint: -1.57
+  ur5e_wrist_2_joint: 1.57
+  ur5e_wrist_3_joint: 0
 zobnik1_entry:
-  ur5e_elbow_joint: -2.330332040786743
-  ur5e_shoulder_lift_joint: -1.3947421324304123
-  ur5e_shoulder_pan_joint: -0.08171588579286748
-  ur5e_wrist_1_joint: -0.984542505150177
-  ur5e_wrist_2_joint: 1.568321704864502
-  ur5e_wrist_3_joint: -0.07989961305727178
+  ur5e_elbow_joint: -1.0464067459106445
+  ur5e_shoulder_lift_joint: -1.4759412941387673
+  ur5e_shoulder_pan_joint: -0.00015098253359013825
+  ur5e_wrist_1_joint: -2.167659898797506
+  ur5e_wrist_2_joint: 1.5716447830200195
+  ur5e_wrist_3_joint: -0.000478092824117482
 zobnik1_pickup:
   ur5e_elbow_joint: -2.4344639778137207
   ur5e_shoulder_lift_joint: -1.5559172986871381

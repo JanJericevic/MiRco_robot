@@ -16,7 +16,7 @@
   <!-- namespace of the robot base -->
   <group ns="$(arg namespace)$(arg mir_namespace)">
 
-    <!-- launch mir control node: provides services for saving mobile robot poses and sending robot to target goals-->
+    <!-- launch mir control node. provides services for saving mobile robot poses and sending robot to target goals-->
     <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" respawn="false"  output="screen" />
     
   </group>
@@ -24,7 +24,7 @@
   <!-- namespace of the robot arm + gripper-->
   <group ns="$(arg namespace)$(arg arm_namespace)">
 
-    <!-- Launch moveit -->
+    <!-- launch moveit -->
     <include file="$(find moca_moveit_config)/launch/move_group.launch">
       <arg name="debug" value="$(arg debug)" />
       <arg name="namespace" value="$(arg namespace)" />

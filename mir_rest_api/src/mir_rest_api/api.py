@@ -550,6 +550,7 @@ class MirRestApi:
         else:
             return self.handle_request()
     
+    # ---------- mission queue ----------
     def mission_queue_get(self, ros: bool = 0) -> [int, dict]:
         """Retrieve the list of missions in the queue. Finished, failed, pending and executing missions will be displayed here
 
@@ -813,6 +814,110 @@ class MirRestApi:
             return self.handle_request_ros()
         else:
             return self.handle_request()
+    
+    def position_types_id_get(self, id: str, ros: bool = 0) -> [int,dict]:
+        """Retrieve the details about the position type with the specified type ID
+
+        :param guid: position type ID
+        :type guid: str
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: [int,dict]
+        """
+
+        """ Position Types:
+        {'id': 0, 'name': 'Robot position', 'url': '/v2.0.0/position_types/0'},
+        {'id': 1, 'name': 'Cart position', 'url': '/v2.0.0/position_types/1'},
+        {'id': 2, 'name': 'Cart pickup position', 'url': '/v2.0.0/position_types/2'},
+        {'id': 3, 'name': 'Cart left entry', 'url': '/v2.0.0/position_types/3'},
+        {'id': 4, 'name': 'Cart right entry', 'url': '/v2.0.0/position_types/4'},
+        {'id': 5, 'name': 'Shelf position', 'url': '/v2.0.0/position_types/5'},
+        {'id': 6, 'name': 'Shelf short entry position', 'url': '/v2.0.0/position_types/6'},
+        {'id': 7, 'name': 'MiRCharge 100/200', 'url': '/v2.0.0/position_types/7'},
+        {'id': 8, 'name': 'MiRCharge 100/200 entry', 'url': '/v2.0.0/position_types/8'},
+        {'id': 9, 'name': 'V-marker', 'url': '/v2.0.0/position_types/9'},
+        {'id': 10, 'name': 'V-marker entry', 'url': '/v2.0.0/position_types/10'},
+        {'id': 11, 'name': 'VL-marker', 'url': '/v2.0.0/position_types/11'},
+        {'id': 12, 'name': 'VL-marker entry', 'url': '/v2.0.0/position_types/12'},
+        {'id': 13, 'name': 'L-marker', 'url': '/v2.0.0/position_types/13'},
+        {'id': 14, 'name': 'L-marker entry', 'url': '/v2.0.0/position_types/14'},
+        {'id': 15, 'name': 'Emergency position', 'url': '/v2.0.0/position_types/15'},
+        {'id': 16, 'name': 'Precision marker', 'url': '/v2.0.0/position_types/16'},
+        {'id': 17, 'name': 'Precision marker entry', 'url': '/v2.0.0/position_types/17'},
+        {'id': 18, 'name': 'Pallet rack', 'url': '/v2.0.0/position_types/18'},
+        {'id': 19, 'name': 'Pallet rack entry position', 'url': '/v2.0.0/position_types/19'},
+        {'id': 20, 'name': 'MiRCharge 500/1000', 'url': '/v2.0.0/position_types/20'},
+        {'id': 21, 'name': 'MiRCharge 500/1000 entry', 'url': '/v2.0.0/position_types/21'},
+        {'id': 22, 'name': 'Bar-marker', 'url': '/v2.0.0/position_types/22'},
+        {'id': 23, 'name': 'Bar-marker entry', 'url': '/v2.0.0/position_types/23'},
+        {'id': 25, 'name': 'elevator position', 'url': '/v2.0.0/position_types/25'},
+        {'id': 26, 'name': 'elevator entry position', 'url': '/v2.0.0/position_types/26'},
+        {'id': 42, 'name': 'Staging position', 'url': '/v2.0.0/position_types/42'},
+        {'id': 106, 'name': 'Shelf long entry position', 'url': '/v2.0.0/position_types/106'}]]
+        """
+
+        self.method = "GET"
+        self.endpoint = self.url + "/position_types/" + id
+        self.json = ""
+
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
+        
+    def position_types_get(self, ros: bool = 0) -> [int,dict]:
+        """Retrieve a list of possible position types
+
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: [int,dict]
+        """
+
+        self.method = "GET"
+        self.endpoint = self.url + "/position_types"
+        self.json = ""
+
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
+
+    # ---------- actions ----------
+    def actions_get(self, ros: bool = 0) -> [int, dict]:
+        """Retrieve the list of action definitions
+
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
+        """
+
+        self.method = "GET"
+        self.endpoint = self.url + "/actions"
+        self.json = ""
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
+    
+    def actions_action_type_get(self, action_type: str, ros: bool = 0) -> [int, dict]:
+        """Retrieve the details about the action. It displays the parameters of the action and the limits for the values among others
+
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
+        """
+
+        self.method = "GET"
+        self.endpoint = self.url + "/actions/" + action_type 
+        self.json = ""
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
 
 def main():
 
@@ -822,18 +927,77 @@ def main():
     """)
 
     # set the MiR100 ip
-    ip = "193.2.177.115"
+    ip = "192.168.65.179"
 
     # if using ROS service for REST requests
     # rospy.wait_for_service('mir_rest_api_service')
 
     try:
-        api = MirRestApi("Distributor", "distributor")  
-        # api = MirRestApi("UserName", "Password", ip) # when setting robot IP
+        # api = MirRestApi("Distributor", "distributor")  
+        api = MirRestApi("Distributor", "distributor", ip) # when setting robot IP
+
+        ##########################################
+
+        # get docking markers in current map
+        response = api.status_get()
+        map_id = response[1]["map_id"]
+        map_markers = []
+        positions = api.maps_map_id_positions_get(map_id)[1]
+        for position in positions:
+            if position["type_id"] == 11:
+                map_markers.append(position)
+        # pprint(map_markers)
+
+        # get docking marker info
+        for marker in map_markers:
+            marker_guid = marker["guid"]
+            info = api.positions_guid_get(marker_guid)
+            pprint(info)
+
+        # get docking helper mission
+        helpers = api.missions_groups_group_name_missions_get("MoCA_helper_missions")[1]
+        helper = next(helper for helper in helpers if helper["name"] == "dock_to_vl_marker")
+        helper_guid = helper["guid"]
+
+        helper_info = api.missions_guid_get(helper_guid)
+        pprint("------ DOCK HELPER MISSION INFO")
+        pprint(helper_info)
+
+        helper_actions = api.missions_mission_id_actions_get(helper_guid)[1]
+        pprint("------ DOCK HELPER MISSION ACTIONS")
+        pprint(helper_actions)
+
+        actions = api.actions_get()
+        # pprint(actions)
+
         
-        # example of direct REST request
-        # response = api.mission_queue_delete()
-        # pprint(response)
+
+
+        ##########################################
+
+
+
+        # ///////// MISSION QUEUE ////////////
+        # mission queue
+        # mission_queue = api.mission_queue_get()
+        # pprint(mission_queue)
+        # get go to mission from mission queue
+        # go_to = api.mission_queue_id_get(852)[1]
+        # pprint("------ GO TO MISSION")
+        # pprint(go_to)
+        # get go to mission info
+        # go_to_mission_id = go_to["mission_id"]
+        # go_to_mission_info = api.missions_guid_get(go_to_mission_id)
+        # pprint("------ GO TO MISSION INFO")
+        # pprint(go_to_mission_info)
+        # get go to mission actions
+        # go_to_mission_actions = api.missions_mission_id_actions_get(go_to_mission_id)
+        # pprint("------ GO TO MISSION ACTIONS")
+        # pprint(go_to_mission_actions)
+        # /////////////////////////////////////
+
+
+
 
         # example of REST request over ROS service
         # print(api.status_state_get(1))

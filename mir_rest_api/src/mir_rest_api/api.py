@@ -529,6 +529,27 @@ class MirRestApi:
         else:
             return self.handle_request()
     
+    def missions_mission_id_actions_guid_put(self, mission_id: str, guid: str, action_msg, ros: bool = 0) -> [int, dict]:
+        """Modify the values of the action with the specified GUID that belongs to the mission with the specified mission ID
+
+        :param mission_id: mission ID
+        :type mission_id: str
+        :param guid: action GUID
+        :type guid: str
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
+        """
+
+        self.method = "PUT"
+        self.endpoint = self.url + "/missions/" + mission_id + "/actions/" + guid
+        self.json = action_msg
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
+    
     def missions_mission_id_actions_guid_delete(self, mission_id: str, guid: str, ros: bool = 0) -> [int, dict]:
         """Erase the action with the specified GUID from the mission with the specified mission ID
 
@@ -937,38 +958,6 @@ def main():
         api = MirRestApi("Distributor", "distributor", ip) # when setting robot IP
 
         ##########################################
-
-        # get docking markers in current map
-        response = api.status_get()
-        map_id = response[1]["map_id"]
-        map_markers = []
-        positions = api.maps_map_id_positions_get(map_id)[1]
-        for position in positions:
-            if position["type_id"] == 11:
-                map_markers.append(position)
-        # pprint(map_markers)
-
-        # get docking marker info
-        for marker in map_markers:
-            marker_guid = marker["guid"]
-            info = api.positions_guid_get(marker_guid)
-            pprint(info)
-
-        # get docking helper mission
-        helpers = api.missions_groups_group_name_missions_get("MoCA_helper_missions")[1]
-        helper = next(helper for helper in helpers if helper["name"] == "dock_to_vl_marker")
-        helper_guid = helper["guid"]
-
-        helper_info = api.missions_guid_get(helper_guid)
-        pprint("------ DOCK HELPER MISSION INFO")
-        pprint(helper_info)
-
-        helper_actions = api.missions_mission_id_actions_get(helper_guid)[1]
-        pprint("------ DOCK HELPER MISSION ACTIONS")
-        pprint(helper_actions)
-
-        actions = api.actions_get()
-        # pprint(actions)
 
         
 

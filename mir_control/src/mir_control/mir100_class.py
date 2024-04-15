@@ -61,13 +61,16 @@ class MiR100:
         # MiR REST api
         if use_api:
             self.api = MirRestApi(api_uname,api_pass, mir_ip)
+        
+        # Get mission guid for docking mission
+        helper_missions = self.api.missions_groups_group_name_missions_get("MoCA_helper_missions")
+        self.dock_to_vl_guid = next(item for item in helper_missions[1] if item["name"] == "dock_to_vl_marker")["guid"]
 
         # Get mission guids for color missions
-        light_missions = self.api.missions_groups_group_name_missions_get("MoCA_helper_missions")
-        self.magenta_color_guid = next(item for item in light_missions[1] if item["name"] == "show_magenta_light")["guid"]
-        self.cyan_color_guid = next(item for item in light_missions[1] if item["name"] == "show_cyan_light")["guid"]
-        self.green_color_guid = next(item for item in light_missions[1] if item["name"] == "show_green_light")["guid"]
-        self.red_color_guid = next(item for item in light_missions[1] if item["name"] == "show_red_light")["guid"]
+        self.magenta_color_guid = next(item for item in helper_missions[1] if item["name"] == "show_magenta_light")["guid"]
+        self.cyan_color_guid = next(item for item in helper_missions[1] if item["name"] == "show_cyan_light")["guid"]
+        self.green_color_guid = next(item for item in helper_missions[1] if item["name"] == "show_green_light")["guid"]
+        self.red_color_guid = next(item for item in helper_missions[1] if item["name"] == "show_red_light")["guid"]
 
         # initialize goal teacher
         self.gt = GoalTeacher()
@@ -112,6 +115,16 @@ class MiR100:
         :type msg: str
         """
         rospy.loginfo('\033[95m' + "MiR100: " + msg + '\033[0m')
+    
+    def dock_to_vl_marker(self):
+        # put robot in 'ready' state
+        self.api.status_state_id_put(3)
+        delete = self.api.mission_queue_delete()[0]
+        if delete != 204:
+            rospy.logwarn("Mission queue unsuccessfully deleted. Docking aborted")
+            return
+        self.loginfo_magenta("Docking to vl marker")
+        self.api.mission_queue_post(self.dock_to_vl_guid)
     
     def show_light(self, state: str) -> None:
         """Workaround for showing color indicators on MiR100. Infinite loop mission defined on web interface that are then triggered over REST api

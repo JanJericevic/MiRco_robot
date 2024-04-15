@@ -63,7 +63,7 @@ class MiR100:
             self.api = MirRestApi(api_uname,api_pass, mir_ip)
 
         # Get mission guids for color missions
-        light_missions = self.api.missions_groups_group_name_missions_get("FE_robolab_light")
+        light_missions = self.api.missions_groups_group_name_missions_get("MoCA_helper_missions")
         self.magenta_color_guid = next(item for item in light_missions[1] if item["name"] == "show_magenta_light")["guid"]
         self.cyan_color_guid = next(item for item in light_missions[1] if item["name"] == "show_cyan_light")["guid"]
         self.green_color_guid = next(item for item in light_missions[1] if item["name"] == "show_green_light")["guid"]

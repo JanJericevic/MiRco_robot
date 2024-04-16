@@ -11,7 +11,7 @@ def main():
 
     # init robot arm
     rospack = rospkg.RosPack()
-    package = "moca_robot"
+    package = "mirco_robot"
     file_name = rospack.get_path(package) + "/config/ur5e_saved_poses.yml" 
     ur5e_arm = UR5e("robot_arm", pose_file = file_name)
 

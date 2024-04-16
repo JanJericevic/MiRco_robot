@@ -1,6 +1,6 @@
 <launch>
   <!-- set robot args -->
-  <arg name="namespace" default="/moca" doc="namespace of the whole robot cell"/>
+  <arg name="namespace" default="/mirco" doc="namespace of the whole robot cell"/>
   <!-- ur5e args -->
   <arg name="arm_namespace" default="/ur5e" doc="robot arm namespace"/>
 

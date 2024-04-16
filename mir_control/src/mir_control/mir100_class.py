@@ -63,7 +63,7 @@ class MiR100:
             self.api = MirRestApi(api_uname,api_pass, mir_ip)
         
         # Get mission guid for docking mission
-        helper_missions = self.api.missions_groups_group_name_missions_get("MoCA_helper_missions")
+        helper_missions = self.api.missions_groups_group_name_missions_get("MiRco_helper_missions")
         self.dock_to_vl_guid = next(item for item in helper_missions[1] if item["name"] == "dock_to_vl_marker")["guid"]
 
         # Get mission guids for color missions

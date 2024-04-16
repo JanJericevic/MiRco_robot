@@ -536,6 +536,8 @@ class MirRestApi:
         :type mission_id: str
         :param guid: action GUID
         :type guid: str
+        :param action_msg: MiR action body
+        :type action_msg: json
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
         :return: a list containing REST response status code and body
@@ -924,8 +926,10 @@ class MirRestApi:
             return self.handle_request()
     
     def actions_action_type_get(self, action_type: str, ros: bool = 0) -> [int, dict]:
-        """Retrieve the details about the action. It displays the parameters of the action and the limits for the values among others
+        """Retrieve the details about the action type. It displays the parameters of the action and the limits for the values among others
 
+        :param action_type: action type
+        :type action_type: str
         :param ros: use ROS service, defaults to 0
         :type ros: bool, optional
         :return: a list containing REST response status code and body
@@ -948,45 +952,14 @@ def main():
     """)
 
     # set the MiR100 ip
-    ip = "192.168.65.179"
+    # ip = "192.168.65.179"
 
     # if using ROS service for REST requests
     # rospy.wait_for_service('mir_rest_api_service')
 
     try:
-        # api = MirRestApi("Distributor", "distributor")  
+        # api = MirRestApi("UserName", "Password")  
         api = MirRestApi("Distributor", "distributor", ip) # when setting robot IP
-
-        ##########################################
-
-        
-
-
-        ##########################################
-
-
-
-        # ///////// MISSION QUEUE ////////////
-        # mission queue
-        # mission_queue = api.mission_queue_get()
-        # pprint(mission_queue)
-        # get go to mission from mission queue
-        # go_to = api.mission_queue_id_get(852)[1]
-        # pprint("------ GO TO MISSION")
-        # pprint(go_to)
-        # get go to mission info
-        # go_to_mission_id = go_to["mission_id"]
-        # go_to_mission_info = api.missions_guid_get(go_to_mission_id)
-        # pprint("------ GO TO MISSION INFO")
-        # pprint(go_to_mission_info)
-        # get go to mission actions
-        # go_to_mission_actions = api.missions_mission_id_actions_get(go_to_mission_id)
-        # pprint("------ GO TO MISSION ACTIONS")
-        # pprint(go_to_mission_actions)
-        # /////////////////////////////////////
-
-
-
 
         # example of REST request over ROS service
         # print(api.status_state_get(1))

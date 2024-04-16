@@ -820,6 +820,25 @@ class MirRestApi:
         else:
             return self.handle_request()
 
+    def positions_pos_id_docking_offsets_get(self, pos_id: str, ros: bool = 0) -> [int,dict]:
+        """Retrieve the details of the docking offset of the position with the specified position ID
+
+        :param pos_id: position ID
+        :type pos_id: str
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: [int,dict]
+        """
+
+        self.method = "GET"
+        self.endpoint = self.url + "/positions/" + pos_id + "/docking_offsets"
+        self.json = ""
+
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
 
     def position_transition_lists_get(self, ros: bool = 0) -> [int, dict]:
         """Retrieve the list of position transition lists
@@ -939,6 +958,45 @@ class MirRestApi:
         self.method = "GET"
         self.endpoint = self.url + "/actions/" + action_type 
         self.json = ""
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
+    
+    # ---------- docking offsets ----------
+    def docking_offsets_guid_get(self, guid: str, ros: bool = 0) -> [int, dict]:
+        """Retrieve the details of the docking offset with the specified GUID
+
+        :param guid: action docking offset guid
+        :type guid: str
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
+        """
+
+        self.method = "GET"
+        self.endpoint = self.url + "/docking_offsets/" + guid 
+        self.json = ""
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
+    
+    def docking_offsets_guid_put(self, guid: str, offsets, ros: bool = 0) -> [int, dict]:
+        """Modify the values of the docking offset with the specified GUID
+
+        :param guid: action docking offset guid
+        :type guid: str
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: list[int, dict]
+        """
+
+        self.method = "PUT"
+        self.endpoint = self.url + "/docking_offsets/" + guid 
+        self.json = offsets
         if ros == 1:
             return self.handle_request_ros()
         else:

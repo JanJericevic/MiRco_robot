@@ -271,6 +271,7 @@ class MiR100:
                 self.loginfo_magenta("Marker with name: '" + m["name"] + "' already exists. Overwriting...")
 
             marker["guid"] = m["guid"]
+            marker["type_id"] = m["type_id"]
             saved_markers[m["name"]] = marker
             self.loginfo_magenta("Marker saved as: '" + m["name"] + "'")
 

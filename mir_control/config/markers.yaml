@@ -1,0 +1,21 @@
+delivery_marker:
+  guid: 017f3480-fb3d-11ee-947c-94c691a73828
+  offsets_guid: 018037c1-fb3d-11ee-947c-94c691a73828
+  orientation_offset: 2.0
+  type_id: 11
+  x_offset: -0.6
+  y_offset: 0.0
+optotrack_marker:
+  guid: 41bfc881-fbf7-11ee-a72c-94c691a73828
+  offsets_guid: 41c0909c-fbf7-11ee-a72c-94c691a73828
+  orientation_offset: 2.0
+  type_id: 11
+  x_offset: -0.7
+  y_offset: 0.046
+test_marker:
+  guid: 4a190842-fbd0-11ee-a72c-94c691a73828
+  offsets_guid: 4a1a036f-fbd0-11ee-a72c-94c691a73828
+  orientation_offset: 123.0
+  type_id: 11
+  x_offset: 123.0
+  y_offset: 123.0

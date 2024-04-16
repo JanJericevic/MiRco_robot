@@ -1,0 +1,7 @@
+# dock to marker specified with marker name
+string name
+float64 x_offset
+float64 y_offset
+float64 orientation_offset
+---
+string result

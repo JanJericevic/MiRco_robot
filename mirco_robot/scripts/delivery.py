@@ -18,84 +18,6 @@ def send2goal(service_name, target_goal):
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
 
-def docking():
-    mir_ip = rospy.get_param("/robot_base_ip")
-    mir = MiR100(use_api=True, api_uname="Distributor", api_pass="distributor", mir_ip=mir_ip)
-    # get docking markers in current map
-    status = mir.api.status_get()
-    map_id = status[1]["map_id"]
-    map_markers = []
-    positions = mir.api.maps_map_id_positions_get(map_id)[1]
-    for position in positions:
-        if position["type_id"] == 11:
-            map_markers.append(position)
-    # pprint(map_markers)
-
-    # get docking marker info
-    for marker in map_markers:
-        marker_guid = marker["guid"]
-        info = mir.api.positions_guid_get(marker_guid)
-        pprint(info)
-
-    # get docking helper mission
-    helpers = mir.api.missions_groups_group_name_missions_get("MiRco_helper_missions")[1]
-    dock_vl = next(helper for helper in helpers if helper["name"] == "dock_to_vl_marker")
-    # docking helper mission guid
-    dock_vl_guid = dock_vl["guid"]
-    # helper mission docking action guid
-    dock_vl_action = mir.api.missions_mission_id_actions_get(dock_vl_guid)[1]
-    dock_vl_action_guid = dock_vl_action[0]["guid"]
-    # get helper mission docking action
-    # we want to set the marker that this action uses
-    dock_vl_action_msg = mir.api.missions_mission_id_actions_guid_get(dock_vl_guid,dock_vl_action_guid)
-
-    action_msg = {
-        "priority": 1,
-        "allowed_methods": [
-            "PUT",
-            "GET",
-            "DELETE"
-        ],
-        "scope_reference": None,
-        "parameters": [
-            {
-            "value": str(marker_guid),
-            "input_name": None,
-            "guid": str(marker_guid),
-            "id": "marker"
-            },
-            {
-            "value": "mirconst-guid-0000-0001-marker000001",
-            "input_name": None,
-            "guid": "518447c1-fb2a-11ee-947c-94c691a73828",
-            "id": "marker_type"
-            },
-            {
-            "value": 10,
-            "input_name": None,
-            "guid": "518479b9-fb2a-11ee-947c-94c691a73828",
-            "id": "retries"
-            },
-            {
-            "value": 0.2,
-            "input_name": None,
-            "guid": "5184a33d-fb2a-11ee-947c-94c691a73828",
-            "id": "max_linear_speed"
-            }
-        ],
-        "created_by_name": "Distributor",
-        "mission_id": "148924bb-fb2a-11ee-947c-94c691a73828",
-        "action_type": "docking",
-        "created_by_id": "mirconst-guid-0000-0004-users0000000",
-        "guid": "5182e46d-fb2a-11ee-947c-94c691a73828"
-    }
-
-    response = mir.api.missions_mission_id_actions_guid_put(dock_vl_guid, dock_vl_action_guid, action_msg)
-    pprint(response)
-
-    rospy.sleep(3)
-    
-    mir.dock_to_vl_marker()
 
 def main():
     # init node
@@ -134,8 +56,6 @@ def main():
     
     # ------- DELIVERY -------
     rospy.sleep(3)
-    # dock mir to delivery marker
-    # docking()
     # send mir to goal1
     # send2goal(goal_service_name,"start")
     # send2goal(goal_service_name,"delivery")

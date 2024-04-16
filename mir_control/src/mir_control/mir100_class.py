@@ -246,9 +246,10 @@ class MiR100:
             data = self.api.positions_guid_get(guid)[1]
             position = {}
 
-            # check if position is marker entry position
+            # dont save position if position is marker entry position
             if data["type_id"] == 12:
-                position["name"] = data["name"] + "_entry"
+                self.loginfo_magenta("Found marker entry position. Not saving...")
+                continue
             else:
                 position["name"] = data["name"]
             position["x"] = data["pos_x"]
@@ -306,7 +307,7 @@ class MiR100:
 
             saved_goals[p["name"]] = goal
 
-            self.loginfo_magenta("Position saved as: '" + ["name"] + "'")
+            self.loginfo_magenta("Position saved as: '" + p["name"] + "'")
 
         # save to file
         with open(self.gt.filename, 'w') as goal_file:

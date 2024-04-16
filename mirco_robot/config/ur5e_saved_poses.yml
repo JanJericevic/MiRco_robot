@@ -1,0 +1,84 @@
+conveyor_entry:
+  ur5e_elbow_joint: -0.4899006485939026
+  ur5e_shoulder_lift_joint: -2.3828188381590785
+  ur5e_shoulder_pan_joint: -1.6056154409991663
+  ur5e_wrist_1_joint: -1.8373867473998011
+  ur5e_wrist_2_joint: 1.5715205669403076
+  ur5e_wrist_3_joint: -1.6191232840167444
+conveyor_entry_testing:
+  ur5e_elbow_joint: -0.8455644845962524
+  ur5e_shoulder_lift_joint: -2.2627865276732386
+  ur5e_shoulder_pan_joint: -0.9101184050189417
+  ur5e_wrist_1_joint: -1.6012522182860316
+  ur5e_wrist_2_joint: 1.571503758430481
+  ur5e_wrist_3_joint: -0.07309180894960576
+conveyor_place:
+  ur5e_elbow_joint: -0.8171935081481934
+  ur5e_shoulder_lift_joint: -2.341212888757223
+  ur5e_shoulder_pan_joint: -1.605344597493307
+  ur5e_wrist_1_joint: -1.5697318817586456
+  ur5e_wrist_2_joint: 1.570528507232666
+  ur5e_wrist_3_joint: -1.6178305784808558
+conveyor_place_testing:
+  ur5e_elbow_joint: -1.1910014152526855
+  ur5e_shoulder_lift_joint: -2.378328939477438
+  ur5e_shoulder_pan_joint: -0.9114521185504358
+  ur5e_wrist_1_joint: -1.1402459305575867
+  ur5e_wrist_2_joint: 1.5704845190048218
+  ur5e_wrist_3_joint: -0.0726082960711878
+conveyor_start:
+  ur5e_elbow_joint: -1.0463955402374268
+  ur5e_shoulder_lift_joint: -1.4759762671640893
+  ur5e_shoulder_pan_joint: -0.00012857118715459137
+  ur5e_wrist_1_joint: -2.167675634423727
+  ur5e_wrist_2_joint: 1.5716447830200195
+  ur5e_wrist_3_joint: -0.0005052725421350601
+home:
+  ur5e_elbow_joint: -1.57
+  ur5e_shoulder_lift_joint: -1.57
+  ur5e_shoulder_pan_joint: 0
+  ur5e_wrist_1_joint: -1.57
+  ur5e_wrist_2_joint: 1.57
+  ur5e_wrist_3_joint: 0
+zobnik1_entry:
+  ur5e_elbow_joint: -1.0464067459106445
+  ur5e_shoulder_lift_joint: -1.4759412941387673
+  ur5e_shoulder_pan_joint: -0.00015098253359013825
+  ur5e_wrist_1_joint: -2.167659898797506
+  ur5e_wrist_2_joint: 1.5716447830200195
+  ur5e_wrist_3_joint: -0.000478092824117482
+zobnik1_pickup:
+  ur5e_elbow_joint: -2.4344639778137207
+  ur5e_shoulder_lift_joint: -1.5559172986871381
+  ur5e_shoulder_pan_joint: -0.08198434511293584
+  ur5e_wrist_1_joint: -0.7191618245891114
+  ur5e_wrist_2_joint: 1.5676416158676147
+  ur5e_wrist_3_joint: -0.07966787019838506
+zobnik1_place:
+  ur5e_elbow_joint: -2.429415225982666
+  ur5e_shoulder_lift_joint: -1.5447928582182904
+  ur5e_shoulder_pan_joint: -0.08199149767030889
+  ur5e_wrist_1_joint: -0.7353937786868592
+  ur5e_wrist_2_joint: 1.5676778554916382
+  ur5e_wrist_3_joint: -0.07966787019838506
+zobnik2_entry:
+  ur5e_elbow_joint: -2.4225566387176514
+  ur5e_shoulder_lift_joint: -1.3070418995669861
+  ur5e_shoulder_pan_joint: 0.2959517240524292
+  ur5e_wrist_1_joint: -0.982112006550171
+  ur5e_wrist_2_joint: 1.5670018196105957
+  ur5e_wrist_3_joint: 0.2977880835533142
+zobnik2_pickup:
+  ur5e_elbow_joint: -2.520099401473999
+  ur5e_shoulder_lift_joint: -1.4623606962016602
+  ur5e_shoulder_pan_joint: 0.29562056064605713
+  ur5e_wrist_1_joint: -0.7291525167277833
+  ur5e_wrist_2_joint: 1.5663542747497559
+  ur5e_wrist_3_joint: 0.29791259765625
+zobnik2_place:
+  ur5e_elbow_joint: -2.5156209468841553
+  ur5e_shoulder_lift_joint: -1.4525446456721802
+  ur5e_shoulder_pan_joint: 0.29564809799194336
+  ur5e_wrist_1_joint: -0.743598536854126
+  ur5e_wrist_2_joint: 1.5663937330245972
+  ur5e_wrist_3_joint: 0.29789701104164124

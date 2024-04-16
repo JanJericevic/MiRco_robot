@@ -1,0 +1,5 @@
+<launch>
+  <arg name="rviz_config" default="$(find mirco_robot)/cfg/mirco.rviz" />
+  <!-- start rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rviz_config)" output="screen"/>
+</launch>

@@ -1,0 +1,14 @@
+<launch>
+
+  <!-- robot prefixes -->
+  <arg name="mir_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
+
+  <!-- Define the MoveIt controller manager plugin to use for trajectory execution -->
+  <param name="moveit_controller_manager" value="moveit_simple_controller_manager/MoveItSimpleControllerManager" />
+
+  <!-- Load controller list to the parameter server -->
+  <rosparam file="$(find mirco_moveit_config)/config/simple_moveit_controllers.yaml" subst_value="true" />
+  <!-- <rosparam file="$(find mirco_moveit_config)/config/ros_controllers.yaml" /> -->
+</launch>

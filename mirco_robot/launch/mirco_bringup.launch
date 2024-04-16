@@ -1,0 +1,144 @@
+<launch>
+  <!-- set robot args -->
+  <arg name="namespace" default="/mirco" doc="namespace of the whole robot cell"/>
+  <arg name="robot_joint_sources_file" default="$(find mirco_robot)/config/robot_joint_sources.yml" doc="robot joint state publisher sources file"/>
+  <arg name="arm_gripper_joint_sources_file" default="$(find mirco_robot)/config/arm_gripper_joint_sources.yml" doc="robot arm and gripper joint state publisher sources file"/>
+  <!-- mir args -->
+  <arg name="robot_base_ip" default="192.168.65.179" doc="MiR IP address"/>
+  <arg name="mir_type" default="mir_100" doc="MiR variant. Can be 'mir_100' or 'mir_250'"/>
+  <arg name="mir_namespace" default="/mir100" doc="MiR namespace"/>
+  <arg name="mir_prefix" default="mir100_" doc="TF prefix to use for all of the MiR TF frames"/>
+
+  <!-- ur5e args -->
+  <arg name="arm_namespace" default="/ur5e" doc="robot arm namespace"/>
+  <arg name="arm_prefix" default="ur5e_" doc="TF prefix to use for all of the UR5e TF frames"/>
+  <arg name="ur5_kinematics_file" default="$(find ur5e_2f85_description)/config/ur5e_kinematics_calib.yaml" doc="robot arm kinematics calibration file"/>
+  <arg name="ur5e_ip" default="192.168.77.245" doc="UR5e IP address"/>
+  <arg name="controller_config_file" default="$(find ur5e_2f85_description)/config/ur5e_controllers.yaml" doc="Config file used for defining the ROS-Control controllers."/>
+  
+  <!-- gripper args -->
+  <arg name="gripper_prefix" default="2f85_" doc="TF prefix to use for all of the gripper TF frames"/>
+
+  <!-- load prefixes to the parameter server for convenience -->
+  <param name="robot_base_ip" value="$(arg robot_base_ip)" />
+  <param name="robot_namespace" value="$(arg namespace)" />
+  <param name="robot_base_namespace" value="$(arg mir_namespace)" />
+  <param name="robot_base_prefix" value="$(arg mir_prefix)" />
+  <param name="robot_arm_namespace" value="$(arg arm_namespace)" />
+  <param name="robot_arm_prefix" value="$(arg arm_prefix)" />
+  <param name="robot_gripper_prefix" value="$(arg gripper_prefix)" />
+
+  <!-- namespace of the whole robot cell -->
+  <group ns="$(arg namespace)">
+
+    <!-- robot model -->
+    <include file="$(find mirco_description)/launch/load_mirco.launch">
+      <arg name="mir_type" value="$(arg mir_type)" />
+      <arg name="mir_prefix" value="$(arg mir_prefix)" />
+      <arg name="arm_prefix" value="$(arg arm_prefix)" />
+      <arg name="kinematics_params" value="$(arg ur5_kinematics_file)" />
+      <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
+    </include>
+
+    <!-- robot state publisher -->
+    <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher">
+      <remap from="/tf"        to="tf_robot_state_publisher" />
+      <remap from="/tf_static" to="tf_static_robot_state_publisher" />
+    </node>
+
+    <!-- remove those TFs that are also published by the MiR to avoid conflicts -->
+    <node name="tf_remove_child_frames" pkg="mir_driver" type="tf_remove_child_frames.py" output="screen">
+      <remap from="tf_in"         to="tf_robot_state_publisher" />
+      <remap from="tf_out"        to="/tf" />
+      <remap from="tf_static_in"  to="tf_static_robot_state_publisher" />
+      <remap from="tf_static_out" to="/tf_static" />
+      <rosparam param="remove_frames" subst_value="True">
+        - $(arg mir_prefix)base_link
+        - $(arg mir_prefix)front_laser_link
+        - $(arg mir_prefix)back_laser_link
+        - $(arg mir_prefix)camera_top_link
+        - $(arg mir_prefix)camera_top_depth_optical_frame
+        - $(arg mir_prefix)camera_floor_link
+        - $(arg mir_prefix)camera_floor_depth_optical_frame
+        - $(arg mir_prefix)imu_link
+      </rosparam>
+    </node>
+  
+    <!-- This joint state publisher collects the arm and gripper joint states from /$(arg namespace)/ur5e/joint_states topic and -->
+    <!-- the joint states of the robot base and publishes them on the /$(arg namespace)/joint_states topic -->
+    <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+      <rosparam file="$(arg robot_joint_sources_file)" command="load" subst_value="True" />
+      <param name="rate" value="200" />
+    </node>
+
+  </group>
+
+  <!-- namespace of the robot base -->
+  <group ns="$(arg namespace)$(arg mir_namespace)">
+
+    <!-- MiR base -->
+    <node name="mir_bridge" pkg="mir_driver" type="mir_bridge.py" output="screen">
+      <param name="hostname" value="$(arg robot_base_ip)" />
+      <param name="tf_prefix" value="$(arg mir_prefix)" />
+    </node>
+
+    <node name="b_rep117_laser_filter" pkg="mir_driver" type="rep117_filter.py" output="screen">
+      <remap from="scan" to="b_scan" />
+      <remap from="scan_filtered" to="b_scan_rep117" />
+    </node>
+
+    <node name="f_rep117_laser_filter" pkg="mir_driver" type="rep117_filter.py" output="screen">
+      <remap from="scan" to="f_scan" />
+      <remap from="scan_filtered" to="f_scan_rep117" />
+    </node>
+
+    <node name="fake_mir_joint_publisher" pkg="mir_driver" type="fake_mir_joint_publisher.py" output="screen">
+      <param name="prefix" value="$(arg mir_prefix)" />
+      <remap from="joint_states" to="mir_joint_states" />
+    </node>
+  </group>
+
+  <!-- namespace of the robot arm + gripper-->
+  <group ns="$(arg namespace)$(arg arm_namespace)">
+
+    <!-- This joint state publisher collects the joint states of the robot arm and gripper --> 
+    <!-- and publishes them to the /$(arg namespace)/ur5e/joint_states topic -->
+    <node name="arm_gripper_joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+      <rosparam file="$(arg arm_gripper_joint_sources_file)" command="load" subst_value="True" />
+      <param name="rate" value="200" />
+      <remap from="robot_description" to="$(arg namespace)/robot_description" />
+    </node>
+
+    <!-- UR5e robot arm -->
+    <include file="$(find mirco_robot)/launch/ur_control.launch">
+      <arg name="namespace" value="$(arg arm_namespace)" />
+      <arg name="arm_prefix" value="$(arg arm_prefix)" />
+      <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
+      <arg name="controller_config_file" value="$(find ur5e_2f85_description)/config/ur5e_controllers.yaml" /> 
+      <arg name="robot_ip" value="$(arg ur5e_ip)" />
+      <arg name="kinematics_config" value="$(arg ur5_kinematics_file)" />
+      <arg name="tf_prefix" value="$(arg arm_prefix)" />
+      <arg name="use_tool_communication" value="true" />
+      <arg name="tool_voltage" value="24" />
+      <arg name="controllers" value="joint_state_controller scaled_pos_joint_traj_controller speed_scaling_state_controller force_torque_sensor_controller" />
+      <arg name="stopped_controllers" value="pos_joint_traj_controller joint_group_vel_controller" />
+    </include>
+
+    <!-- connect to robotiq gripper over rtu -->
+    <arg name="gripper_device" default="/tmp/ttyUR" />
+    <node name="gripper_control" pkg="robotiq_2f_gripper_control" type="Robotiq2FGripperRtuNode.py" args="$(arg gripper_device)">
+      <remap from="Robotiq2FGripperRobotInput" to="~/input" />
+      <remap from="Robotiq2FGripperRobotOutput" to="~/output" />
+    </node>
+
+    <!-- add a node that translates the gripper data into a joint state -->
+    <node name="gripper_joint_state_publisher" pkg="robotiq_2f_gripper_control" type="gripper_joint_state_publisher.py">
+      <param name="prefix" value="$(arg namespace)$(arg gripper_prefix)" />
+      <remap from="input" to="gripper_control/input" />
+    </node>
+
+  </group>
+
+  
+
+</launch>

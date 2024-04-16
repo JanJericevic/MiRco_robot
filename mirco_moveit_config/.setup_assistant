@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: mirco_description
+    relative_path: urdf/mirco.urdf.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/mirco_robot.srdf.xacro
+  CONFIG:
+    author_name: Jan Jericevic
+    author_email: jan.jericevic@gmail.com
+    generated_timestamp: 1712074873

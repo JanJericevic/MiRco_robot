@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="mirco_robot">
+
+  <!-- include robot macro -->
+  <xacro:include filename="$(find mirco_description)/urdf/mirco_macro.xacro" />
+
+  <!-- mir100 parameters -->
+  <xacro:arg name="mir_type" default="mir_100" />
+  <xacro:arg name="mir_prefix" default="mir100_" />
+  <!-- ur5e parameters -->
+  <xacro:arg name="arm_prefix" default="ur5e_" />
+  <xacro:arg name="kinematics_params" default="$(find ur5e_2f85_description)/config/ur5e_kinematics_calib.yaml" />
+  <!-- gripper parameters -->
+  <xacro:arg name="gripper_prefix" default="2f85_" />
+
+  <!-- instantiate robot with gripper macro -->
+  <xacro:mirco_robot 
+    mir_prefix="$(arg mir_prefix)"
+    arm_prefix="$(arg arm_prefix)" 
+    kinematics_parameters_file="$(arg kinematics_params)"
+    gripper_prefix="$(arg gripper_prefix)"
+  />
+
+</robot>

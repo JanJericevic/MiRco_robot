@@ -1,0 +1,26 @@
+<?xml version="1.0" ?>
+<launch>
+  <!-- set robot args -->
+  <!-- mir args -->
+  <arg name="mir_type"  default="mir_100" doc="MiR variant. Can be 'mir_100' or 'mir_250'" />
+  <arg name="mir_prefix" default="mir100_" doc="TF prefix to use for all of the MiR's TF frames"/>
+  <!-- ur5e args -->
+  <arg name="arm_prefix" default="ur5e_" doc="TF prefix to use for all of the UR's TF frames"/>
+  <arg name="kinematics_params" default="$(find ur5e_2f85_description)/config/ur5e_kinematics_calib.yaml" doc="robot arm kinematics calibration file" />
+  <!-- gripper args -->
+  <arg name="gripper_prefix" default="2f85_" doc="TF prefix to use for all of the gripper's TF frames"/>
+
+  <!-- load urdf -->
+  <include file="$(find mirco_description)/launch/load_mirco.launch">
+    <arg name="mir_type" value="$(arg mir_type)"/>
+    <arg name="mir_prefix" value="$(arg mir_prefix)"/>
+    <arg name="arm_prefix" value="$(arg arm_prefix)"/>
+    <arg name="kinematics_params" value="$(arg kinematics_params)"/>
+    <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
+  </include>
+  <!-- start joint state and robot state publishers -->
+  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui" />
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" />
+  <!-- start rviz -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find mirco_description)/cfg/rviz.rviz"/>
+</launch>

@@ -1,0 +1,9 @@
+<launch>
+    <arg name="namespace" default="/mirco" doc="namespace of the whole robot cell"/>
+    <arg name="arm_namespace" default="/ur5e" doc="robot arm namespace"/>
+    
+    <node name="mirco_delivery_node" pkg="mirco_robot" type="delivery.py" ns="$(arg namespace)$(arg arm_namespace)" respawn="false"  output="screen">
+      <remap from="input" to="gripper_control/input" />
+      <remap from="output" to="gripper_control/output" />
+    </node>
+</launch>

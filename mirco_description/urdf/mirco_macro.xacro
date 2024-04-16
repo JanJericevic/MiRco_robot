@@ -1,0 +1,76 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <xacro:macro name="mirco_robot" params="
+    mir_prefix
+    arm_prefix
+    kinematics_parameters_file
+    gripper_prefix">
+
+    <!-- ////////// MIR100 ////////// -->
+    <!-- include mir100 robot macro-->
+    <xacro:include filename="$(find mir_description)/urdf/include/mir_v1.urdf.xacro" />
+    <xacro:include filename="$(find mir_description)/urdf/include/common.gazebo.xacro" />
+    <!-- set prefix for mir100 robot -->
+    <xacro:property name="mir_prefix_" value="${mir_prefix}" />
+    <xacro:if value="${mir_prefix_ == ''}">
+        <xacro:property name="mir_prefix" value="" />
+    </xacro:if>
+    <xacro:unless value="${mir_prefix_ == ''}">
+        <xacro:property name="mir_prefix" value="${mir_prefix_}" />
+    </xacro:unless>
+    <!-- instantiate mir100 robot macros -->
+    <xacro:mir prefix="${mir_prefix}" />
+    <xacro:controller_plugin_gazebo robot_namespace=""/>
+
+    <!-- instead of the controller_plugin_gazebo, you can use the diffdrive controller like this: -->
+    <!-- <xacro:diff_controller_plugin_gazebo prefix=""
+      left_wheel_joint="left_wheel_joint"
+      right_wheel_joint="right_wheel_joint"
+      wheel_separation="${2*mir_act_wheel_dy}"
+      wheel_radius="${mir_act_wheel_radius}"/>  
+    -->
+
+    <!-- ////////// battery and controller enclosure ////////// -->
+    <joint name="mir_to_enclosure" type="fixed">
+        <parent link="${mir_prefix}surface"/>
+        <child link="enclosure"/>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+
+    <link name="enclosure">
+        <visual>
+            <origin xyz="0 0 0.21" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.75 0.45 0.42"/>
+            </geometry>
+            <material name="grey">
+                <color rgba="0.69 0.69 0.69 1"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 0.21" rpy="0 0 0"/>
+            <geometry>
+                <box size="0.75 0.45 0.42"/>
+            </geometry>
+        </collision>
+    </link>
+
+    <!-- ////////// UR5e + Robotiq 2f85 gripper ////////// -->
+    <!-- include robot with gripper macro-->
+    <xacro:include filename="$(find ur5e_2f85_description)/urdf/ur5e_2f85_macro.xacro" />
+    <!-- instantiate robot macro -->
+    <xacro:ur5e_2f85_robot 
+      arm_prefix="${arm_prefix}" 
+      kinematics_parameters_file="${kinematics_parameters_file}"
+      gripper_prefix="${gripper_prefix}"
+    />
+    <!-- link robot to enclosure -->
+    <joint name="enclosure_to_ur5e" type="fixed">
+      <parent link="enclosure" />
+      <child link = "${arm_prefix}base_link" />
+      <origin xyz="-0.0775 0 0.42" rpy="0 0 ${pi}" />
+    </joint>
+
+  </xacro:macro>
+</robot>

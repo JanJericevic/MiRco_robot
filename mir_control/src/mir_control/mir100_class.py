@@ -44,11 +44,17 @@ class MiR100:
             rospy.signal_shutdown("Action server not available!")
         self.loginfo_magenta("Connected to move base server")
         
-        # send robot to target goal service
+        # send robot to target goal ROS service
         self.goal_server = rospy.Service("~send_to_goal", GoToGoal, self.send_to_goal)
         self.send_srv_name = rospy.get_name()+ "/send_to_goal"
         rospy.wait_for_service(self.send_srv_name)
         self.loginfo_magenta("Send to goal service: " + self.send_srv_name)
+
+        # dock robot to VL marker ROS service
+        self.dock_server = rospy.Service("~dock_to_vl_marker", DockToMarker, self.dock_to_vl_marker)
+        self.dock_srv_name = rospy.get_name()+ "/dock_to_vl_marker"
+        rospy.wait_for_service(self.dock_srv_name)
+        self.loginfo_magenta("Dock to VL marker service: " + self.dock_srv_name)
 
         # move base result subscriber
         self.result_sub = rospy.Subscriber(self.namespace + self.base_namespace + "/move_base/result", MoveBaseActionResult, self.handle_result)
@@ -63,9 +69,12 @@ class MiR100:
         if use_api:
             self.api = MirRestApi(api_uname,api_pass, mir_ip)
         
-        # Get mission guid for docking mission
+        # Get mission guid for docking helper mission
         helper_missions = self.api.missions_groups_group_name_missions_get("MiRco_helper_missions")
         self.dock_to_vl_guid = next(item for item in helper_missions[1] if item["name"] == "dock_to_vl_marker")["guid"]
+        # Get action guid of docking action inside docking helper mission
+        self.dock_to_vl_action = self.api.missions_mission_id_actions_get(self.dock_to_vl_guid)[1]
+        self.dock_to_vl_action_guid = self.dock_to_vl_action[0]["guid"]
 
         # Get mission guids for color missions
         self.magenta_color_guid = next(item for item in helper_missions[1] if item["name"] == "show_magenta_light")["guid"]
@@ -94,7 +103,6 @@ class MiR100:
         # end of robot initialization
         self.loginfo_magenta("MiR100 robot python commander initialization complete.")
         self.log_status_state()
-        # self.dock_to_vl_marker()
 
     def handle_result(self,msg:MoveBaseActionResult) -> None:
         """Move base result callback function
@@ -126,24 +134,6 @@ class MiR100:
         """
         rospy.loginfo('\033[95m' + "MiR100: " + msg + '\033[0m')
     
-    def dock_to_vl_marker(self):
-        """Workaround for docking the robot. 
-        
-        We define a simple mission with a single docking action in the MiR web interface. We 
-        """
-
-        for guid in self.marker_guids:
-            info = self.api.positions_guid_get(guid)
-            pprint(info)
-
-        # put robot in 'ready' state
-        # self.api.status_state_id_put(3)
-        # delete = self.api.mission_queue_delete()[0]
-        # if delete != 204:
-        #     rospy.logwarn("Mission queue unsuccessfully deleted. Docking aborted")
-        #     return
-        # self.loginfo_magenta("Docking to vl marker")
-        # self.api.mission_queue_post(self.dock_to_vl_guid)
     
     def show_light(self, state: str) -> None:
         """Workaround for showing color indicators on MiR100. Infinite loop mission defined on web interface that are then triggered over REST api
@@ -259,7 +249,7 @@ class MiR100:
                 if saved_markers == None:
                     saved_markers = {}
         except IOError as err:
-            print("Could not open %s to read markers" % self.gt.filename)
+            rospy.logwarn("Could not open %s to read markers" % self.gt.filename)
             print(err)
         
         # extract marker info
@@ -296,7 +286,7 @@ class MiR100:
                 if saved_goals == None:
                     saved_goals = {}
         except IOError as err:
-            print("Could not open %s to read target goals" % self.gt.filename)
+            rospy.logwarn("Could not open %s to read target goals" % self.gt.filename)
             print(err)
         
         for p in positions:
@@ -449,6 +439,64 @@ class MiR100:
         if self.result_status == 2:
             return GoToGoalResponse("Move base: received a cancel request")
         return GoToGoalResponse("Move base: " + str(result))
+    
+    def dock_to_vl_marker(self, request: DockToMarkerRequest) -> DockToMarkerResponse:
+        """Workaround for docking the robot. 
+        
+        We define a simple mission with a single docking action in the MiR web interface. We use this mission to dock to markers, each time only changing the marker in the docking action of the mission.
+
+        :param request: dock to marker service request, specifying the marker name
+        :type marker_name: DockToMarkerRequest
+        """
+
+        # read from file
+        try:
+            with open(self.rm_filename) as markers_file:
+                saved_markers = yaml.load(markers_file, Loader=yaml.SafeLoader)
+                if saved_markers == None:
+                    self.loginfo_magenta("Markers file empty")
+                    return
+        except IOError as err:
+            self.loginfo_magenta("Could not open %s to read markers" % self.gt.filename)
+            print(err)
+
+        # get the guid of the selected marker
+        if request.name not in saved_markers:
+            rospy.logwarn("Selected marker name is not valid. You can see known markers in " + self.rm_filename)
+            return
+        marker_guid = saved_markers[request.name]["guid"]
+
+        # we only change the marker used in the docking action
+        # set the json msg
+        action_msg = {
+            "priority": 1,
+            "parameters": [
+                {
+                "value": str(marker_guid),
+                "input_name": None,
+                "guid": str(marker_guid),
+                "id": "marker"
+                }
+            ]
+        }
+
+        # change docking action 
+        response = self.api.missions_mission_id_actions_guid_put(self.dock_to_vl_guid, self.dock_to_vl_action_guid, action_msg)
+
+        # put robot in 'ready' state
+        self.api.status_state_id_put(3)
+        # delete mission queue
+        delete = self.api.mission_queue_delete()[0]
+        if delete != 204:
+            rospy.logwarn("Mission queue unsuccessfully deleted. Docking aborted")
+            return
+        # dock to selected marker using the helper mission
+        self.loginfo_magenta("Docking to vl marker: " + request.name)
+        self.api.mission_queue_post(self.dock_to_vl_guid)
+
+        response = DockToMarkerResponse()
+        response.result = "Docking to vl marker: " + request.name
+        return response
 
 def main():
     rospy.init_node('mir_robot_node')

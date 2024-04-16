@@ -66,6 +66,7 @@ add_service_files(
   GetGoal.srv
   GoToGoal.srv
   GetGoalNames.srv
+  DockToMarker.srv
 )
 
 ## Generate actions in the 'action' folder

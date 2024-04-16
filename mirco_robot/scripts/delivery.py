@@ -48,15 +48,15 @@ def main():
         arm_namespace = ""
 
     # init robot arm
-    rospack = rospkg.RosPack()
-    package = "mirco_robot"
-    file_name = rospack.get_path(package) + "/config/ur5e_saved_poses.yml" 
-    ur5e_arm = UR5e("robot_arm", pose_file = file_name)
+    # rospack = rospkg.RosPack()
+    # package = "mirco_robot"
+    # file_name = rospack.get_path(package) + "/config/ur5e_saved_poses.yml" 
+    # ur5e_arm = UR5e("robot_arm", pose_file = file_name)
     # go home
-    ur5e_arm.set_named_pose("home")
+    # ur5e_arm.set_named_pose("home")
 
     # init robot gripper
-    gripper = Robotiq2f85(max_gap=0.062)
+    # gripper = Robotiq2f85(max_gap=0.062)
 
     # ros service clients for controling mir
     goal_service_name = namespace + robot_base_namespace + "/mir_control_node/send_to_goal"
@@ -67,7 +67,7 @@ def main():
     # ------- DELIVERY -------
     rospy.sleep(3)
     # send mir to start position
-    # send2goal(goal_service_name,"start")
+    send2goal(goal_service_name,"start")
     # dock mir to marker
     dock2marker(docking_service_name,"delivery_marker")
 
@@ -100,7 +100,7 @@ def main():
     # rospy.sleep(3)
 
     # send mir to end position
-    # send2goal(goal_service_name,"end")
+    send2goal(goal_service_name,"end")
 
 
     # rospy.spin()

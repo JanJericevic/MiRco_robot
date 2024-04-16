@@ -17,6 +17,7 @@ from mir_control.srv import *
 import numpy as np
 import yaml
 import math
+import threading
 
 class MiR100:
     """MiR100 robot class
@@ -43,6 +44,8 @@ class MiR100:
             rospy.logerr("Action server not available!")
             rospy.signal_shutdown("Action server not available!")
         self.loginfo_magenta("Connected to move base server")
+
+        self.done_condition = threading.Condition()
         
         # ----- SERVICES -----
         # send robot to target goal ROS service
@@ -138,6 +141,7 @@ class MiR100:
     #     :type msg: GoalStatusArray
     #     """
     #     self.status_status = msg.status_list[0].status
+    #     self.status_status_text = msg.status_list[0].text
     #     self.loginfo_magenta("Move base status: " + str(msg.status_list[0].text))
     
     def loginfo_magenta(self,msg:str) -> None:
@@ -147,6 +151,26 @@ class MiR100:
         :type msg: str
         """
         rospy.loginfo('\033[95m' + "MiR100: " + msg + '\033[0m')
+    
+    def wait_for_result(self, timeout = rospy.Duration()):
+
+        timeout_time = rospy.get_rostime() + timeout
+        loop_period = rospy.Duration(0.1)
+        with self.done_condition:
+            while not rospy.is_shutdown():
+                time_left = timeout_time - rospy.get_rostime()
+                if timeout > rospy.Duration(0.0) and time_left <= rospy.Duration(0.0):
+                    break
+
+                if self.result_status == 3 and self.result_status_text == "Goal reached.":
+                    break
+
+                if time_left > loop_period or timeout == rospy.Duration():
+                    time_left = loop_period
+
+                self.done_condition.wait(time_left.to_sec())
+
+        return self.result_status_text
     
     
     def show_light(self, state: str) -> None:
@@ -482,6 +506,8 @@ class MiR100:
         :rtype: DockToMarkerResponse
         """
 
+        self.result_status = 1
+
         # read from file
         try:
             with open(self.rm_filename) as markers_file:
@@ -532,8 +558,14 @@ class MiR100:
 
         response = DockToMarkerResponse()
         response.result = "Docking to vl marker: " + request.name
+
+        # Waits for the server to finish performing the action
+        result = self.wait_for_result()
+        # return service response
+        if self.result_status == 2:
+            return DockToMarkerResponse("Move base: received a cancel request")
         if self.result_status == 3:
-            return response
+            return DockToMarkerResponse("Move base: " + str(result))
     
     def change_marker_offsets(self, request: ChangeOffsetsRequest) -> ChangeOffsetsResponse:
         """Change the offsets of a marker

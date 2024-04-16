@@ -58,10 +58,10 @@ class MiR100:
         self.loginfo_magenta("Dock to VL marker service: " + self.dock_srv_name)
 
         # get saved markers ROS service
-        self.saved_markers_server = rospy.Service("~get_markers", GetMarkers, self.get_markers)
-        self.saved_markers_srv_name = rospy.get_name()+ "/get_markers"
-        rospy.wait_for_service(self.markers_srv_name)
-        self.loginfo_magenta("Get markers service: " + self.markers_srv_name)
+        # self.saved_markers_server = rospy.Service("~get_markers", GetMarkers, self.get_markers)
+        # self.saved_markers_srv_name = rospy.get_name()+ "/get_markers"
+        # rospy.wait_for_service(self.markers_srv_name)
+        # self.loginfo_magenta("Get markers service: " + self.markers_srv_name)
 
         # change marker offsets ROS service
         self.offsets_server = rospy.Service("~change_marker_offsets", ChangeOffsets, self.change_marker_offsets)
@@ -70,6 +70,7 @@ class MiR100:
         self.loginfo_magenta("Change marker offsets service: " + self.offsets_srv_name)
 
         # move base result subscriber
+        self.result_status = None
         self.result_sub = rospy.Subscriber(self.namespace + self.base_namespace + "/move_base/result", MoveBaseActionResult, self.handle_result)
         # move base status subscriber
         # self.status_sub = rospy.Subscriber(self.namespace + self.base_namespace + "/move_base/status", GoalStatusArray, self.handle_status)
@@ -461,7 +462,8 @@ class MiR100:
         # return service response
         if self.result_status == 2:
             return GoToGoalResponse("Move base: received a cancel request")
-        return GoToGoalResponse("Move base: " + str(result))
+        if self.result_status == 3:
+            return GoToGoalResponse("Move base: " + str(result))
 
     # def get_markers(self):
 
@@ -515,7 +517,7 @@ class MiR100:
         }
 
         # change docking action 
-        response = self.api.missions_mission_id_actions_guid_put(self.dock_to_vl_guid, self.dock_to_vl_action_guid, action_msg)
+        change = self.api.missions_mission_id_actions_guid_put(self.dock_to_vl_guid, self.dock_to_vl_action_guid, action_msg)
 
         # put robot in 'ready' state
         self.api.status_state_id_put(3)
@@ -530,7 +532,8 @@ class MiR100:
 
         response = DockToMarkerResponse()
         response.result = "Docking to vl marker: " + request.name
-        return response
+        if self.result_status == 3:
+            return response
     
     def change_marker_offsets(self, request: ChangeOffsetsRequest) -> ChangeOffsetsResponse:
         """Change the offsets of a marker

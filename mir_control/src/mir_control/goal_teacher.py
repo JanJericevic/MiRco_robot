@@ -57,7 +57,6 @@ class GoalTeacher(object):
         """
         rospy.loginfo('\033[34m' + "Goal Teacher: " + msg + '\033[0m')
 
-
     def save_target_goal(self, request:SaveGoalRequest) -> str:
         """Save current mobile robot pose as a target goal
 
@@ -114,7 +113,6 @@ class GoalTeacher(object):
 
         self.loginfo_blue("Target goal saved as: '" + request.name + "'")
         return "Target goal saved"
-
 
     def get_target_goal(self, request:GetGoalRequest) -> Pose:
         """Get a saved target goal as a Pose msg

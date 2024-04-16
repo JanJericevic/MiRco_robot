@@ -117,6 +117,11 @@ class MiR100:
         rospy.loginfo('\033[95m' + "MiR100: " + msg + '\033[0m')
     
     def dock_to_vl_marker(self):
+        """Workaround for docking the robot. 
+        
+        We define a simple mission with a single docking action in the MiR web interface. We 
+        """
+
         # put robot in 'ready' state
         self.api.status_state_id_put(3)
         delete = self.api.mission_queue_delete()[0]
@@ -188,17 +193,17 @@ class MiR100:
         else:
             self.logwarn("Unable to get MiR state")
     
-    def euler_2_quaternion(self, roll, pitch, yaw):
+    def euler_2_quaternion(self, roll: float, pitch: float, yaw: float) -> list:
         """Euler angle to a quaternion.
 
-        :param roll: roll
-        :type roll: _type_
-        :param pitch: pitch
-        :type pitch: _type_
-        :param yaw: yaw
-        :type yaw: _type_
-        :return: list
-        :rtype: list of quaternion values
+        :param roll: roll angle
+        :type roll: float
+        :param pitch: pitch angle
+        :type pitch: float
+        :param yaw: yaw angle
+        :type yaw: float
+        :return: quaternion angle representation
+        :rtype: list
         """
 
         qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
@@ -227,7 +232,10 @@ class MiR100:
         return(position_guids)
 
     def get_position_data(self, position_guids) -> list:
-        """get pose data of positions defined by position guids
+        """Get pose data of positions defined by position guids.
+
+        Both positions and markers from the web interface are categorized as position within the REST api. 
+        Markers also have entry positions that also show up when looking up map positions. These marker entry positions have the same name as its parent marker.
 
         :return: list of positions data
         :rtype: list
@@ -238,7 +246,11 @@ class MiR100:
             data = self.api.positions_guid_get(guid)[1]
             position = {}
 
-            position["name"] = data["name"]
+            # check if position is marker entry position
+            if data["type_id"] == 12:
+                position["name"] = data["name"] + "_entry"
+            else:
+                position["name"] = data["name"]
             position["x"] = data["pos_x"]
             position["y"] = data["pos_y"]
             position["orientation"] = data["orientation"]
@@ -248,6 +260,9 @@ class MiR100:
         return positions
     
     def save_positions_2_file(self):
+        """Save position data to file
+        """
+
         guids = self.get_position_guids()
         positions = self.get_position_data(guids)
 
@@ -291,7 +306,7 @@ class MiR100:
 
             saved_goals[p["name"]] = goal
 
-            self.loginfo_magenta("Position saved as: '" + p["name"] + "'")
+            self.loginfo_magenta("Position saved as: '" + ["name"] + "'")
 
         # save to file
         with open(self.gt.filename, 'w') as goal_file:
@@ -352,7 +367,7 @@ class MiR100:
         return
     
     def send_to_goal(self, request:GoToGoal) -> GoToGoalResponse:
-        """ROS service callback function. Sends robot to target goal
+        """Send robot to target goal over ROS service
 
         :param request: service request
         :type request: GoToGoal
@@ -396,23 +411,8 @@ class MiR100:
 def main():
     rospy.init_node('mir_robot_node')
     try:
-        # mir_ip = "192.168.65.179"
-        # api = MirRestApi("Distributor","distributor",mir_ip)
-        api = MirRestApi("Distributor","distributor")
-        mir = MiR100(api)
-
-        # position_guids = mir.get_position_guids()
-        # positions = mir.get_position_data(position_guids)
-        # pprint(positions)
-
-        # target_goals = mir.get_goals_from_parameter("mir100/pick_and_place/target_goals")
-        # mir.go_2_goals(target_goals)
-
-        # mir.show_light("planner")
-        # rospy.sleep(3)
-        # mir.show_light("blocked_path")
-        # rospy.sleep(3)
-        # mir.show_light("off")
+        mir_ip = "192.168.65.179"
+        mir = MiR100(use_api=True, api_uname="UserName", api_pass="Password", mir_ip=mir_ip)
 
     except rospy.ServiceException as e:
         print("error: %s" %e)

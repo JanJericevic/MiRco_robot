@@ -48,15 +48,15 @@ def main():
         arm_namespace = ""
 
     # init robot arm
-    # rospack = rospkg.RosPack()
-    # package = "mirco_robot"
-    # file_name = rospack.get_path(package) + "/config/ur5e_saved_poses.yml" 
-    # ur5e_arm = UR5e("robot_arm", pose_file = file_name)
+    rospack = rospkg.RosPack()
+    package = "mirco_robot"
+    file_name = rospack.get_path(package) + "/config/ur5e_saved_poses.yml" 
+    ur5e_arm = UR5e("robot_arm", pose_file = file_name)
     # go home
-    # ur5e_arm.set_named_pose("home")
+    ur5e_arm.set_named_pose("home")
 
     # init robot gripper
-    # gripper = Robotiq2f85(max_gap=0.062)
+    gripper = Robotiq2f85(max_gap=0.062)
 
     # ros service clients for controling mir
     goal_service_name = namespace + robot_base_namespace + "/mir_control_node/send_to_goal"
@@ -82,22 +82,22 @@ def main():
         "conveyor_start"
     ]
 
-    # for idx, pose in enumerate(pose_list):
-    #     print(pose)
-    #     joint_state = ur5e_arm.teacher_get_pose(pose)
-    #     if idx >=1 and pose_list[idx-1] == "conveyor_start" and pose_list[idx] == "conveyor_entry_testing":
-    #         ur5e_arm.move_j(joint_state)
-    #     elif idx >=1 and pose_list[idx-1] == "conveyor_entry_testing" and pose_list[idx] == "conveyor_start":
-    #         ur5e_arm.move_j(joint_state)
-    #     else:
-    #         ur5e_arm.move_l(joint_state)
-    #     if "pickup" in pose:
-    #         gripper.close()
-    #     if "place" in pose:
-    #         gripper.open()
+    for idx, pose in enumerate(pose_list):
+        print(pose)
+        joint_state = ur5e_arm.teacher_get_pose(pose)
+        if idx >=1 and pose_list[idx-1] == "conveyor_start" and pose_list[idx] == "conveyor_entry_testing":
+            ur5e_arm.move_j(joint_state)
+        elif idx >=1 and pose_list[idx-1] == "conveyor_entry_testing" and pose_list[idx] == "conveyor_start":
+            ur5e_arm.move_j(joint_state)
+        else:
+            ur5e_arm.move_l(joint_state)
+        if "pickup" in pose:
+            gripper.close()
+        if "place" in pose:
+            gripper.open()
 
-    # ur5e_arm.set_named_pose("home")
-    # rospy.sleep(3)
+    ur5e_arm.set_named_pose("home")
+    rospy.sleep(3)
 
     # send mir to end position
     send2goal(goal_service_name,"end")

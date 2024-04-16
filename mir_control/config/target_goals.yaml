@@ -8,6 +8,16 @@ delivery:
     x: 13.5
     y: 9.587
     z: 0
+delivery_marker:
+  orientation:
+    w: 0.7099272930538219
+    x: 0.0
+    y: 0.0
+    z: -0.7042749736979675
+  position:
+    x: 13.425
+    y: 10.517
+    z: 0
 delivery_test:
   orientation:
     w: 0.7109529138748157
@@ -18,15 +28,25 @@ delivery_test:
     x: 15.901
     y: 12.117
     z: 0
-start:
+end:
   orientation:
-    w: 0.7023767079211439
+    w: 0.7071067811865476
     x: 0.0
     y: 0.0
-    z: -0.7118054229702497
+    z: 0.7071067811865475
   position:
-    x: 14.514
-    y: 14.335
+    x: 15.55
+    y: 9.35
+    z: 0
+start:
+  orientation:
+    w: 0.7071067811865476
+    x: 0.0
+    y: 0.0
+    z: -0.7071067811865475
+  position:
+    x: 14.0
+    y: 12.55
     z: 0
 test:
   orientation:

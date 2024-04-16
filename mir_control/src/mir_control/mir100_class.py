@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
 import rospy
+import rospkg
 import tf
 from geometry_msgs.msg import Pose, PoseStamped, PoseArray
 from std_msgs.msg import Header
@@ -78,13 +79,22 @@ class MiR100:
         rospy.wait_for_service(self.gt.save_srv_name)
         rospy.wait_for_service(self.gt.get_srv_name)
 
+        # get a filename to save robot positions and markers
+        # robot positions file
+        self.rp_filename = self.gt.filename
+        # robot markers file
+        rospack = rospkg.RosPack()
+        package = "mir_control"
+        self.rm_filename = rospack.get_path(package) + "/config/markers.yaml"
+
         # save map positions to file
         self.loginfo_magenta("Saving map positions to file")
-        self.save_positions_2_file()
+        self.save_positions()
 
         # end of robot initialization
         self.loginfo_magenta("MiR100 robot python commander initialization complete.")
         self.log_status_state()
+        # self.dock_to_vl_marker()
 
     def handle_result(self,msg:MoveBaseActionResult) -> None:
         """Move base result callback function
@@ -122,14 +132,18 @@ class MiR100:
         We define a simple mission with a single docking action in the MiR web interface. We 
         """
 
+        for guid in self.marker_guids:
+            info = self.api.positions_guid_get(guid)
+            pprint(info)
+
         # put robot in 'ready' state
-        self.api.status_state_id_put(3)
-        delete = self.api.mission_queue_delete()[0]
-        if delete != 204:
-            rospy.logwarn("Mission queue unsuccessfully deleted. Docking aborted")
-            return
-        self.loginfo_magenta("Docking to vl marker")
-        self.api.mission_queue_post(self.dock_to_vl_guid)
+        # self.api.status_state_id_put(3)
+        # delete = self.api.mission_queue_delete()[0]
+        # if delete != 204:
+        #     rospy.logwarn("Mission queue unsuccessfully deleted. Docking aborted")
+        #     return
+        # self.loginfo_magenta("Docking to vl marker")
+        # self.api.mission_queue_post(self.dock_to_vl_guid)
     
     def show_light(self, state: str) -> None:
         """Workaround for showing color indicators on MiR100. Infinite loop mission defined on web interface that are then triggered over REST api
@@ -214,58 +228,60 @@ class MiR100:
         # return a list of floats, not numpy floats
         return [qx.item(), qy.item(), qz.item(), qw.item()]
     
-    def get_position_guids(self) -> list:
-        """Get positions for the active map that were defined in the MiR web interface.
+    def get_positions(self) -> list:
+        """Get positions details for the active map that were defined in the MiR web interface.
 
-        :return: list of position guids
+        :return: list of positions
         :rtype: list
         """
 
         status = self.api.status_get()
         map_id = status[1]["map_id"]
-        positions = self.api.maps_map_id_positions_get(map_id)[1]
-        position_guids = []
-        for position in positions:
-            guid = position["guid"]
-            position_guids.append(guid)
-        
-        return(position_guids)
-
-    def get_position_data(self, position_guids) -> list:
-        """Get pose data of positions defined by position guids.
-
-        Both positions and markers from the web interface are categorized as position within the REST api. 
-        Markers also have entry positions that also show up when looking up map positions. These marker entry positions have the same name as its parent marker.
-
-        :return: list of positions data
-        :rtype: list
-        """
-
+        map_positions = self.api.maps_map_id_positions_get(map_id)[1]
         positions = []
-        for guid in position_guids:
-            data = self.api.positions_guid_get(guid)[1]
-            position = {}
-
-            # dont save position if position is marker entry position
-            if data["type_id"] == 12:
-                self.loginfo_magenta("Found marker entry position. Not saving...")
-                continue
-            else:
-                position["name"] = data["name"]
-            position["x"] = data["pos_x"]
-            position["y"] = data["pos_y"]
-            position["orientation"] = data["orientation"]
-
-            positions.append(position)
+        for map_position in map_positions:
+            positions.append(self.api.positions_guid_get(map_position["guid"])[1])
 
         return positions
     
-    def save_positions_2_file(self):
-        """Save position data to file
+    def save_markers_2_file(self, markers: list) -> None:
+        """Save markers to file
         """
 
-        guids = self.get_position_guids()
-        positions = self.get_position_data(guids)
+        if markers == []:
+            self.loginfo_magenta("No markers detected on map")
+            return
+
+        # read from file
+        try:
+            with open(self.rm_filename) as markers_file:
+                saved_markers = yaml.load(markers_file, Loader=yaml.SafeLoader)
+                if saved_markers == None:
+                    saved_markers = {}
+        except IOError as err:
+            print("Could not open %s to read markers" % self.gt.filename)
+            print(err)
+        
+        # extract marker info
+        for m in markers:
+            marker = {}
+            # check if marker already exists
+            if m["name"] in saved_markers:
+                marker = saved_markers[m["name"]]
+                self.loginfo_magenta("Marker with name: '" + m["name"] + "' already exists. Overwriting...")
+
+            marker["guid"] = m["guid"]
+            saved_markers[m["name"]] = marker
+            self.loginfo_magenta("Marker saved as: '" + m["name"] + "'")
+
+        # save to file
+        with open(self.rm_filename, 'w') as markers_file:
+            yaml.dump(saved_markers, markers_file)
+        self.loginfo_magenta("Markers saved to file")
+    
+    def save_robot_positions_2_file(self, positions) -> None:
+        """Save robot positions to file
+        """
 
         if positions == []:
             self.loginfo_magenta("No saved positions detected on map")
@@ -283,16 +299,16 @@ class MiR100:
             print(err)
         
         for p in positions:
-            # check if position already exists
             goal = {}
+            # check if position already exists
             if p["name"] in saved_goals:
                 goal = saved_goals[p["name"]]
                 self.loginfo_magenta("Position with name: '" + p["name"] + "' already exists. Overwriting...")
 
             # position position
             position = {}
-            position["x"] = p["x"]
-            position["y"] = p["y"]
+            position["x"] = p["pos_x"]
+            position["y"] = p["pos_y"]
             position["z"] = 0
             goal['position'] = position
             # position orientation
@@ -306,14 +322,38 @@ class MiR100:
             goal['orientation'] = orientation
 
             saved_goals[p["name"]] = goal
-
             self.loginfo_magenta("Position saved as: '" + p["name"] + "'")
 
         # save to file
         with open(self.gt.filename, 'w') as goal_file:
             yaml.dump(saved_goals, goal_file)
-        
         self.loginfo_magenta("Positions saved to file")
+    
+    def save_positions(self) -> None:
+        """Sort positions and save them
+        """
+
+        # get positions
+        positions  = self.get_positions()
+
+        robot_positions = []
+        vl_markers = []
+        for position in positions:
+            if position["type_id"] == 0:
+                robot_positions.append(position)
+            elif position["type_id"] == 11:
+                vl_markers.append(position)
+            elif position["type_id"] == 12:
+                self.loginfo_magenta("Found marker entry position. Not saving...")
+                continue
+            else:
+                rospy.logwarn("Found unknown position type. Currently only saving positions of types {'Robot position','VL-marker'} ")
+                continue
+
+        self.save_markers_2_file(vl_markers)
+        self.save_robot_positions_2_file(robot_positions)
+
+
 
     def go_2_goal(self,target_goal:Pose) -> bool:
         """go to goal

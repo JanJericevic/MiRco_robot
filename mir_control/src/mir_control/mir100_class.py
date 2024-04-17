@@ -13,6 +13,7 @@ from pprint import pprint
 from typing import List, Union
 from mir_control.goal_teacher import GoalTeacher
 from mir_control.srv import *
+from mir_control.msg import *
 
 import numpy as np
 import yaml
@@ -61,11 +62,11 @@ class MiR100:
         rospy.wait_for_service(self.dock_srv_name)
         self.loginfo_magenta("Dock to VL marker service: " + self.dock_srv_name)
 
-        # get saved markers ROS service
+        # get saved marker ROS service
         self.saved_markers_server = rospy.Service("~get_markers", GetMarkers, self.get_markers)
-        self.saved_markers_srv_name = rospy.get_name()+ "/get_markers"
-        rospy.wait_for_service(self.markers_srv_name)
-        self.loginfo_magenta("Get markers service: " + self.markers_srv_name)
+        self.saved_marker_srv_name = rospy.get_name()+ "/get_markers"
+        rospy.wait_for_service(self.saved_marker_srv_name)
+        self.loginfo_magenta("Get markers service: " + self.saved_marker_srv_name)
 
         # change marker offsets ROS service
         self.offsets_server = rospy.Service("~change_marker_offsets", ChangeOffsets, self.change_marker_offsets)
@@ -402,6 +403,36 @@ class MiR100:
 
         self.save_markers_2_file(vl_markers)
         self.save_robot_positions_2_file(robot_positions)
+
+    def get_markers(self, request: GetMarkersRequest) -> GetMarkersResponse:
+        """Get markers
+
+        :param request: ROS servive request
+        :type request: GetMarkersRequest
+        :return: ROS service response. Return a list of markers
+        :rtype: GetMarkersResponse
+        """
+        # read from file
+        try:
+            with open(self.rm_filename) as markers_file:
+                saved_markers = yaml.load(markers_file, Loader=yaml.SafeLoader)
+                if saved_markers == None:
+                    self.loginfo_magenta("Markers file empty")
+                    return
+        except IOError as err:
+            self.loginfo_magenta("Could not open %s to read markers" % self.gt.filename)
+            print(err)
+
+        markers = []
+        for marker in saved_markers:
+            m = Marker()
+            m.name = marker
+            m.x_offset = saved_markers[marker]["x_offset"]
+            m.y_offset = saved_markers[marker]["y_offset"]
+            m.orientation_offset = saved_markers[marker]["orientation_offset"]
+            markers.append(m)
+        
+        return [markers]
     
     def change_marker_offsets(self, request: ChangeOffsetsRequest) -> ChangeOffsetsResponse:
         """Change the offsets of a VL marker
@@ -423,7 +454,6 @@ class MiR100:
             self.loginfo_magenta("Could not open %s to read markers" % self.gt.filename)
             print(err)
 
-        # get the offsets guid of the selected marker
         if request.name not in saved_markers:
             saved_marker_names = list(saved_markers)
             msg = ChangeOffsetsResponse()
@@ -431,6 +461,7 @@ class MiR100:
             rospy.logwarn(msg.result)
             return msg
 
+        # get the offsets guid of the selected marker
         offsets_guid = saved_markers[request.name]["offsets_guid"]
         # set offsets
         offsets = {
@@ -548,8 +579,6 @@ class MiR100:
             return GoToGoalResponse("Move base: received a cancel request")
         if self.result_status == 3:
             return GoToGoalResponse("Move base: " + str(result))
-
-    # def get_markers(self):
 
     
     def dock_to_vl_marker(self, request: DockToMarkerRequest) -> DockToMarkerResponse:

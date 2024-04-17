@@ -1,4 +1,4 @@
-# dock to marker specified with marker name
+# Change offsets of the selected marker
 string name
 float64 x_offset
 float64 y_offset

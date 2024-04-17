@@ -45,6 +45,7 @@ class MiR100:
             rospy.signal_shutdown("Action server not available!")
         self.loginfo_magenta("Connected to move base server")
 
+        # used for the wait_for_result function
         self.done_condition = threading.Condition()
         
         # ----- SERVICES -----
@@ -61,10 +62,10 @@ class MiR100:
         self.loginfo_magenta("Dock to VL marker service: " + self.dock_srv_name)
 
         # get saved markers ROS service
-        # self.saved_markers_server = rospy.Service("~get_markers", GetMarkers, self.get_markers)
-        # self.saved_markers_srv_name = rospy.get_name()+ "/get_markers"
-        # rospy.wait_for_service(self.markers_srv_name)
-        # self.loginfo_magenta("Get markers service: " + self.markers_srv_name)
+        self.saved_markers_server = rospy.Service("~get_markers", GetMarkers, self.get_markers)
+        self.saved_markers_srv_name = rospy.get_name()+ "/get_markers"
+        rospy.wait_for_service(self.markers_srv_name)
+        self.loginfo_magenta("Get markers service: " + self.markers_srv_name)
 
         # change marker offsets ROS service
         self.offsets_server = rospy.Service("~change_marker_offsets", ChangeOffsets, self.change_marker_offsets)
@@ -152,7 +153,17 @@ class MiR100:
         """
         rospy.loginfo('\033[95m' + "MiR100: " + msg + '\033[0m')
     
-    def wait_for_result(self, timeout = rospy.Duration()):
+    def wait_for_result(self, timeout = rospy.Duration()) -> str:
+        """Wait for result function.
+
+        When docking the robot with the helper mission (see dock_to_vl_marker function), MiR does not publish a goal to the move base action server. 
+        Because of this the the actionlib.SimpleActionClient.wait_for_result() does not work.
+
+        :param timeout: timeout, defaults to rospy.Duration()
+        :type timeout: Duration, optional
+        :return: result
+        :rtype: str
+        """
 
         timeout_time = rospy.get_rostime() + timeout
         loop_period = rospy.Duration(0.1)
@@ -391,6 +402,55 @@ class MiR100:
 
         self.save_markers_2_file(vl_markers)
         self.save_robot_positions_2_file(robot_positions)
+    
+    def change_marker_offsets(self, request: ChangeOffsetsRequest) -> ChangeOffsetsResponse:
+        """Change the offsets of a VL marker
+
+        :param request: ROS service request. Specifies the marker name and its offsets
+        :type request: ChangeOffsetsRequest
+        :return: ROS service response
+        :rtype: ChangeOffsetsResponse
+        """
+
+        # read from file
+        try:
+            with open(self.rm_filename) as markers_file:
+                saved_markers = yaml.load(markers_file, Loader=yaml.SafeLoader)
+                if saved_markers == None:
+                    self.loginfo_magenta("Markers file empty")
+                    return
+        except IOError as err:
+            self.loginfo_magenta("Could not open %s to read markers" % self.gt.filename)
+            print(err)
+
+        # get the offsets guid of the selected marker
+        if request.name not in saved_markers:
+            saved_marker_names = list(saved_markers)
+            msg = ChangeOffsetsResponse()
+            msg.result = "Selected marker name is not valid. Known markers: " + str(saved_marker_names)
+            rospy.logwarn(msg.result)
+            return msg
+
+        offsets_guid = saved_markers[request.name]["offsets_guid"]
+        # set offsets
+        offsets = {
+            "orientation_offset": request.orientation_offset,
+            "x_offset": request.x_offset,
+            "y_offset": request.y_offset
+        }
+        self.api.docking_offsets_guid_put(offsets_guid,offsets)
+
+        self.loginfo_magenta("Changed offsets of marker: " + request.name)
+        # refresh marker value
+        self.loginfo_magenta("Refreshing position values")
+        positions  = self.get_positions()
+        for position in positions:
+            if position["name"] == request.name and position["type_id"] == 11:
+                self.save_markers_2_file([position])
+        
+        msg = ChangeOffsetsResponse()
+        msg.result = "Changed offsets of marker: " + request.name
+        return msg
 
 
 
@@ -556,65 +616,14 @@ class MiR100:
         self.loginfo_magenta("Docking to vl marker: " + request.name)
         self.api.mission_queue_post(self.dock_to_vl_guid)
 
-        response = DockToMarkerResponse()
-        response.result = "Docking to vl marker: " + request.name
-
         # Waits for the server to finish performing the action
         result = self.wait_for_result()
         # return service response
         if self.result_status == 2:
-            return DockToMarkerResponse("Move base: received a cancel request")
+            return DockToMarkerResponse("Move base: " + str(result))
         if self.result_status == 3:
             return DockToMarkerResponse("Move base: " + str(result))
     
-    def change_marker_offsets(self, request: ChangeOffsetsRequest) -> ChangeOffsetsResponse:
-        """Change the offsets of a marker
-
-        :param request: ROS service request. Specifies the marker name and its offsets
-        :type request: ChangeOffsetsRequest
-        :return: ROS service response
-        :rtype: ChangeOffsetsResponse
-        """
-
-        # read from file
-        try:
-            with open(self.rm_filename) as markers_file:
-                saved_markers = yaml.load(markers_file, Loader=yaml.SafeLoader)
-                if saved_markers == None:
-                    self.loginfo_magenta("Markers file empty")
-                    return
-        except IOError as err:
-            self.loginfo_magenta("Could not open %s to read markers" % self.gt.filename)
-            print(err)
-
-        # get the offsets guid of the selected marker
-        if request.name not in saved_markers:
-            saved_marker_names = list(saved_markers)
-            msg = ChangeOffsetsResponse()
-            msg.result = "Selected marker name is not valid. Known markers: " + str(saved_marker_names)
-            rospy.logwarn(msg.result)
-            return msg
-
-        offsets_guid = saved_markers[request.name]["offsets_guid"]
-        # set offsets
-        offsets = {
-            "orientation_offset": request.orientation_offset,
-            "x_offset": request.x_offset,
-            "y_offset": request.y_offset
-        }
-        self.api.docking_offsets_guid_put(offsets_guid,offsets)
-
-        self.loginfo_magenta("Changed offsets of marker: " + request.name)
-        # refresh marker value
-        self.loginfo_magenta("Refreshing position values")
-        positions  = self.get_positions()
-        for position in positions:
-            if position["name"] == request.name and position["type_id"] == 11:
-                self.save_markers_2_file([position])
-        
-        msg = ChangeOffsetsResponse()
-        msg.result = "Changed offsets of marker: " + request.name
-        return msg
 
 def main():
     rospy.init_node('mir_robot_node')

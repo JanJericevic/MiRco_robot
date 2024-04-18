@@ -4,6 +4,7 @@ import rospy
 import rospkg
 import tf
 import yaml
+import math
 
 from mir_control.srv import *
 from geometry_msgs.msg import Pose
@@ -31,7 +32,7 @@ class GoalTeacher(object):
         self.tf_listener.waitForTransform("/map", self.mobile_frame, rospy.Time(), rospy.Duration(4.0))
 
         # provide a service to save a target goal
-        self.save_goal_server = rospy.Service("~save_mobile_goal", SaveGoal, self.save_target_goal)
+        # self.save_goal_server = rospy.Service("~save_mobile_goal", SaveGoal, self.save_target_goal)
 
         # provide a service to get a target goal
         self.get_goal_server = rospy.Service("~get_mobile_goal", GetGoal, self.get_target_goal)
@@ -41,10 +42,10 @@ class GoalTeacher(object):
         
         # print service addresses
         self.node_name = rospy.get_name()
-        self.save_srv_name = self.node_name + "/save_mobile_goal"
+        # self.save_srv_name = self.node_name + "/save_mobile_goal"
         self.get_srv_name = self.node_name + "/get_mobile_goal"
         self.get_names_srv_name = self.node_name + "/get_mobile_goal_names"
-        self.loginfo_blue("Save mobile goal service: " + self.save_srv_name)
+        # self.loginfo_blue("Save mobile goal service: " + self.save_srv_name)
         self.loginfo_blue("Get mobile goal service: " + self.get_srv_name)
         self.loginfo_blue("Get mobile goal names service: " + self.get_names_srv_name)
         self.loginfo_blue("Goal teacher initialization done")
@@ -57,14 +58,14 @@ class GoalTeacher(object):
         """
         rospy.loginfo('\033[34m' + "Goal Teacher: " + msg + '\033[0m')
 
-    def save_target_goal(self, request:SaveGoalRequest) -> str:
+    def save_target_goal(self, request:SaveGoalRequest) -> list:
         """Save current mobile robot pose as a target goal
 
         :param request: service request. calls SaveGoal service
         :type request: SaveGoalRequest
         :raises Exception: if no transform is received
-        :return: message when finished
-        :rtype: str
+        :return: [saved goal, ROS service response]
+        :rtype: list
         """
 
         # get transform 
@@ -91,7 +92,7 @@ class GoalTeacher(object):
             goal = saved_goals[request.name]
             self.loginfo_blue("Goal with name: '" + request.name +  "' already exists. Overwriting...")
 
-        # update goal values
+        # update goal values in file
         position={}
         position["x"] = trans[0]
         position["y"] = trans[1]
@@ -109,10 +110,11 @@ class GoalTeacher(object):
 
         # save to file
         with open(self.filename, 'w') as goal_file:
-            yaml.dump(saved_goals, goal_file)
+            yaml.dump(saved_goals, goal_file)            
 
-        self.loginfo_blue("Target goal saved as: '" + request.name + "'")
-        return "Target goal saved"
+        self.loginfo_blue("Target goal saved to file as: '" + request.name + "'")
+        msg = "Target goal saved to file"
+        return [goal, msg]
 
     def get_target_goal(self, request:GetGoalRequest) -> Pose:
         """Get a saved target goal as a Pose msg

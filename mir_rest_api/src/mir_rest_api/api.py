@@ -781,6 +781,27 @@ class MirRestApi:
             return self.handle_request()
     
     # ---------- positions ----------
+    def positions_post(self, position, ros: bool = 0) -> [int, dict]: 
+        """Add a new position.
+
+        Position json needs to have at least: {name, pos_x, pos_y, orientation, type_id, map_id}
+
+        :param position: position json
+        :type position: json
+        :param ros: use ROS service, defaults to 0
+        :type ros: bool, optional
+        :return: a list containing REST response status code and body
+        :rtype: [int, dict]
+        """
+
+        self.method = "POST"
+        self.endpoint = self.url + "/positions"
+        self.json = position
+        if ros == 1:
+            return self.handle_request_ros()
+        else:
+            return self.handle_request()
+
     def maps_map_id_positions_get(self, map_id: str, ros: bool = 0) -> [int, dict]:
         """Retrieve the list of positions that belong to the map with the specified map ID
 

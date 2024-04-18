@@ -74,6 +74,12 @@ class MiR100:
         rospy.wait_for_service(self.offsets_srv_name)
         self.loginfo_magenta("Change marker offsets service: " + self.offsets_srv_name)
 
+        # save a target goal ROS service
+        self.save_goal_server = rospy.Service("~save_mobile_goal", SaveGoal, self.save_goal)
+        self.save_goal_srv_name = rospy.get_name()+ "/save_mobile_goal"
+        rospy.wait_for_service(self.save_goal_srv_name)
+        self.loginfo_magenta("Save mobile goal service: " + self.save_goal_srv_name)
+
         # move base result subscriber
         self.result_status = None
         self.result_sub = rospy.Subscriber(self.namespace + self.base_namespace + "/move_base/result", MoveBaseActionResult, self.handle_result)
@@ -104,7 +110,7 @@ class MiR100:
         # initialize goal teacher
         self.gt = GoalTeacher()
         # wait for goal teacher services
-        rospy.wait_for_service(self.gt.save_srv_name)
+        # rospy.wait_for_service(self.gt.save_srv_name)
         rospy.wait_for_service(self.gt.get_srv_name)
 
         # get a filename to save robot positions and markers
@@ -184,7 +190,6 @@ class MiR100:
 
         return self.result_status_text
     
-    
     def show_light(self, state: str) -> None:
         """Workaround for showing color indicators on MiR100 with ROS. Infinite loop mission defined on web interface that are then triggered over REST api
 
@@ -247,6 +252,36 @@ class MiR100:
         else:
             self.logwarn("Unable to get MiR state")
     
+    def quaternion_2_euler(self, x: float, y: float, z: float, w: float) -> list:
+        """Quaternion into euler angles (roll, pitch, yaw). In radians
+
+        :param x: quaternion x
+        :type x: float
+        :param y: quaternion y
+        :type y: float
+        :param z: quaternion z
+        :type z: float
+        :param w: quaternion w
+        :type w: float
+        :return: [roll, pitch, yaw]
+        :rtype: list
+        """
+
+        t0 = +2.0 * (w * x + y * z)
+        t1 = +1.0 - 2.0 * (x * x + y * y)
+        roll = math.atan2(t0, t1)
+     
+        t2 = +2.0 * (w * y - z * x)
+        t2 = +1.0 if t2 > +1.0 else t2
+        t2 = -1.0 if t2 < -1.0 else t2
+        pitch = math.asin(t2)
+     
+        t3 = +2.0 * (w * z + x * y)
+        t4 = +1.0 - 2.0 * (y * y + z * z)
+        yaw = math.atan2(t3, t4)
+     
+        return [roll, pitch, yaw]
+    
     def euler_2_quaternion(self, roll: float, pitch: float, yaw: float) -> list:
         """Euler angle to a quaternion.
 
@@ -267,6 +302,38 @@ class MiR100:
 
         # return a list of floats, not numpy floats
         return [qx.item(), qy.item(), qz.item(), qw.item()]
+    
+    def save_goal(self, request: SaveGoalRequest) -> SaveGoalResponse:
+        
+        # save to file
+        goal = self.gt.save_target_goal(request)[0]
+
+        # save to map (MiR web interface)
+        # check if map already has position with same name:
+        map_positions = self.get_positions()
+        for mp in map_positions:
+            if mp["name"] == request.name:
+                return "Position with that name already exists on map. Not saving to web interface..."
+
+        # we need orientation in degrees
+        q_x = goal["orientation"]["x"]
+        q_y = goal["orientation"]["y"]
+        q_z = goal["orientation"]["z"]
+        q_w = goal["orientation"]["w"]
+        euler_z = self.quaternion_2_euler(q_x, q_y, q_z, q_w)[-1]
+
+        position_msg = {
+            "name": request.name,
+            "pos_x": goal["position"]["x"],
+            "pos_y": goal["position"]["y"],
+            "orientation": math.degrees(euler_z),
+            "type_id": 0,  # we save position of type 'Robot position'
+            "map_id": self.api.status_get()[1]["map_id"]
+        }
+
+        self.api.positions_post(position_msg)
+        return "Position saved as: " + str(request.name)
+
     
     def get_positions(self) -> list:
         """Get positions details for the active map that were defined in the MiR web interface.
@@ -483,8 +550,6 @@ class MiR100:
         msg.result = "Changed offsets of marker: " + request.name
         return msg
 
-
-
     def go_2_goal(self,target_goal:Pose) -> bool:
         """go to goal
 
@@ -580,7 +645,6 @@ class MiR100:
         if self.result_status == 3:
             return GoToGoalResponse("Move base: " + str(result))
 
-    
     def dock_to_vl_marker(self, request: DockToMarkerRequest) -> DockToMarkerResponse:
         """Workaround for docking the robot with ROS. 
         
@@ -653,7 +717,6 @@ class MiR100:
         if self.result_status == 3:
             return DockToMarkerResponse("Move base: " + str(result))
     
-
 def main():
     rospy.init_node('mir_robot_node')
     try:

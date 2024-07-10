@@ -1,0 +1,18 @@
+<launch>
+  <!-- launch mir driver and control node -->
+
+  <!-- set robot args -->
+  <arg name="mir_tf_prefix" default="mir100_" doc="TF prefix to use for all of MiR's TF frames"/>
+  <arg name="mir_namespace" default="/mir100" doc="MiR namespace"/>
+  <arg name="mir_hostname" default="192.168.12.20" />
+  <arg name="namespace" default="/mirco" doc="namespace of the whole robot cell"/>
+
+  <!-- mir driver -->
+  <include file="$(find mir_driver)/launch/mir.launch" ns="mir_namespace">
+    <arg name="tf_prefix" value="$(arg mir_tf_prefix)" />
+    <arg name="mir_hostname" value="$(arg mir_hostname)" />
+  </include>
+  
+  <!-- launch mir control node -->
+  <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" ns="$(arg namespace)$(arg mir_namespace)" respawn="false"  output="screen"/>
+</launch>

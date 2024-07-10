@@ -101,6 +101,9 @@ class MiR100:
         self.dock_to_vl_action = self.api.missions_mission_id_actions_get(self.dock_to_vl_guid)[1]
         self.dock_to_vl_action_guid = self.dock_to_vl_action[0]["guid"]
 
+        # Get mission guid for adjust localization mission
+        self.adjust_localization_guid = next(item for item in helper_missions[1] if item["name"] == "adjust_localization")["guid"]
+
         # Get mission guids for color missions
         self.magenta_color_guid = next(item for item in helper_missions[1] if item["name"] == "show_magenta_light")["guid"]
         self.cyan_color_guid = next(item for item in helper_missions[1] if item["name"] == "show_cyan_light")["guid"]

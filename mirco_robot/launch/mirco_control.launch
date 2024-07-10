@@ -16,7 +16,7 @@
   <!-- namespace of the robot base -->
   <group ns="$(arg namespace)$(arg mir_namespace)">
 
-    <!-- launch mir control node. provides services for saving mobile robot poses and sending robot to target goals-->
+    <!-- launch mir control node. provides services for saving mobile robot poses(goals) and sending robot to target goals-->
     <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" respawn="false"  output="screen" />
     
   </group>

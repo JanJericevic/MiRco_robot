@@ -4,15 +4,25 @@
   <!-- set robot args -->
   <arg name="mir_tf_prefix" default="mir100_" doc="TF prefix to use for all of MiR's TF frames"/>
   <arg name="mir_namespace" default="/mir100" doc="MiR namespace"/>
-  <arg name="mir_hostname" default="192.168.12.20" />
-  <arg name="namespace" default="/mirco" doc="namespace of the whole robot cell"/>
+  <arg name="mir_ip" default="192.168.12.20" />
 
-  <!-- mir driver -->
-  <include file="$(find mir_driver)/launch/mir.launch" ns="mir_namespace">
-    <arg name="tf_prefix" value="$(arg mir_tf_prefix)" />
-    <arg name="mir_hostname" value="$(arg mir_hostname)" />
-  </include>
-  
+  <!-- mir driver takes a while to establish a connection to MiR100 -->
+  <!-- we want to delay the start of the mir_control_node untill its done -->
+  <arg name="node_start_delay" default="45.0" />
+
+  <!-- load parameters -->
+  <param name="mir_ip" value="$(arg mir_ip)" />
+  <param name="robot_base_namespace" value="$(arg mir_namespace)" />
+
+  <group ns="$(arg mir_namespace)">
+    <!-- mir driver -->
+    <include file="$(find mir_driver)/launch/mir.launch">
+      <arg name="tf_prefix" value="$(arg mir_tf_prefix)" />
+      <arg name="mir_hostname" value="$(arg mir_hostname)" />
+    </include>
+
   <!-- launch mir control node -->
-  <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" ns="$(arg namespace)$(arg mir_namespace)" respawn="false"  output="screen"/>
+    <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" respawn="false"  output="screen" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' "/>
+  </group>
+
 </launch>

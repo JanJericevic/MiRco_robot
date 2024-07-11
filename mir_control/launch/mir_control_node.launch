@@ -1,9 +1,0 @@
-<launch>
-  <!-- set robot args -->
-  <arg name="namespace" default="/mirco" doc="namespace of the whole robot cell"/>
-  <!-- mir args -->
-  <arg name="mir_namespace" default="/mir100" doc="MiR namespace"/>
-
-  <!-- launch mir control node -->
-  <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" ns="$(arg namespace)$(arg mir_namespace)" respawn="false"  output="screen"/>
-</launch>

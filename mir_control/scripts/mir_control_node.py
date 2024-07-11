@@ -11,7 +11,7 @@ def main():
     rospy.init_node('mir_control_node', anonymous=True)
 
     # init mobile base
-    mir_ip = rospy.get_param("/robot_base_ip")
+    mir_ip = rospy.get_param("/mir_ip")
     mir = MiR100(use_api=True, api_uname="Distributor", api_pass="distributor", mir_ip=mir_ip)
 
     

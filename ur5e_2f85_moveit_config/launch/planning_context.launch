@@ -1,6 +1,6 @@
 <launch>
   <!-- robot prefixes -->
-  <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="ur5e_prefix" default="" doc="TF prefix for robot arm"/>
   <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
 
   <!-- urdf file location -->
@@ -14,13 +14,13 @@
 
   <!-- Load universal robot description format (URDF) -->
   <include if="$(arg load_robot_description)" file="$(arg robot_description_file)">
-      <arg name="arm_prefix" value="$(arg arm_prefix)"/>
+      <arg name="ur5e_prefix" value="$(arg ur5e_prefix)"/>
       <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
   </include>
 
   <!-- The semantic description that corresponds to the URDF -->
   <param name="robot_description_semantic" command="$(find xacro)/xacro '$(find ur5e_2f85_moveit_config)/config/ur5e_2f85_robot.srdf.xacro'
-    arm_prefix:=$(arg arm_prefix)
+    arm_prefix:=$(arg ur5e_prefix)
     gripper_prefix:=$(arg gripper_prefix)"
     />
 

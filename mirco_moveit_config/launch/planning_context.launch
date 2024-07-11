@@ -2,7 +2,7 @@
   <!-- robot namespace and prefixes -->
   <arg name="namespace" default="" doc="namespace for the whole robot cell"/>
   <arg name="mir_prefix" default="" doc="TF prefix for robot base"/>
-  <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="ur5e_prefix" default="" doc="TF prefix for robot arm"/>
   <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
 
   <!-- urdf file location -->
@@ -18,14 +18,14 @@
   <include if="$(arg load_robot_description)" file="$(arg robot_description_file)">
     <arg name="robot_description" value="$(arg robot_description)"/>
     <arg name="mir_prefix" value="$(arg mir_prefix)"/>
-    <arg name="arm_prefix" value="$(arg arm_prefix)"/>
+    <arg name="ur5e_prefix" value="$(arg ur5e_prefix)"/>
     <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
   </include>
 
   <!-- The semantic description that corresponds to the URDF -->
   <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro '$(find mirco_moveit_config)/config/mirco_robot.srdf.xacro' 
     mir_prefix:=$(arg mir_prefix)
-    arm_prefix:=$(arg arm_prefix)
+    ur5e_prefix:=$(arg ur5e_prefix)
     gripper_prefix:=$(arg gripper_prefix)" 
     />
 

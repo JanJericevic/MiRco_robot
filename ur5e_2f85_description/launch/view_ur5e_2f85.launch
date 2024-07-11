@@ -1,11 +1,11 @@
 <?xml version="1.0"?>
 <launch>
   <!-- set robot and gripper prefixes -->
-  <arg name="arm_prefix" default=""/>
+  <arg name="ur5e_prefix" default=""/>
   <arg name="gripper_prefix" default=""/>
   <!-- load urdf -->
   <include file="$(find ur5e_2f85_description)/launch/load_ur5e_2f85.launch">
-    <arg name="arm_prefix" value="$(arg arm_prefix)"/>
+    <arg name="ur5e_prefix" value="$(arg ur5e_prefix)"/>
     <arg name="gripper_prefix" value="$(arg gripper_prefix)"/>
   </include>
   <!-- start joint state and robot state publishers -->

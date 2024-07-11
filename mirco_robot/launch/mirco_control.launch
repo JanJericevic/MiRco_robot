@@ -6,8 +6,8 @@
   <arg name="mir_namespace" default="/mir100" doc="MiR namespace"/>
   <arg name="mir_prefix" default="mir100_" doc="TF prefix to use for all of the MiR TF frames"/>
   <!-- ur5e args -->
-  <arg name="arm_namespace" default="/ur5e" doc="robot arm namespace"/>
-  <arg name="arm_prefix" default="ur5e_" doc="TF prefix to use for all of the UR5e TF frames"/>
+  <arg name="ur5e_namespace" default="/ur5e" doc="robot arm namespace"/>
+  <arg name="ur5e_prefix" default="ur5e_" doc="TF prefix to use for all of the UR5e TF frames"/>
   <!-- gripper args -->
   <arg name="gripper_prefix" default="2f85_" doc="TF prefix to use for all of the gripper TF frames"/>
    <!-- rviz -->
@@ -16,26 +16,26 @@
   <!-- namespace of the robot base -->
   <group ns="$(arg namespace)$(arg mir_namespace)">
 
-    <!-- launch mir control node. provides services for saving mobile robot poses(goals) and sending robot to target goals-->
+    <!-- launch mir control node. provides services for saving mobile robot poses and sending robot to target goals-->
     <node name="mir_control_node" pkg="mir_control" type="mir_control_node.py" respawn="false"  output="screen" />
     
   </group>
 
   <!-- namespace of the robot arm + gripper-->
-  <group ns="$(arg namespace)$(arg arm_namespace)">
+  <group ns="$(arg namespace)$(arg ur5e_namespace)">
 
     <!-- launch moveit -->
     <include file="$(find mirco_moveit_config)/launch/move_group.launch">
       <arg name="debug" value="$(arg debug)" />
       <arg name="namespace" value="$(arg namespace)" />
       <arg name="mir_prefix" value="$(arg mir_prefix)" />
-      <arg name="arm_prefix" value="$(arg arm_prefix)" />
+      <arg name="ur5e_prefix" value="$(arg ur5e_prefix)" />
       <arg name="gripper_prefix" value="$(arg gripper_prefix)" />
     </include>
 
-    <include file="$(find mirco_robot)/launch/view_mirco.launch">
+    <!-- <include file="$(find mirco_robot)/launch/view_mirco.launch">
       <arg name="rviz_config" value="$(arg rviz_config)"/>
-    </include>
+    </include> -->
 
   </group>
 

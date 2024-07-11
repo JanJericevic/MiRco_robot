@@ -2,7 +2,7 @@
   <!-- This file summarizes all settings required for trajectory execution  -->
 
   <!-- robot prefixes -->
-  <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="ur5e_prefix" default="" doc="TF prefix for robot arm"/>
   <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
 
   <!-- Define moveit controller manager plugin: fake, simple, or ros_control -->

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="namespace" doc="namespace for all topics"/>
-  <arg name="arm_prefix" doc="prefix for robot arm"/>
+  <arg name="ur5e_prefix" doc="prefix for robot arm"/>
   <arg name="gripper_prefix" doc="prefix for robot gripper"/>
 
   <!-- GDB functionality -->

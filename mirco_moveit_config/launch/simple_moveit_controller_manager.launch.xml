@@ -2,7 +2,7 @@
 
   <!-- robot prefixes -->
   <arg name="mir_prefix" default="" doc="TF prefix for robot arm"/>
-  <arg name="arm_prefix" default="" doc="TF prefix for robot arm"/>
+  <arg name="ur5e_prefix" default="" doc="TF prefix for robot arm"/>
   <arg name="gripper_prefix" default="" doc="TF prefix for robot gripper"/>
 
   <!-- Define the MoveIt controller manager plugin to use for trajectory execution -->

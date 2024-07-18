@@ -13,7 +13,7 @@ def send2goal(service_name, target_goal):
     try:
         goal_service = rospy.ServiceProxy(service_name, GoToGoal)
         result = goal_service(target_goal) 
-        print(result)
+        # print(result)
 
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
@@ -22,7 +22,7 @@ def dock2marker(service_name, marker):
     try:
         docking_service = rospy.ServiceProxy(service_name, DockToMarker)
         result = docking_service(marker) 
-        print(result)
+        # print(result)
 
     except rospy.ServiceException as e:
         print("Service call failed: %s"%e)
@@ -63,44 +63,79 @@ def main():
     docking_service_name = namespace + robot_base_namespace + "/mir_control_node/dock_to_vl_marker"
     rospy.wait_for_service(goal_service_name)
     rospy.wait_for_service(docking_service_name)
+
     
     # ------- DELIVERY -------
-    rospy.sleep(3)
-    # send mir to start position
-    send2goal(goal_service_name,"start")
-    # dock mir to marker
-    dock2marker(docking_service_name,"delivery_marker")
+    for i in range(1):
 
-    # pick and place sequence
-    pose_list = [
-        "zobnik1_pickup",
-        "zobnik1_entry",
-        "conveyor_start",
-        "conveyor_entry_testing",
-        "conveyor_place_testing",
-        "conveyor_entry_testing",
-        "conveyor_start"
-    ]
+        rospy.sleep(3)
+        # send mir to start position
+        # send2goal(goal_service_name,"start")
+        # dock mir to marker
+        dock2marker(docking_service_name,"delivery_marker")
+        
 
-    for idx, pose in enumerate(pose_list):
-        print(pose)
-        joint_state = ur5e_arm.teacher_get_pose(pose)
-        if idx >=1 and pose_list[idx-1] == "conveyor_start" and pose_list[idx] == "conveyor_entry_testing":
-            ur5e_arm.move_j(joint_state)
-        elif idx >=1 and pose_list[idx-1] == "conveyor_entry_testing" and pose_list[idx] == "conveyor_start":
-            ur5e_arm.move_j(joint_state)
-        else:
-            ur5e_arm.move_l(joint_state)
-        if "pickup" in pose:
-            gripper.close()
-        if "place" in pose:
-            gripper.open()
+        # pick and place sequence
+        pose_list_1 = [
+            "zobnik1_entry",
+            "zobnik1_pickup",
+            "zobnik1_entry",
+            "conveyor_start",
+            "conveyor_entry",
+            "conveyor_place",
+            "conveyor_entry",
+            "conveyor_start",
+            "home"
+        ]
 
-    ur5e_arm.set_named_pose("home")
-    rospy.sleep(3)
+        for idx, pose in enumerate(pose_list_1):
+            joint_state = ur5e_arm.teacher_get_pose(pose)
+            if idx >=1 and pose_list_1[idx-1] == "conveyor_start" and pose_list_1[idx] == "conveyor_entry":
+                ur5e_arm.move_j(joint_state)
+            elif idx >=1 and pose_list_1[idx-1] == "conveyor_entry" and pose_list_1[idx] == "conveyor_start":
+                ur5e_arm.move_j(joint_state)
+            else:
+                ur5e_arm.move_l(joint_state)
+            if "pickup" in pose:
+                gripper.close()
+            if "place" in pose:
+                gripper.open()
 
-    # send mir to end position
-    send2goal(goal_service_name,"end")
+        # send mir to start position
+        send2goal(goal_service_name,"start")
+        # dock mir to marker
+        dock2marker(docking_service_name,"delivery_marker")
+
+        pose_list_2 = [
+            "conveyor_start",
+            "conveyor_entry",
+            "conveyor_pickup",
+            "conveyor_entry",
+            "conveyor_start",
+            "zobnik1_entry",
+            "zobnik1_place",
+            "zobnik1_entry",
+            "home"
+        ]
+
+        for idx, pose in enumerate(pose_list_2):
+            joint_state = ur5e_arm.teacher_get_pose(pose)
+            if idx >=1 and pose_list_2[idx-1] == "conveyor_start" and pose_list_2[idx] == "conveyor_entry":
+                ur5e_arm.move_j(joint_state)
+            elif idx >=1 and pose_list_2[idx-1] == "conveyor_entry" and pose_list_2[idx] == "conveyor_start":
+                ur5e_arm.move_j(joint_state)
+            else:
+                ur5e_arm.move_l(joint_state)
+            if "pickup" in pose:
+                gripper.close()
+            if "place" in pose:
+                gripper.open()
+
+        rospy.sleep(10)
+        # send mir to start position
+        send2goal(goal_service_name,"start")
+
+        i = i+1
 
 
     # rospy.spin()

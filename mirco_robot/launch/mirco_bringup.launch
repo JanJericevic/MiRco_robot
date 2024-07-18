@@ -4,7 +4,7 @@
   <arg name="robot_joint_sources_file" default="$(find mirco_robot)/config/robot_joint_sources.yml" doc="robot joint state publisher sources file"/>
   <arg name="arm_gripper_joint_sources_file" default="$(find mirco_robot)/config/arm_gripper_joint_sources.yml" doc="robot arm and gripper joint state publisher sources file"/>
   <!-- mir args -->
-  <arg name="mir_ip" default="192.168.65.173" doc="MiR IP address"/>
+  <arg name="mir_ip" default="192.168.65.160" doc="MiR IP address"/>
   <arg name="mir_type" default="mir_100" doc="MiR variant. Can be 'mir_100' or 'mir_250'"/>
   <arg name="mir_namespace" default="/mir100" doc="MiR namespace"/>
   <arg name="mir_prefix" default="mir100_" doc="TF prefix to use for all of the MiR TF frames"/>
@@ -20,7 +20,7 @@
   <arg name="gripper_prefix" default="2f85_" doc="TF prefix to use for all of the gripper TF frames"/>
 
   <!-- load prefixes to the parameter server for convenience -->
-  <param name="robot_base_ip" value="$(arg mir_ip)" />
+  <param name="mir_ip" value="$(arg mir_ip)" />
   <param name="robot_namespace" value="$(arg namespace)" />
   <param name="robot_base_namespace" value="$(arg mir_namespace)" />
   <param name="robot_base_prefix" value="$(arg mir_prefix)" />

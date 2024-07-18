@@ -5,12 +5,12 @@ hardware_control_loop:
 # Settings for ros_control hardware interface
 ur_hardware_interface:
    joints: &robot_joints
-     - $(arg arm_prefix)shoulder_pan_joint
-     - $(arg arm_prefix)shoulder_lift_joint
-     - $(arg arm_prefix)elbow_joint
-     - $(arg arm_prefix)wrist_1_joint
-     - $(arg arm_prefix)wrist_2_joint
-     - $(arg arm_prefix)wrist_3_joint
+     - $(arg ur5e_prefix)shoulder_pan_joint
+     - $(arg ur5e_prefix)shoulder_lift_joint
+     - $(arg ur5e_prefix)elbow_joint
+     - $(arg ur5e_prefix)wrist_1_joint
+     - $(arg ur5e_prefix)wrist_2_joint
+     - $(arg ur5e_prefix)wrist_3_joint
 
 # Publish all joint states ----------------------------------
 joint_state_controller:
@@ -35,12 +35,12 @@ scaled_pos_joint_traj_controller:
    constraints:
       goal_time: 0.6
       stopped_velocity_tolerance: 0.05
-      $(arg arm_prefix)shoulder_pan_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)shoulder_lift_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)elbow_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)wrist_1_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)wrist_2_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)wrist_3_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_pan_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_lift_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)elbow_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)wrist_1_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)wrist_2_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)wrist_3_joint: {trajectory: 0.2, goal: 0.1}
    stop_trajectory_duration: 0.5
    state_publish_rate: *loop_hz
    action_monitor_rate: 20
@@ -51,12 +51,12 @@ pos_joint_traj_controller:
    constraints:
       goal_time: 0.6
       stopped_velocity_tolerance: 0.05
-      $(arg arm_prefix)shoulder_pan_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)shoulder_lift_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)elbow_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)wrist_1_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)wrist_2_joint: {trajectory: 0.2, goal: 0.1}
-      $(arg arm_prefix)wrist_3_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_pan_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_lift_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)elbow_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)wrist_1_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)wrist_2_joint: {trajectory: 0.2, goal: 0.1}
+      $(arg ur5e_prefix)wrist_3_joint: {trajectory: 0.2, goal: 0.1}
    stop_trajectory_duration: 0.5
    state_publish_rate: *loop_hz
    action_monitor_rate: 20
@@ -67,28 +67,28 @@ scaled_vel_joint_traj_controller:
    constraints:
       goal_time: 0.6
       stopped_velocity_tolerance: 0.05
-      $(arg arm_prefix)shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)elbow_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)wrist_1_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)wrist_2_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)elbow_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)wrist_3_joint: {trajectory: 0.1, goal: 0.1}
    gains:
       #!!These values have not been optimized!!
-      $(arg arm_prefix)shoulder_pan_joint:  {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)shoulder_lift_joint: {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)elbow_joint:         {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)wrist_1_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)wrist_2_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)wrist_3_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)shoulder_pan_joint:  {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)shoulder_lift_joint: {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)elbow_joint:         {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)wrist_1_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)wrist_2_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)wrist_3_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
    # Use a feedforward term to reduce the size of PID gains
    velocity_ff:
-      $(arg arm_prefix)shoulder_pan_joint: 1.0
-      $(arg arm_prefix)shoulder_lift_joint: 1.0
-      $(arg arm_prefix)elbow_joint: 1.0
-      $(arg arm_prefix)wrist_1_joint: 1.0
-      $(arg arm_prefix)wrist_2_joint: 1.0
-      $(arg arm_prefix)wrist_3_joint: 1.0
+      $(arg ur5e_prefix)shoulder_pan_joint: 1.0
+      $(arg ur5e_prefix)shoulder_lift_joint: 1.0
+      $(arg ur5e_prefix)elbow_joint: 1.0
+      $(arg ur5e_prefix)wrist_1_joint: 1.0
+      $(arg ur5e_prefix)wrist_2_joint: 1.0
+      $(arg ur5e_prefix)wrist_3_joint: 1.0
    stop_trajectory_duration: 0.5
    state_publish_rate: *loop_hz
    action_monitor_rate: 20
@@ -99,28 +99,28 @@ vel_joint_traj_controller:
    constraints:
       goal_time: 0.6
       stopped_velocity_tolerance: 0.05
-      $(arg arm_prefix)shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)elbow_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)wrist_1_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)wrist_2_joint: {trajectory: 0.1, goal: 0.1}
-      $(arg arm_prefix)wrist_3_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_pan_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)shoulder_lift_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)elbow_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)wrist_1_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)wrist_2_joint: {trajectory: 0.1, goal: 0.1}
+      $(arg ur5e_prefix)wrist_3_joint: {trajectory: 0.1, goal: 0.1}
    gains:
       #!!These values have not been optimized!!
-      $(arg arm_prefix)shoulder_pan_joint:  {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)shoulder_lift_joint: {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)elbow_joint:         {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)wrist_1_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)wrist_2_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
-      $(arg arm_prefix)wrist_3_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)shoulder_pan_joint:  {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)shoulder_lift_joint: {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)elbow_joint:         {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)wrist_1_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)wrist_2_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
+      $(arg ur5e_prefix)wrist_3_joint:       {p: 5.0,  i: 0.05, d: 0.1, i_clamp: 1}
    # Use a feedforward term to reduce the size of PID gains
    velocity_ff:
-      $(arg arm_prefix)shoulder_pan_joint: 1.0
-      $(arg arm_prefix)shoulder_lift_joint: 1.0
-      $(arg arm_prefix)elbow_joint: 1.0
-      $(arg arm_prefix)wrist_1_joint: 1.0
-      $(arg arm_prefix)wrist_2_joint: 1.0
-      $(arg arm_prefix)wrist_3_joint: 1.0
+      $(arg ur5e_prefix)shoulder_pan_joint: 1.0
+      $(arg ur5e_prefix)shoulder_lift_joint: 1.0
+      $(arg ur5e_prefix)elbow_joint: 1.0
+      $(arg ur5e_prefix)wrist_1_joint: 1.0
+      $(arg ur5e_prefix)wrist_2_joint: 1.0
+      $(arg ur5e_prefix)wrist_3_joint: 1.0
    stop_trajectory_duration: 0.5
    state_publish_rate: *loop_hz
    action_monitor_rate: 20
@@ -140,7 +140,7 @@ forward_cartesian_traj_controller:
 
 twist_controller:
   type: "ros_controllers_cartesian/TwistController"
-  frame_id: "$(arg arm_prefix)tool0_controller"
+  frame_id: "$(arg ur5e_prefix)tool0_controller"
   publish_rate: *loop_hz
   joints: *robot_joints
 
@@ -148,16 +148,16 @@ pose_based_cartesian_traj_controller:
     type: pose_controllers/CartesianTrajectoryController
 
     # UR driver convention
-    base: $(arg arm_prefix)base
-    tip: $(arg arm_prefix)tool0_controller
+    base: $(arg ur5e_prefix)base
+    tip: $(arg ur5e_prefix)tool0_controller
     joints: *robot_joints
 
 joint_based_cartesian_traj_controller:
     type: position_controllers/CartesianTrajectoryController
 
     # UR driver convention
-    base: $(arg arm_prefix)base
-    tip: $(arg arm_prefix)tool0
+    base: $(arg ur5e_prefix)base
+    tip: $(arg ur5e_prefix)tool0
     joints: *robot_joints
 
 robot_status_controller:

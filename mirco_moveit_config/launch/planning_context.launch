@@ -25,7 +25,7 @@
   <!-- The semantic description that corresponds to the URDF -->
   <param name="$(arg robot_description)_semantic" command="$(find xacro)/xacro '$(find mirco_moveit_config)/config/mirco_robot.srdf.xacro' 
     mir_prefix:=$(arg mir_prefix)
-    ur5e_prefix:=$(arg ur5e_prefix)
+    arm_prefix:=$(arg ur5e_prefix)
     gripper_prefix:=$(arg gripper_prefix)" 
     />
 

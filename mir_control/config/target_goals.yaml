@@ -1,12 +1,32 @@
-delivery_test:
+Pos_2:
   orientation:
-    w: 0.7109529138748157
+    w: 0.7030720798299189
     x: 0.0
     y: 0.0
-    z: 0.7032396136829244
+    z: -0.7111185910687696
   position:
-    x: 15.901
-    y: 12.117
+    x: 17.7
+    y: 12.7
+    z: 0
+Pos_3:
+  orientation:
+    w: 0.9063077870366499
+    x: 0.0
+    y: 0.0
+    z: -0.42261826174069944
+  position:
+    x: 18.55
+    y: 10.8
+    z: 0
+Pos_start:
+  orientation:
+    w: 0.0112920402716304
+    x: 0.0
+    y: 0.0
+    z: -0.9999362428807668
+  position:
+    x: 21.218
+    y: 13.802
     z: 0
 end:
   orientation:
@@ -15,8 +35,68 @@ end:
     y: 0.0
     z: 0.7071067811865475
   position:
-    x: 15.55
-    y: 9.35
+    x: 15.4
+    y: 10.75
+    z: 0
+robolab_1:
+  orientation:
+    w: 0.38268343236508984
+    x: 0.0
+    y: 0.0
+    z: -0.9238795325112867
+  position:
+    x: 23.25
+    y: 19.45
+    z: 0
+robolab_2:
+  orientation:
+    w: 0.340428783117644
+    x: 0.0
+    y: 0.0
+    z: -0.9402703034899274
+  position:
+    x: 21.15
+    y: 14.4
+    z: 0
+robolab_dvigalo:
+  orientation:
+    w: 0.7071067811865476
+    x: 0.0
+    y: 0.0
+    z: 0.7071067811865475
+  position:
+    x: 7.15
+    y: 20.65
+    z: 0
+robolab_sredina:
+  orientation:
+    w: 0.7071067811865476
+    x: 0.0
+    y: 0.0
+    z: -0.7071067811865475
+  position:
+    x: 17.85
+    y: 11.0
+    z: 0
+robolab_tunel_1:
+  orientation:
+    w: 1.0
+    x: 0.0
+    y: 0.0
+    z: 0.0
+  position:
+    x: 7.15
+    y: 23.0
+    z: 0
+robolab_tunel_2:
+  orientation:
+    w: 0.7071067811865476
+    x: 0.0
+    y: 0.0
+    z: -0.7071067811865475
+  position:
+    x: 27.4
+    y: 22.35
     z: 0
 start:
   orientation:
@@ -25,6 +105,6 @@ start:
     y: 0.0
     z: -0.7071067811865475
   position:
-    x: 14.0
-    y: 12.55
+    x: 14.55
+    y: 12.4
     z: 0

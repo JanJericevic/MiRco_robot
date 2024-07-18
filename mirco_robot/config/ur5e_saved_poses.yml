@@ -12,6 +12,13 @@ conveyor_entry_testing:
   ur5e_wrist_1_joint: -1.8472730122008265
   ur5e_wrist_2_joint: 1.563146710395813
   ur5e_wrist_3_joint: -1.504554573689596
+conveyor_pickup:
+  ur5e_elbow_joint: -0.8290176391601562
+  ur5e_shoulder_lift_joint: -2.341555257836813
+  ur5e_shoulder_pan_joint: -1.6053641478167933
+  ur5e_wrist_1_joint: -1.5575509781813999
+  ur5e_wrist_2_joint: 1.570508360862732
+  ur5e_wrist_3_joint: -1.617786709462301
 conveyor_pickup_testing:
   ur5e_elbow_joint: -1.1644225120544434
   ur5e_shoulder_lift_joint: -2.1397482357420863

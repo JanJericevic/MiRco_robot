@@ -69,11 +69,6 @@ def main():
     for i in range(1):
 
         rospy.sleep(7)
-        # send mir to start position
-        # send2goal(goal_service_name,"start")
-        # dock mir to marker
-        # dock2marker(docking_service_name,"delivery_marker")
-        
 
         # pick and place sequence
         pose_list_1 = [
@@ -109,14 +104,8 @@ def main():
                 gripper.open()
             
             rospy.sleep(1)
-                
-        # send mir to start position
-        # send2goal(goal_service_name,"start")
         
         i = i+1
-
-
-
 
     # rospy.spin()
 

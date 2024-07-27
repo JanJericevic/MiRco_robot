@@ -1,3 +1,0 @@
-source_list:
-  - $(arg namespace)$(arg mir_namespace)/mir_joint_states
-  - $(arg namespace)$(arg ur5e_namespace)/joint_states

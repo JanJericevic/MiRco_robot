@@ -1,0 +1,3 @@
+source_list:
+  - $(arg mirco_namespace)$(arg mir_namespace)/mir_joint_states
+  - $(arg mirco_namespace)$(arg ur5e_namespace)/joint_states

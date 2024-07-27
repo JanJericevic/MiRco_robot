@@ -1,3 +1,0 @@
-source_list:
-  - $(arg namespace)$(arg ur5e_namespace)/arm_joint_states
-  - $(arg namespace)$(arg ur5e_namespace)/gripper_joint_states

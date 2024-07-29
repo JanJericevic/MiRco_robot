@@ -32,7 +32,7 @@ class GoalTeacher(object):
         self.tf_listener.waitForTransform("/map", self.mobile_frame, rospy.Time(), rospy.Duration(4.0))
 
         # provide a service to save a target goal
-        # self.save_goal_server = rospy.Service("~save_mobile_goal", SaveGoal, self.save_target_goal)
+        self.save_goal_server = rospy.Service("~save_mobile_goal", SaveGoal, self.save_target_goal)
 
         # provide a service to get a target goal
         self.get_goal_server = rospy.Service("~get_mobile_goal", GetGoal, self.get_target_goal)

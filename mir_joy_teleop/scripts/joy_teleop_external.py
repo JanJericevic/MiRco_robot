@@ -111,17 +111,16 @@ def main():
 
     print("""
     Set your MiR interface User Name and Password.
-    If using other network than MiR100 internal network set robot IP.
+    Set robot IP
     """)
 
-    # set the MiR100 ip
-    ip = "193.2.177.115"
+    # get the MiR100 ip
+    mir_ip = rospy.get_param("/mir_ip")
 
     # if using ROS service for REST requests
     # rospy.wait_for_service('mir_rest_api_service')
 
-    api = MirRestApi("UserName", "Password")  
-    # api = MirRestApi("UserName", "Password", ip) # when setting robot IP
+    api = MirRestApi("UserName", "Password", mir_ip)  
     
     rospy.init_node('joy_teleop_node', anonymous=True)
     jt = JoyTeleop(api)

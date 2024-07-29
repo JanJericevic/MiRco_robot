@@ -3,6 +3,8 @@
   <arg name="device" default="js0" />
   <!-- select which roscore controls the robot: internal(MiR100) / external(mir_driver). Affects message type for /cmd_vel  -->
   <arg name="roscore" default="internal" />
+  <!-- set robot args -->
+  <arg name="mir_namespace" default="/mir100" doc="MiR namespace" />
 
   <!-- joy node -->
   <!-- select correct input device -->
@@ -14,5 +16,5 @@
 
   <!-- teleop node -->
   <node pkg="mir_joy_teleop" type="joy_teleop_internal.py" name="joy_teleop_node" output="screen" if="$(eval roscore == 'internal')" />
-  <node pkg="mir_joy_teleop" type="joy_teleop_external.py" name="joy_teleop_node" output="screen" if="$(eval roscore == 'external')" />
+  <node pkg="mir_joy_teleop" type="joy_teleop_external.py" name="joy_teleop_node" output="screen" if="$(eval roscore == 'external')" ns="$(arg mir_namespace)" />
 </launch>

@@ -167,7 +167,7 @@ class MiR100:
         """Wait for result function.
 
         When docking the robot with the helper mission (see dock_to_vl_marker function), MiR does not publish a goal to the move base action server. 
-        Because of this the the actionlib.SimpleActionClient.wait_for_result() does not work.
+        Because of this the actionlib.SimpleActionClient.wait_for_result() does not work.
 
         :param timeout: timeout, defaults to rospy.Duration()
         :type timeout: Duration, optional
@@ -723,7 +723,7 @@ class MiR100:
 def main():
     rospy.init_node('mir_robot_node')
     try:
-        mir_ip = "192.168.65.179"
+        mir_ip = "set MiR100_IP"
         mir = MiR100(use_api=True, api_uname="UserName", api_pass="Password", mir_ip=mir_ip)
 
     except rospy.ServiceException as e:

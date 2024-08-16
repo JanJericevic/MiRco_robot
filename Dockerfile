@@ -7,12 +7,12 @@ RUN apt update \
     && apt install -y net-tools wireless-tools iproute2 arp-scan nmap sudo python3-pip nano git \
     && apt install -y --no-install-recommends build-essential python3-rosdep python3-catkin-lint python3-catkin-tools python3-wstool 
 RUN apt install -y ros-noetic-moveit
-# RUN apt update \
-#     && apt install -y ros-noetic-universal-robots
+# ur driver
 RUN apt update \
     && apt install -y ros-noetic-ur-robot-driver ros-noetic-ur-calibration ros-noetic-ur-calibration-dbgsym
+# robotiq dependencies
 RUN apt update \
-    && apt-get install -y ros-noetic-soem
+    && apt-get install -y ros-noetic-soem robotiq_modbus_tcp
 
 # update and install python packages
 RUN python3 -m pip install --upgrade pip setuptools wheel \

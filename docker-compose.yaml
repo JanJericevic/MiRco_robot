@@ -17,7 +17,7 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix  # X11 socket for display forwarding
       - /dev/dri:/dev/dri  # Direct rendering access to the GPU
-      - /home/user/ws/MiRco/src:/home/user/ws/src:rw
+      - /home/user/ws/MiRco/src:/home/user/ws/src:rw # mounts directory as volume
     devices:
       - /dev/input:/dev/input # mount input devices. for example a joystick
     runtime: nvidia  # Use NVIDIA runtime

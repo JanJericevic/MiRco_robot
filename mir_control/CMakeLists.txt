@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   sensor_msgs
   trajectory_msgs
+  mir_rest_api
 )
 
 ## System dependencies are found with CMake's conventions
@@ -115,7 +116,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES mir_control
-  CATKIN_DEPENDS actionlib actionlib_msgs rospy std_msgs message_runtime geometry_msgs sensor_msgs trajectory_msgs
+  CATKIN_DEPENDS actionlib actionlib_msgs rospy std_msgs message_runtime geometry_msgs sensor_msgs trajectory_msgs mir_rest_api
 #  DEPENDS system_lib
 )
 

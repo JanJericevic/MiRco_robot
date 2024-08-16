@@ -9,6 +9,9 @@ project(mirco_robot)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   rospy
+  mir_control
+  mir_rest_api
+  ur5e_2f85
 )
 
 ## System dependencies are found with CMake's conventions
@@ -103,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES mirco_robot
-#  CATKIN_DEPENDS rospy
+ CATKIN_DEPENDS rospy mir_control mir_rest_api ur5e_2f85
 #  DEPENDS system_lib
 )
 

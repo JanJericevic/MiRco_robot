@@ -11,6 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   joy
   rospy
   std_msgs
+  mir_rest_api
 )
 
 ## System dependencies are found with CMake's conventions
@@ -105,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES mir_joy_teleop
-  CATKIN_DEPENDS joy rospy std_msgs
+  CATKIN_DEPENDS joy rospy std_msgs mir_rest_api
 #  DEPENDS system_lib
 )
 

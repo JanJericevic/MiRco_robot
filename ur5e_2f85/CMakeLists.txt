@@ -11,9 +11,11 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   actionlib
   moveit_msgs
+  moveit
   sensor_msgs
   trajectory_msgs
   message_generation
+  robotiq_2f_gripper_control
 )
 
 ## System dependencies are found with CMake's conventions
@@ -110,7 +112,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES ur5e_2f85
-  CATKIN_DEPENDS CATKIN_DEPENDS rospy actionlib moveit_msgs sensor_msgs trajectory_msgs message_runtime
+  CATKIN_DEPENDS CATKIN_DEPENDS rospy actionlib moveit_msgs moveit sensor_msgs trajectory_msgs message_runtime robotiq_2f_gripper_control
 #  DEPENDS system_lib
 )
 

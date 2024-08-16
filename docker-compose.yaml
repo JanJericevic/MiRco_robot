@@ -1,0 +1,24 @@
+services:
+  MiRco:
+    image: mirco_docker
+    container_name: mirco_container
+    stdin_open: true  # equivalent to `-i`
+    tty: true         # equivalent to `-t`
+    entrypoint: /ros_entrypoint.sh
+    command: bash
+    network_mode: host  # Use host network
+    environment:
+      - DISPLAY=${DISPLAY}  # Forward the X11 display
+      - QT_X11_NO_MITSHM=1  # Prevent issues with shared memory in some cases
+      - NVIDIA_VISIBLE_DEVICES=all  # Expose all GPUs to the container
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility,video,graphics  # Enable all relevant GPU capabilities
+      - ROS_LOCALHOST_ONLY=1
+      - QT_SCALE_FACTOR=3
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix  # X11 socket for display forwarding
+      - /dev/dri:/dev/dri  # Direct rendering access to the GPU
+      - /home/user/ws/MiRco/src:/home/user/ws/src:rw
+    devices:
+      - /dev/input:/dev/input # mount input devices. for example a joystick
+    runtime: nvidia  # Use NVIDIA runtime
+

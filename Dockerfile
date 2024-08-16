@@ -4,7 +4,7 @@ FROM osrf/ros:noetic-desktop-full
 # update and install packages
 RUN apt update \
     && apt upgrade -y \
-    && apt install -y net-tools wireless-tools iproute2 arp-scan nmap sudo python3-pip nano git \
+    && apt install -y net-tools wireless-tools iproute2 arp-scan nmap sudo python3-pip python3-dev nano git \
     && apt install -y --no-install-recommends build-essential python3-rosdep python3-catkin-lint python3-catkin-tools python3-wstool 
 RUN apt install -y ros-noetic-moveit
 # ur driver
@@ -15,7 +15,7 @@ RUN apt update \
     && apt-get install -y ros-noetic-soem
 
 # update and install python packages
-RUN python3 -m pip install --upgrade pip setuptools wheel \
+RUN python3 -m pip install --upgrade pip setuptools importlib_metadata wheel \
     && python3 -m pip install virtualenv requests scipy
 
 # clean up the apt cache

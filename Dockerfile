@@ -12,7 +12,7 @@ RUN apt update \
     && apt install -y ros-noetic-ur-robot-driver ros-noetic-ur-calibration ros-noetic-ur-calibration-dbgsym
 # robotiq dependencies
 RUN apt update \
-    && apt-get install -y ros-noetic-soem robotiq_modbus_tcp
+    && apt-get install -y ros-noetic-soem
 
 # update and install python packages
 RUN python3 -m pip install --upgrade pip setuptools wheel \
